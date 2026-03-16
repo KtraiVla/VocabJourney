@@ -39,7 +39,7 @@ Người học sử dụng hệ thống để:
 
 - Đăng ký tài khoản
 - Đăng nhập hệ thống
-- Học từ vựng theo bài học
+- Học từ vựng theo chủ đề
 - Làm bài quiz
 - Theo dõi tiến độ học tập
 - Nhận điểm thưởng và tăng level
