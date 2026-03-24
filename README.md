@@ -1,4 +1,4 @@
-# DoAn3_VocabJourney
+# VocabJourney
 # 📚 ĐỒ ÁN 3: XÂY DỰNG WEBSITE HỌC TỪ VỰNG TIẾNG ANH TRỰC TUYẾN
 
 ## 1. Giới thiệu
