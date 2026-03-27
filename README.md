@@ -78,7 +78,6 @@ Hệ thống cần hỗ trợ các chức năng:
 Thông tin người dùng được lưu trữ để cá nhân hóa trải nghiệm học tập.
 
 
-
 # 4.2 Quản lý từ vựng và bài học
 
 Cơ sở dữ liệu từ vựng bao gồm:
@@ -131,8 +130,6 @@ Hệ thống ghi nhận các dữ liệu học tập của người dùng:
 
 Gamification giúp tăng động lực học tập thông qua các yếu tố trò chơi.
 
----
-
 ## 5.1 Hệ thống điểm (Points)
 
 Người dùng nhận điểm khi:
@@ -152,8 +149,6 @@ Trong đó:
 - $P_{lesson}$: điểm khi hoàn thành bài học
 - $P_{quiz}$: điểm khi hoàn thành quiz
 - $P_{challenge}$: điểm khi hoàn thành thử thách
-
-
 
 # 5.2 Hệ thống Level
 
@@ -192,8 +187,6 @@ Ví dụ:
 | Beginner | Học 20 từ |
 | Quiz Master | Hoàn thành 10 quiz |
 | Dedicated Learner | Học liên tục 7 ngày |
-
-
 
 # 5.4 Hệ thống Streak
 
@@ -238,7 +231,6 @@ Reward = BaseXP \times Difficulty
 $$
 
 
-
 # 5.6 Hệ thống Achievement (Thành tích)
 
 Achievement ghi nhận các cột mốc học tập quan trọng.
@@ -278,7 +270,6 @@ $$
 Phương pháp này giúp người học ôn tập từ vựng **trước khi quên hoàn toàn**.
 
 
-
 # 7. Kiến trúc hệ thống
 
 Hệ thống bao gồm các thành phần:
@@ -294,7 +285,6 @@ Công nghệ có thể sử dụng:
 - Frontend: HTML, CSS, JavaScript
 - Backend: NodeJS / PHP / ASP.net
 - Database: MySQL / PostgreSQL
-
 
 
 # 8. Thiết kế cơ sở dữ liệu (Concept)
@@ -321,7 +311,6 @@ Các bảng này giúp quản lý:
 - Hệ thống gamification
 
 
-
 # 9. Yêu cầu chức năng
 
 Hệ thống cần hỗ trợ các chức năng chính:
@@ -334,7 +323,6 @@ Hệ thống cần hỗ trợ các chức năng chính:
 - Tích hợp gamification
 
 
-
 # 10. Yêu cầu phi chức năng
 
 Hệ thống cần đảm bảo:
@@ -343,7 +331,6 @@ Hệ thống cần đảm bảo:
 - Tốc độ truy cập nhanh
 - Dữ liệu được lưu trữ an toàn
 - Có khả năng mở rộng khi số lượng người dùng tăng
-
 
 
 # 11. Thống kê học tập
@@ -358,8 +345,6 @@ $$
 Accuracy = \frac{CorrectAnswers}{TotalAnswers} \times 100\%
 $$
 
-
-
 # 12. Hướng phát triển trong tương lai
 
 Một số hướng phát triển có thể mở rộng:
@@ -369,8 +354,6 @@ Một số hướng phát triển có thể mở rộng:
 - Bảng xếp hạng người học
 - Hệ thống bạn bè
 - Ứng dụng di động
-
-
 
 # 13. Kết luận
 
