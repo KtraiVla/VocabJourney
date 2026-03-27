@@ -17,7 +17,6 @@ Hệ thống giúp người học:
 Việc kết hợp giữa học tập và gamification giúp tăng **động lực học tập**, giúp người học duy trì việc học lâu dài và hiệu quả hơn.
 
 
-
 # 2. Mục tiêu của hệ thống
 
 Hệ thống được xây dựng với các mục tiêu sau:
@@ -28,7 +27,6 @@ Hệ thống được xây dựng với các mục tiêu sau:
 - Theo dõi tiến độ học tập của người dùng
 - Tăng động lực học tập thông qua Gamification
 - Áp dụng phương pháp **Spaced Repetition** để ghi nhớ từ vựng hiệu quả hơn
-
 
 
 # 3. Đối tượng sử dụng hệ thống
@@ -97,7 +95,6 @@ Các từ vựng được tổ chức thành:
 Điều này giúp người học tiếp cận từ vựng theo từng bước và dễ dàng ghi nhớ hơn.
 
 
-
 # 4.3 Hệ thống Quiz
 
 Hệ thống cung cấp các bài kiểm tra để đánh giá kiến thức từ vựng của người học.
@@ -112,7 +109,6 @@ Các dạng câu hỏi gồm:
 Kết quả bài quiz sẽ được lưu để phân tích tiến độ học tập.
 
 
-
 # 4.4 Theo dõi tiến độ học tập
 
 Hệ thống ghi nhận các dữ liệu học tập của người dùng:
@@ -123,7 +119,6 @@ Hệ thống ghi nhận các dữ liệu học tập của người dùng:
 - Kết quả bài quiz
 
 Điều này giúp người học theo dõi sự tiến bộ của mình và ôn tập lại các nội dung chưa nắm vững.
-
 
 
 # 5. Hệ thống Gamification
@@ -242,7 +237,6 @@ Ví dụ:
 - Duy trì streak 30 ngày
 
 Các thành tích được lưu trong hồ sơ người dùng.
-
 
 
 # 6. Hệ thống ôn tập từ vựng thông minh (Spaced Repetition)
