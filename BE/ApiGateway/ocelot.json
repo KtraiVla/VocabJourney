@@ -1,3 +1,42 @@
 {
-
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/auth/{catchAll}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7251 // thay bằng số cổng của project
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/auth/{catchAll}",
+      "UpstreamHttpMethod": [
+        "Get",
+        "Post",
+        "Put",
+        "Delete"
+      ]
+    },
+    // Cấu hình cho dự án
+    {
+      "DownstreamPathTemplate": "/api/{catchAll}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7050 // thay bằng số cổng của project
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/{catchAll}",
+      "UpstreamHttpMethod": [
+        "Get",
+        "Post",
+        "Put",
+        "Delete"
+      ]
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:7245" // thay số 5000 bằng cổng của ApiGateway 7245
+  }
 }
