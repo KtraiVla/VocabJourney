@@ -8,8 +8,8 @@ function Navbar() {
         <div className="container nav-container">
           {/* logo bên trái */}
           <div className="logo-section">
-            <div className="logo">
-              <BookOpen size={24} color="while"></BookOpen>
+            <div className="logo-icon">
+              <BookOpen size={24} color="white"></BookOpen>
             </div>
             <span className="logo-text">VocabJourney</span>
           </div>

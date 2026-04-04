@@ -1,10 +1,14 @@
 .navbar {
   border-bottom: 1px solid #f1f5f9;
+  background-color: var(--bg-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .nav-container {
   display: flex;
-  padding: 20px 0;
+  padding: 16px 0;
   justify-content: space-between;
   align-items: center;
 }
@@ -19,23 +23,25 @@
 .logo-icon {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
+  background-color: var(--primary); /* Nền xanh cho icon */
+  border-radius: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
+  box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.2);
 }
 
 .logo-text {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.5px;
+  color: var(--text-main);
 }
 
-/* 3. Căn chỉnh cụm Buttons bên phải */
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .btn-login {
@@ -43,6 +49,7 @@
   font-size: 15px;
   padding: 10px 16px;
   color: var(--text-main);
+  transition: color 0.2s ease;
 }
 
 .btn-login:hover {
@@ -54,11 +61,21 @@
   color: white;
   font-weight: 600;
   font-size: 15px;
-  padding: 12px 24px;
+  padding: 10px 20px;
   border-radius: 8px;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.2);
 }
 
 .btn-get-started:hover {
   background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 8px -1px rgba(14, 165, 233, 0.3);
+}
+
+/* Responsive cơ bản: Ẩn menu giữa trên mobile */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
 }
