@@ -1,0 +1,64 @@
+.navbar {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.nav-container {
+  display: flex;
+  padding: 20px 0;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-text {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+/* 3. Căn chỉnh cụm Buttons bên phải */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-login {
+  font-weight: 600;
+  font-size: 15px;
+  padding: 10px 16px;
+  color: var(--text-main);
+}
+
+.btn-login:hover {
+  color: var(--primary);
+}
+
+.btn-get-started {
+  background-color: var(--primary);
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.btn-get-started:hover {
+  background-color: var(--primary-hover);
+}
