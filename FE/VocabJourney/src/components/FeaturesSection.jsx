@@ -1,32 +1,32 @@
 import React from "react";
-import { Brain, Gamepad2, TrendingUp, Clock } from "lucide-react";
+import { Brain, Trophy, Target, BookOpen } from "lucide-react";
 import "./FeaturesSection.css";
 
 function FeaturesSection() {
   const features = [
     {
-      icon: <Brain size={32} />,
-      title: "Spaced Repetition",
-      description: "Our smart algorithm schedules reviews at the optimal time to ensure long-term retention.",
-      color: "blue"
+      icon: <BookOpen size={32} />,
+      title: "Nội Dung Hình Ảnh Phong Phú",
+      description: "Mỗi từ đều đi kèm với hình ảnh đẹp mắt, phát âm rõ ràng và ví dụ thực tế để nâng cao khả năng ghi nhớ.",
+      color: "cyan"
     },
     {
-      icon: <Gamepad2 size={32} />,
-      title: "Gamified Learning",
-      description: "Earn points, complete quests, and compete on the leaderboard to stay motivated.",
+      icon: <Brain size={32} />,
+      title: "Lặp Lại Có Khoảng Cách",
+      description: "Thuật toán thông minh của chúng tôi hiển thị từ vào thời điểm hoàn hảo để tối đa hóa khả năng ghi nhớ và giảm thiểu quên lãng.",
       color: "purple"
     },
     {
-      icon: <TrendingUp size={32} />,
-      title: "Progress Tracking",
-      description: "Visualize your vocabulary growth with detailed statistics and daily insights.",
-      color: "green"
+      icon: <Trophy size={32} />,
+      title: "Trò Chơi Hóa",
+      description: "Kiếm XP, nâng cấp, duy trì chuỗi ngày học và mở khóa huy hiệu khi bạn tiến bộ trong hành trình từ vựng của mình.",
+      color: "orange"
     },
     {
-      icon: <Clock size={32} />,
-      title: "Bite-sized Lessons",
-      description: "Learn effectively in just 10 minutes a day, fitting perfectly into your busy schedule.",
-      color: "orange"
+      icon: <Target size={32} />,
+      title: "Bài Kiểm Tra Tương Tác",
+      description: "Kiểm tra kiến thức của bạn với các bài quiz hấp dẫn có nhiều loại câu hỏi và phản hồi tức thì.",
+      color: "green"
     }
   ];
 

@@ -10,25 +10,25 @@ function HeroSection() {
         <div className="hero-content">
           <div className="hero-badge">
             <Sparkles size={16} className="badge-icon" />
-            <span>The #1 Fun Way to Learn English</span>
+            <span>Học thông minh hơn, không cần học vất vả hơn</span>
           </div>
 
           <h1 className="hero-title">
-            Master Vocabulary <br />
-            <span className="hero-highlight">With Joy & Ease</span>
+            Làm Chủ Từ Vựng <br />
+            <span className="hero-highlight">Một Cách Vui Vẻ</span>
           </h1>
 
           <p className="hero-subtitle">
-            Embark on an interactive journey to build your english vocabulary,
-            track your progress, and master the language naturally through
-            gamified learning and spaced repetition.
+            Biến đổi trải nghiệm học từ vựng của bạn với trò chơi hóa, lặp lại
+            có khoảng cách và nội dung trực quan hấp dẫn. Tham gia cùng hàng
+            ngàn học viên trên hành trình thành thạo tiếng Anh.
           </p>
 
           <div className="hero-actions">
             <button className="btn-primary-large">
-              Start Your Journey <ArrowRight size={20} />
+              Bắt đầu học <ArrowRight size={20} />
             </button>
-            <button className="btn-secondary-large">View Courses</button>
+            <button className="btn-secondary-large">Xem thử</button>
           </div>
 
           <div className="hero-stats">
@@ -38,7 +38,7 @@ function HeroSection() {
               </div>
               <div className="stat-info">
                 <strong>10,000+</strong>
-                <span>Active Learners</span>
+                <span>Hơn 10.000 học viên</span>
               </div>
             </div>
           </div>

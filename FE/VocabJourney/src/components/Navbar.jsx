@@ -1,6 +1,6 @@
 import React from "react";
 import { BookOpen } from "lucide-react";
-import "./Navbar.css"
+import "./Navbar.css";
 function Navbar() {
   return (
     <>
@@ -15,8 +15,8 @@ function Navbar() {
           </div>
           {/* cta bên phải */}
           <div className="nav-actions">
-            <button className="btn-login">Login</button>
-            <button className="btn-get-started">Get Started</button>
+            <button className="btn-login">Đăng nhập</button>
+            <button className="btn-get-started">Bắt đầu</button>
           </div>
         </div>
       </nav>

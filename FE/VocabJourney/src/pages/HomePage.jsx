@@ -4,6 +4,7 @@ import FeaturesSection from "../components/FeaturesSection.jsx";
 import HowItWord from "../components/HowItWord.jsx";
 import ThongKe from "../components/ThongKe.jsx";
 import CTASection from "../components/CTASection.jsx";
+import Footer from "../components/Footer.jsx";
 
 function HomePage() {
   return (
@@ -14,6 +15,7 @@ function HomePage() {
       <HowItWord />
       <ThongKe />
       <CTASection />
+      <Footer />
     </>
   );
 }
