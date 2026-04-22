@@ -1,0 +1,82 @@
+.cta-section {
+  padding: 80px 0;
+  background-color: #f0faff; /* Very light blue background */
+  text-align: center;
+}
+
+.cta-content {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.cta-icon-wrapper {
+  color: #00bcd4; /* Cyan color for the lightning bolt */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cta-icon {
+  width: 48px;
+  height: 48px;
+  stroke-width: 1.5;
+}
+
+.cta-title {
+  font-size: 40px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.cta-desc {
+  font-size: 18px;
+  color: #4a5568;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0;
+}
+
+.cta-button {
+  padding: 16px 40px;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  margin-top: 10px;
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4);
+}
+
+.cta-button:active {
+  transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .cta-title {
+    font-size: 32px;
+  }
+
+  .cta-desc {
+    font-size: 16px;
+  }
+
+  .cta-section {
+    padding: 60px 20px;
+  }
+}
