@@ -1,5 +1,6 @@
 import { Zap } from "lucide-react";
 import "./CTASection.css";
+import { Link } from "react-router-dom";
 
 export default function CTASection() {
   return (
@@ -15,7 +16,11 @@ export default function CTASection() {
               Tham gia cùng hàng ngàn học viên đang cải thiện từ vựng tiếng Anh
               mỗi ngày. Bắt đầu học miễn phí ngay hôm nay!
             </p>
-            <button className="cta-button">Bắt Đầu Miễn Phí</button>
+            <button>
+              <Link className="cta-button" to="./dangky">
+                Bắt Đầu Miễn Phí
+              </Link>
+            </button>
           </div>
         </div>
       </div>
