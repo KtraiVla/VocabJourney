@@ -1,0 +1,149 @@
+.dashboard-navbar {
+  height: 80px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+}
+
+.db-nav-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+/* Logo */
+.db-nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.db-logo-icon {
+  background: #0ea5e9;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(14, 165, 233, 0.2);
+}
+
+.db-logo-text {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0ea5e9;
+  letter-spacing: -0.5px;
+}
+
+/* Navigation Links */
+.db-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.db-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #64748b;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.db-nav-item:hover {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.db-nav-item.active {
+  background: #f0fdfa;
+  color: #0d9488;
+}
+
+.db-item-icon {
+  display: flex;
+  align-items: center;
+}
+
+.db-item-label {
+  font-size: 15px;
+}
+
+/* Streak Indicator */
+.db-streak-pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 20px;
+  background: #fffbeb;
+  border: 1.5px solid #fef3c7;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.db-streak-pill:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+  border-color: #fde68a;
+}
+
+.db-streak-icon {
+  display: flex;
+  align-items: center;
+}
+
+.db-streak-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.db-streak-count {
+  font-size: 18px;
+  font-weight: 800;
+  color: #d97706;
+}
+
+.db-streak-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f59e0b;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .db-item-label {
+    display: none;
+  }
+  .db-nav-item {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .db-nav-logo .db-logo-text {
+    display: none;
+  }
+  .db-streak-pill {
+    padding: 6px 12px;
+  }
+  .db-streak-info {
+    display: none;
+  }
+}
