@@ -38,7 +38,7 @@ function DangNhap() {
       headers: {
         "Content-Type": "application/json"
       }, 
-      body: JSON.strongify({
+      body: JSON.stringify({
         username: email,
         password: matkhau,
       }),

@@ -57,7 +57,7 @@ namespace IdentityService.Repositories
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 // Lấy mật khẩu đã băm, ID và Vai trò của người dùng
-                string query = "SELECT MatKhau, MaNguoiDung, VaiTro FROM NguoiDung WHERE TenDangNhap = @Username AND TrangThaiHoatDong = 1";
+                string query = "SELECT MatKhau, MaNguoiDung, VaiTro FROM NguoiDung WHERE (TenDangNhap = @Username OR Email = @Username) AND TrangThaiHoatDong = 1";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@Username", username);
