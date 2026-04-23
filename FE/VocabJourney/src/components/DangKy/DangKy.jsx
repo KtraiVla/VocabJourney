@@ -11,6 +11,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import "./DangKy.css";
 import bgDangKy from "../../assets/images/hoctienganh.jpg";
+import authService from "../../services/authService";
 
 export default function DangKy() {
   const navigate = useNavigate();
@@ -49,22 +50,13 @@ export default function DangKy() {
       return;
     }
 
-    const response = await fetch("https://localhost:7251/api/Auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: hoten,
-        email: email,
-        password: matkhau,
-      }),
-    });
-
-    if (response.ok) {
-      alert("Bạn đã đăng ký tài khoản thành công!");
+    try {
+      const response = await authService.register(hoten, email, matkhau);
+      alert(
+        response.data.message || "Tuyệt vời! Đăng ký tài khoản thành công!",
+      );
       navigate("/dangnhap");
-    } else {
+    } catch {
       alert("Đăng ký thất bại! Có thể tên hoặc email đã có người sử dụng!");
     }
   }

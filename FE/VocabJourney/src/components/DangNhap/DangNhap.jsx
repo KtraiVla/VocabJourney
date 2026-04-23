@@ -3,6 +3,7 @@ import bgDangNhap from "../../assets/images/bg.jpg";
 import { Mail, Lock, BookOpen, Library, Trophy, Flame } from "lucide-react";
 import "./DangNhap.css";
 import { Link, useNavigate } from "react-router-dom";
+import authService from "../../services/authService";
 
 function DangNhap() {
   const navigate = useNavigate();
@@ -10,46 +11,42 @@ function DangNhap() {
   const [email, setEmail] = useState("");
   const [matkhau, setMatKhau] = useState("");
 
-  const thayDoiEmail = (e) => {setEmail(e.target.value)}; 
-  const thayDoiMK = (e) => {setMatKhau(e.target.value)}
+  const thayDoiEmail = (e) => {
+    setEmail(e.target.value);
+  };
+  const thayDoiMK = (e) => {
+    setMatKhau(e.target.value);
+  };
 
   async function handleLogin(e) {
     e.preventDefault();
     // kiểm tra email và mật khẩu
-    if(email === ""){
+    if (email === "") {
       alert("Bạn chưa nhập email!");
       return;
     }
-    if(matkhau === ""){
-      alert("Bạn chưa nhập mật khẩu")
+    if (matkhau === "") {
+      alert("Bạn chưa nhập mật khẩu");
       return;
     }
-    if(email.includes("@") === false){
+    if (email.includes("@") === false) {
       alert("Email sai định dạng, phải có ý tự '@'!");
       return;
     }
-    if(matkhau.length < 6){
-      alert("Mật khẩu phải có ít nhất 6 ký tự!")
+    if (matkhau.length < 6) {
+      alert("Mật khẩu phải có ít nhất 6 ký tự!");
       return;
     }
 
-    const response = await fetch("https://localhost:7251/api/Auth/login", {
-      method: "POST", 
-      headers: {
-        "Content-Type": "application/json"
-      }, 
-      body: JSON.stringify({
-        username: email,
-        password: matkhau,
-      }),
-    });
+    try {
+      const response = await authService.login(email, matkhau);
+      const data = response.data;
+      localStorage.setItem("vocabToken", data.token); 
 
-    if(response.ok){
-      alert("Bạn đã đăng nhập thành công!"); 
-      navigate("/homeuser");
-    }
-    else{
-      alert("Sai tài khoản hoặc mật khẩu!")
+      alert("Bạn đã đăng nhập thành công!");
+      navigate("/homeuser"); // Chuyển sang trang chủ
+    } catch {
+      alert("Sai tài khoản hoặc mật khẩu!");
     }
   }
 
@@ -76,10 +73,11 @@ function DangNhap() {
               <div className="input-wrapper">
                 <Mail className="input-icon" size={20} />
                 <input
-                 type="email" 
-                 placeholder="alex@example.com" 
-                 value = {email} 
-                 onChange={thayDoiEmail}/>
+                  type="email"
+                  placeholder="alex@example.com"
+                  value={email}
+                  onChange={thayDoiEmail}
+                />
               </div>
             </div>
 
@@ -87,11 +85,12 @@ function DangNhap() {
               <label>Mật Khẩu</label>
               <div className="input-wrapper">
                 <Lock className="input-icon" size={20} />
-                <input 
-                type="password" 
-                placeholder="••••••••" 
-                value={matkhau}
-                onChange={thayDoiMK} />
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={matkhau}
+                  onChange={thayDoiMK}
+                />
               </div>
             </div>
 
@@ -109,7 +108,11 @@ function DangNhap() {
               </Link>
             </div>
 
-            <button type="submit" className="auth-submit-btn" onClick = {handleLogin}>
+            <button
+              type="submit"
+              className="auth-submit-btn"
+              onClick={handleLogin}
+            >
               Đăng Nhập
             </button>
           </form>
