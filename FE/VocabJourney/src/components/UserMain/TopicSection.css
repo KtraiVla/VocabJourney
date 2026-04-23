@@ -1,6 +1,7 @@
 .topics-section {
   flex: 1;
   min-width: 0;
+  margin-top: 50px;
 }
 
 .topics-header {

@@ -6,6 +6,7 @@ import ContinueCard from "../components/UserMain/ContinueCard.jsx";
 import ReviewCard from "../components/UserMain/ReviewCard.jsx";
 import ChallengesSection from "../components/UserMain/ChallengeSection.jsx";
 import TopicsSection from "../components/UserMain/TopicSection.jsx";
+import WhyChooseUs from "../components/UserMain/WhyChooseUs.jsx";
 import ThanhTich from "../components/UserMain/ThanhTich.jsx";
 import Quote from "../components/UserMain/Quote.jsx";
 import CongDong from "../components/UserMain/CongDong.jsx";
@@ -25,6 +26,7 @@ function MainUser() {
               <ContinueCard />
               <ReviewCard />
               <TopicsSection></TopicsSection>
+              <WhyChooseUs />
             </div>
 
             {/* cột bên trái */}
