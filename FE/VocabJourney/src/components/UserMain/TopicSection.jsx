@@ -1,4 +1,4 @@
-import "./TopicsSection.css";
+import "./TopicSection.css";
 import TopicCard from "./TopicCard.jsx";
 import img1 from "../../assets/images/dulich.jpg";
 import img2 from "../../assets/images/dongvat.jpg";

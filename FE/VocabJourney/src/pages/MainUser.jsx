@@ -6,6 +6,9 @@ import ContinueCard from "../components/UserMain/ContinueCard.jsx";
 import ReviewCard from "../components/UserMain/ReviewCard.jsx";
 import ChallengesSection from "../components/UserMain/ChallengeSection.jsx";
 import TopicsSection from "../components/UserMain/TopicSection.jsx";
+import ThanhTich from "../components/UserMain/ThanhTich.jsx";
+import Quote from "../components/UserMain/Quote.jsx";
+import CongDong from "../components/UserMain/CongDong.jsx";
 
 function MainUser() {
   return (
@@ -27,6 +30,9 @@ function MainUser() {
             {/* cột bên trái */}
             <aside className="dashboard-sidebar">
               <ChallengesSection></ChallengesSection>
+              <ThanhTich></ThanhTich>
+              <Quote></Quote>
+              <CongDong></CongDong>
             </aside>
           </div>
         </div>
