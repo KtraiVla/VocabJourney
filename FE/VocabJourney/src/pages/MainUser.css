@@ -1,0 +1,43 @@
+.homeuser-page {
+  background-color: #f8fafc;
+  min-height: 100vh;
+}
+
+.homeuser-page-content {
+  padding-bottom: 60px;
+}
+
+.homeuser-grid {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 30px;
+  margin-top: 40px;
+  align-items: start;
+}
+
+.homeuser-right {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.dashboard-sidebar {
+  position: sticky;
+  top: 100px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .homeuser-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-sidebar {
+    position: static;
+    order: 2;
+  }
+  
+  .homeuser-right {
+    order: 1;
+  }
+}

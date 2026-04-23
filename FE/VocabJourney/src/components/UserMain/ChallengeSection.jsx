@@ -1,4 +1,4 @@
-import "./ChallengesSection.css";
+import "./ChallengeSection.css";
 import ChallengeItem from "./ChallengeItem.jsx";
 import { Target } from "lucide-react";
 
