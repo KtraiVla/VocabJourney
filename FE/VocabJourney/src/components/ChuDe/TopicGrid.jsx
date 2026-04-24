@@ -1,77 +1,141 @@
+import React, { useState, useEffect } from "react";
 import "./TopicGrid.css";
 import TopicCard from "./TopicCard";
+import topicService from "../../services/topicService";
 
-const topicsData = [
-  {
-    title: "Du Lịch & Khám Phá",
-    description: "Từ vựng thiết yếu cho các chuyến du lịch",
-    lessons: 8,
-    words: 96,
-    percent: 75,
-    overlay: "blue",
-    image:
-      "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&q=80&w=600",
-  },
-  {
-    title: "Tiếng Anh Thương Mại",
-    description: "Từ vựng chuyên nghiệp cho công việc",
-    lessons: 12,
-    words: 144,
-    percent: 45,
-    overlay: "yellow",
-    image:
-      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=600",
-  },
-  {
-    title: "Ẩm Thực & Nhà Hàng",
-    description: "Từ vựng về nhà hàng và nấu ăn",
-    lessons: 6,
-    words: 72,
-    percent: 90,
-    overlay: "green",
-    image:
-      "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=600",
-  },
-  {
-    title: "Giao Tiếp Hàng Ngày",
-    description: "Cụm từ thông dụng cho các tình huống hàng ngày",
-    lessons: 10,
-    words: 120,
-    percent: 30,
-    overlay: "purple",
-    image:
-      "https://images.unsplash.com/photo-1521791136364-708a16ac3310?auto=format&fit=crop&q=80&w=600",
-  },
-  {
-    title: "Công Nghệ",
-    description: "Từ vựng liên quan đến công nghệ hiện đại",
-    lessons: 7,
-    words: 84,
-    percent: 15,
-    overlay: "pink",
-    image:
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=600",
-  },
-  {
-    title: "Sức Khỏe & Thể Dục",
-    description: "Từ vựng về sức khỏe và thể chất",
-    lessons: 5,
-    words: 60,
-    percent: 60,
-    overlay: "teal",
-    image:
-      "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=80&w=600",
-  },
-];
 
 export default function TopicGird() {
+  const [chude, setChuDe] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+  useEffect(function () {
+    async function fetchTopics() {
+      try {
+        const response = await topicService.getAllTopics();
+        const dataFromDB = response.data;
+        const colors = [
+          "blue",
+          "yellow",
+          "green",
+          "purple",
+          "pink",
+          "teal",
+          "orange",
+          "indigo",
+          "red",
+          "cyan",
+        ];
+
+        const formattedData = dataFromDB.map(function (item, index) {
+          return {
+            id: item.maChuDe,
+            title: item.tenChuDe,
+            description: item.moTa,
+            image: item.anhMinhHoa,
+            lessons: Math.floor(Math.random() * 5) + 5,
+            words: Math.floor(Math.random() * 50) + 50,
+            percent: Math.floor(Math.random() * 100),
+            overlay: colors[index % colors.length],
+          };
+        });
+        setChuDe(formattedData);
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách chủ đề: ", error);
+      }
+    }
+    fetchTopics();
+  }, []);
+
+  const viTriCuoiCung = currentPage * itemsPerPage;
+  const viTriDauTien = viTriCuoiCung - itemsPerPage;
+  const currentTopics = chude.slice(viTriDauTien, viTriCuoiCung);
+  const tongSoTrang = Math.ceil(chude.length / itemsPerPage);
+
+  function thayDoiTrang(pageNumber) {
+    setCurrentPage(pageNumber);
+  }
+
+  function bamNutTruoc() {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  }
+  function bamNutSau() {
+    if (currentPage < tongSoTrang) {
+      setCurrentPage(currentPage + 1);
+    }
+  }
+
+  const danhSachCacTrang = [];
+  for (let i = 1; i <= tongSoTrang; i++) {
+    danhSachCacTrang.push(i);
+  }
+
   return (
     <div className="topics-grid-container">
       <div className="topics-grid">
-        {topicsData.map((topic, index) => (
-          <TopicCard key={index} {...topic} />
+        {currentTopics.map((topic, index) => (
+          <TopicCard key={topic.id} {...topic} />
         ))}
       </div>
+
+      {tongSoTrang > 1 && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "10px",
+            marginTop: "30px",
+            marginBottom: "20px",
+          }}
+        >
+          {/* Nút Trước (Gọi thẳng hàm bamNutTruoc) */}
+          <button
+            onClick={bamNutTruoc}
+            disabled={currentPage === 1}
+            style={{
+              padding: "8px 16px",
+              cursor: currentPage === 1 ? "not-allowed" : "pointer",
+            }}
+          >
+            Trước
+          </button>
+
+          {/* Lặp qua danh sách [1, 2...] để vẽ nút bấm số */}
+          {danhSachCacTrang.map(function (page) {
+            return (
+              <button
+                key={page}
+                onClick={function () {
+                  thayDoiTrang(page);
+                }}
+                style={{
+                  padding: "8px 16px",
+                  cursor: "pointer",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  backgroundColor: currentPage === page ? "#007bff" : "white",
+                  color: currentPage === page ? "white" : "black",
+                }}
+              >
+                {page}
+              </button>
+            );
+          })}
+
+          {/* Nút Sau (Gọi thẳng hàm bamNutSau) */}
+          <button
+            onClick={bamNutSau}
+            disabled={currentPage === tongSoTrang}
+            style={{
+              padding: "8px 16px",
+              cursor: currentPage === tongSoTrang ? "not-allowed" : "pointer",
+            }}
+          >
+            Sau
+          </button>
+        </div>
+      )}
     </div>
   );
 }
