@@ -12,7 +12,7 @@ namespace VocabJourney.Controllers
         private readonly TopicRepository _topicRepo;
 
         // Gọi IConfiguration ra để đọc file appsettings.json
-        public TopicsController(IConfiguration configuration)
+        public TopicController(IConfiguration configuration)
         {
             string connString = configuration.GetConnectionString("DefaultConnection");
 

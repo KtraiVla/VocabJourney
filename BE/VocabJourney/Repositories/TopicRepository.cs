@@ -34,7 +34,6 @@ namespace VocabJourney.Repositories
                                 TenChuDe = reader["TenChuDe"].ToString(),
                                 MoTa = reader["MoTa"].ToString(),
                                 AnhMinhHoa = reader["AnhMinhHoa"] != DBNull.Value ? reader["AnhMinhHoa"].ToString() : "",
-
                                 // Đọc giá trị DateTime từ SQL
                                 NgayTao = reader["NgayTao"] != DBNull.Value ? Convert.ToDateTime(reader["NgayTao"]) : DateTime.Now
                             });
