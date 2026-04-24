@@ -41,7 +41,7 @@ export default function TopicsSection() {
         </a>
       </div>
 
-      <div className="topics-grid">
+      <div className="topics-section-grid">
         {topics.map((topic, index) => (
           <TopicCard
             key={index}
