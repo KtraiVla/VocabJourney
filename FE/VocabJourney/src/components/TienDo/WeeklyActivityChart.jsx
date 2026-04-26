@@ -1,78 +1,81 @@
-import "./WeeklyActivityChart.css";
 import {
-  BarChart,
-  Bar,
+  BarChart, // khung của biểu đồ
+  Bar, // cột của biểu đồ
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
+  CartesianGrid, // đường kẻ nền
+  Tooltip, // hộp thông tin khi trỏ chuột
   ResponsiveContainer,
-  Cell,
 } from "recharts";
 
-const CustomTooltip = ({ active, payload, label }) => {
+// tạo một hộp thông tin tùy chỉnh
+function CustomTooltip({ active, payload, label }) {
   if (active && payload && payload.length) {
     return (
       <div className="custom-tooltip">
-        <p className="tooltip-label">{`Ngày: ${label}`}</p>
-        <p className="tooltip-value">{`Đã học: ${payload[0].value} từ`}</p>
+        <p className="tooltip-label">Ngày: {label}</p>
+        <p className="tooltip-value">Đã học: {payload[0].value}</p>
       </div>
     );
   }
   return null;
-};
+}
 
 function WeeklyActivityChart() {
-  const data = [
+  const weeklyData = [
     { day: "T2", value: 12 },
     { day: "T3", value: 15 },
     { day: "T4", value: 10 },
-    { day: "T5", value: 18 },
-    { day: "T6", value: 14 },
-    { day: "T7", value: 21 },
-    { day: "CN", value: 16 },
+    { day: "T5", value: 17 },
+    { day: "T6", value: 9 },
+    { day: "T7", value: 20 },
+    { day: "CN", value: 19 },
   ];
 
   return (
     <div className="activity-chart-card">
       <h3 className="activity-chart-title">Hoạt Động Học Tập Hàng Tuần</h3>
-
       <div className="chart-container-recharts">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
-            data={data}
-            margin={{
-              top: 5,
-              right: 5,
-              left: -25,
-              bottom: 0,
-            }}
+            data={weeklyData}
+            margin={{ top: 5, right: 5, left: -25, bottom: 0 }}
           >
             <CartesianGrid
               strokeDasharray="3 3"
               vertical={false}
               stroke="#f1f5f9"
             />
+
+            {/* trục X */}
             <XAxis
               dataKey="day"
-              axisLine={false}
+              axisLine="false"
               tickLine={false}
               tick={{ fill: "#94a3b8", fontSize: 12 }}
               dy={10}
-            />
+            ></XAxis>
+
+            {/* trục Y */}
             <YAxis
               axisLine={false}
               tickLine={false}
               tick={{ fill: "#94a3b8", fontSize: 12 }}
               domain={[0, 25]}
               ticks={[0, 5, 10, 15, 20, 25]}
-            />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: "#f8fafc" }} />
-            <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={40}>
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill="#06b6d4" />
-              ))}
-            </Bar>
+            ></YAxis>
+
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ fill: "#f8fafc" }}
+            ></Tooltip>
+
+            <Bar
+              dataKey="value"
+              fill="#06b6d4"
+              radius={[4, 4, 0, 0]}
+              maxBarSize={40}
+            ></Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>
