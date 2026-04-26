@@ -1,0 +1,119 @@
+.activity-chart-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.activity-chart-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+
+.chart-container {
+  display: flex;
+  flex: 1;
+  min-height: 200px;
+  gap: 12px;
+}
+
+.y-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #94a3b8;
+  font-size: 12px;
+  padding-bottom: 24px; /* Space for X-axis labels */
+}
+
+.chart-area {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 0;
+}
+
+.grid-line {
+  height: 1px;
+  background-color: #f1f5f9;
+  width: 100%;
+}
+
+.bars-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+  padding-bottom: 24px;
+  height: 100%;
+}
+
+.bar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.bar {
+  width: 32px;
+  background-color: #06b6d4;
+  border-radius: 4px 4px 0 0;
+  transition: height 0.5s ease-out;
+}
+
+.x-axis-label {
+  position: absolute;
+  bottom: -24px;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.chart-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24px;
+  gap: 8px;
+}
+
+.legend-color-box {
+  width: 12px;
+  height: 12px;
+  background-color: #06b6d4;
+  border-radius: 2px;
+}
+
+.legend-text {
+  font-size: 14px;
+  color: #64748b;
+}
+
+@media (max-width: 640px) {
+  .bar {
+    width: 20px;
+  }
+}

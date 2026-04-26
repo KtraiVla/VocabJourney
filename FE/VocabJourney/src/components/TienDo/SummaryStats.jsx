@@ -1,5 +1,6 @@
 import { BookOpen, Target, Award, Calendar } from "lucide-react";
-
+import SummaryCard from "./SummaryCard.jsx";
+import "./SummaryStats.css";
 
 export default function SummaryStats() {
   const stats = [
