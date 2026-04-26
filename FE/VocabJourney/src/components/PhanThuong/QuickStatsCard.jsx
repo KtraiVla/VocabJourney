@@ -1,4 +1,5 @@
 import { Star } from "lucide-react";
+import { BookOpen, Target, Award, Calendar } from "lucide-react";
 import "./QuickStatsCard.css";
 
 export default function QuickStatsCard() {
