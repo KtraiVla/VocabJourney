@@ -24,11 +24,11 @@ function DashboardNavbar() {
       label: "Phần Thưởng",
     },
     {
-      path: "/dashboard/progress",
+      path: "/tiendo",
       icon: <BarChart3 size={20} />,
       label: "Tiến Độ",
     },
-    { path: "/dashboard/profile", icon: <User size={20} />, label: "Hồ Sơ" },
+    { path: "/profile", icon: <User size={20} />, label: "Hồ Sơ" },
   ];
 
   return (
