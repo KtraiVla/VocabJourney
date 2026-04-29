@@ -1,0 +1,143 @@
+.topic-banner {
+  background-color: white;
+  border-radius: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+  border: 6px solid white; /* Thêm viền trắng 6px */
+}
+
+.topic-banner-image-section {
+  background: linear-gradient(135deg, #7eb6ff 0%, #3b82f6 100%);
+  padding: 2rem;
+  color: white;
+  position: relative;
+}
+
+/* Add a subtle map/world pattern background effect */
+.topic-banner-image-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    radial-gradient(
+      circle at 20% 50%,
+      rgba(255, 255, 255, 0.15) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 40%
+    );
+  z-index: 1;
+}
+
+.topic-banner-content {
+  position: relative;
+  z-index: 2;
+}
+
+.topic-banner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.topic-title-group h1 {
+  font-size: 3.5rem;
+  font-weight: 900;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: -1px;
+}
+
+.topic-title-group p {
+  font-size: 1.25rem;
+  margin: 0;
+  opacity: 0.95;
+  font-weight: 500;
+}
+
+.topic-icon-container {
+  background-color: #10b981; /* Green circle for owl */
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.topic-stats-row {
+  display: flex;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.topic-stat-badge {
+  background-color: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(10px);
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: white;
+}
+
+.badge-emoji {
+  font-size: 1.1rem;
+}
+
+.topic-progress-section {
+  padding: 1.5rem 2rem;
+  background-color: white;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.progress-label {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #1e293b;
+}
+
+.progress-percentage {
+  font-weight: 800;
+  font-size: 1.125rem;
+  color: #3b82f6;
+}
+
+.progress-bar-container {
+  height: 12px;
+  background-color: #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: #1e293b;
+  border-radius: 6px;
+  transition: width 0.5s ease-out;
+}

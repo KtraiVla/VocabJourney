@@ -22,7 +22,6 @@ export default function HoSoPage() {
           </div>
         </div>
         <LearningSetting></LearningSetting>
-
       </div>
     </div>
   );

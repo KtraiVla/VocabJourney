@@ -1,0 +1,109 @@
+.quiz-banner-container {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  border-radius: 20px;
+  padding: 3rem 2.5rem; /* Increased padding */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem; /* Ensure minimum space between text and button */
+  color: white;
+  margin-top: 4rem;
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background stars/decorations */
+.quiz-banner-container::before {
+  content: "⭐";
+  position: absolute;
+  top: 10%;
+  right: 10%;
+  font-size: 5rem; /* Larger star */
+  opacity: 0.1;
+  transform: rotate(15deg);
+}
+
+.quiz-banner-container::after {
+  content: "🎯";
+  position: absolute;
+  bottom: -10%;
+  left: 5%;
+  font-size: 6rem; /* Larger target */
+  opacity: 0.1;
+  transform: rotate(-15deg);
+}
+
+.quiz-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem; /* Increased gap */
+  position: relative;
+  z-index: 2;
+}
+
+.quiz-icon-wrapper {
+  background-color: rgba(255, 255, 255, 0.2);
+  width: 80px; /* Larger icon wrapper */
+  height: 80px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem; /* Larger icon */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.quiz-text h3 {
+  font-size: 1.75rem; /* Larger title */
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+}
+
+.quiz-text p {
+  margin: 0;
+  font-size: 1.1rem; /* Larger text */
+  opacity: 0.9;
+}
+
+.quiz-action {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.start-quiz-btn {
+  background-color: white;
+  color: #1e293b;
+  border: none;
+  padding: 1rem 2rem; /* Larger button padding */
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 1.1rem; /* Larger button text */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.start-quiz-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  background-color: #f8fafc;
+}
+
+@media (max-width: 768px) {
+  .quiz-banner-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .quiz-banner-content {
+    flex-direction: column;
+  }
+}
