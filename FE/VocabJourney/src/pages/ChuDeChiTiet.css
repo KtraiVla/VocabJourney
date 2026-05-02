@@ -1,0 +1,10 @@
+.topic-detail-page {
+  background-color: #f8fafc;
+  min-height: 100vh;
+}
+
+.topic-detail-container {
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}

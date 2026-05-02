@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Check, Lock, Play, RotateCcw, BookOpen } from "lucide-react";
 import "./LessonItem.css";
 
-export default function LessonItem(
+export default function LessonItem({
   number,
   title,
   description,
@@ -10,7 +10,7 @@ export default function LessonItem(
   status,
   progress,
   alignment = "center",
-) {
+}) {
   const navigate = useNavigate();
 
   const handleStartLesson = () => {

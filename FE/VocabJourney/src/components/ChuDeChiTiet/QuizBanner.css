@@ -1,7 +1,7 @@
 .quiz-banner-container {
   background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
   border-radius: 20px;
-  padding: 3rem 2.5rem; /* Increased padding */
+  padding: 3rem 2.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -37,27 +37,27 @@
 .quiz-banner-content {
   display: flex;
   align-items: center;
-  gap: 2rem; /* Increased gap */
+  gap: 1.25rem;
   position: relative;
   z-index: 2;
 }
 
 .quiz-icon-wrapper {
   background-color: rgba(255, 255, 255, 0.2);
-  width: 80px; /* Larger icon wrapper */
-  height: 80px;
+  width: 60px;
+  height: 60px;
   flex-shrink: 0;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem; /* Larger icon */
+  font-size: 1.75rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .quiz-text h3 {
-  font-size: 1.75rem; /* Larger title */
+  font-size: 1.5rem;
   font-weight: 800;
   margin: 0 0 0.5rem 0;
 }
@@ -78,7 +78,7 @@
   background-color: white;
   color: #1e293b;
   border: none;
-  padding: 1rem 2rem; /* Larger button padding */
+  padding: 0.75rem 1.5rem;
   border-radius: 14px;
   font-weight: 800;
   font-size: 1.1rem; /* Larger button text */

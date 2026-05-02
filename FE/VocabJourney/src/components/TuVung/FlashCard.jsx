@@ -1,0 +1,86 @@
+import React, { useState } from "react";
+import "./FlashCard.css";
+
+export default function FlashCard({
+  word,
+  phonetic,
+  type,
+  translation,
+  definition,
+  exampleEn,
+  exampleVi,
+  image,
+}) {
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  // Hàm xử lý sự kiện khi nhấn vào thẻ
+  const handleFlip = () => {
+    setIsFlipped(!isFlipped);
+  };
+
+  return (
+    <div className="flashcard-container" onClick={handleFlip}>
+      <div className={`flashcard-inner ${isFlipped ? "is-flipped" : ""}`}>
+        {/* Mặt trước của thẻ */}
+        <div className="flashcard-front">
+          {/* Nửa trên: Hình ảnh */}
+          <div 
+            className="flashcard-image-section"
+            style={{ backgroundImage: `url(${image})` }}
+          >
+            <div className="difficulty-badge">Dễ</div>
+            <div className="flashcard-hint-pill">
+              👆 Chạm để xem nghĩa
+            </div>
+          </div>
+
+          {/* Nửa dưới: Chữ */}
+          <div className="flashcard-text-section">
+            <h2 className="flashcard-word-main">{word}</h2>
+            <div className="flashcard-phonetic-row">
+              <span className="phonetic-text">{phonetic}</span>
+              <button className="speaker-btn" onClick={(e) => {
+                e.stopPropagation(); // Ngăn sự kiện lật thẻ khi bấm loa
+                console.log("Play sound");
+              }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-volume-2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mặt sau của thẻ */}
+        <div className="flashcard-back">
+          <div className="flashcard-back-header">
+            <span>💡</span>
+          </div>
+          <div className="flashcard-back-content">
+            <div className="info-box box-translation">
+              <div className="info-label">
+                <span className="info-icon">VN</span>
+                <span>Tiếng Việt</span>
+              </div>
+              <h3 className="info-translation-text">{translation}</h3>
+            </div>
+
+            <div className="info-box box-definition">
+              <div className="info-label">
+                <span className="info-icon">💡</span>
+                <span>Định nghĩa</span>
+              </div>
+              <p className="info-text">{definition}</p>
+            </div>
+
+            <div className="info-box box-example">
+              <div className="info-label">
+                <span className="info-icon">📝</span>
+                <span>Ví dụ</span>
+              </div>
+              <p className="info-text example-en-text">"{exampleEn}"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

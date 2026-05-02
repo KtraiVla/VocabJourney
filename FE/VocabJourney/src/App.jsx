@@ -9,6 +9,8 @@ import ChuDePage from "./pages/ChuDePage.jsx";
 import PhanThuongPage from "./pages/PhanThuongPage.jsx";
 import TienDoPage from "./pages/TienDoPage.jsx";
 import HoSoPage from "./pages/HoSoPage.jsx";
+import ChuDeChiTietPage from "./pages/ChuDeChiTietPage.jsx";
+import HocTuVungPage from "./pages/HocTuVungPage.jsx";
 
 import "./App.css";
 
@@ -23,6 +25,8 @@ function App() {
       <Route path="/phanthuong" element={<PhanThuongPage />} />
       <Route path="/tiendo" element={<TienDoPage />} />
       <Route path="/hoso" element={<HoSoPage />} />
+      <Route path="/chudechitiet" element={<ChuDeChiTietPage />}></Route>
+      <Route path="/hoctuvung" element={<HocTuVungPage />}></Route>
     </Routes>
   );
 }

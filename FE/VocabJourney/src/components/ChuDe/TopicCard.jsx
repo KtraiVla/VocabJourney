@@ -88,7 +88,9 @@ export default function TopicCard({
 
         <button className="continue-btn" style={{ background: theme.gradient }}>
           <Play size={16} fill="white" />
-          <span>Tiếp tục</span>
+          <span>
+            <Link to = "">Tiếp tục</Link>
+          </span>
           <span className="arrow">→</span>
         </button>
       </div>

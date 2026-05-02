@@ -1,0 +1,144 @@
+.hoc-tu-vung-page {
+  background-color: #f8fafc;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.learning-main-container {
+  flex: 1;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.learning-top-header {
+  background-color: white;
+  padding-top: 1rem;
+}
+
+.learning-header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.learning-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.learning-back-btn:hover {
+  background-color: #f8fafc;
+  transform: translateY(-1px);
+}
+
+.learning-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.learning-stats {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.learning-counter {
+  background-color: #f1f5f9;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-weight: 700;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.learning-score-badge {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  padding: 0.4rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.score-divider {
+  margin: 0 0.5rem;
+  color: #cbd5e1;
+}
+
+.score-correct { color: #10b981; }
+.score-incorrect { color: #ef4444; }
+
+.final-score {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 1rem;
+}
+
+/* Kiểu dáng màn hình hoàn thành */
+.finish-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+.finish-container h2 {
+  font-size: 3rem;
+  color: #10b981;
+  margin-bottom: 1rem;
+}
+
+.finish-container p {
+  font-size: 1.25rem;
+  color: #475569;
+  margin-bottom: 2rem;
+}
+
+.btn-restart {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2.5rem;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.btn-restart:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
