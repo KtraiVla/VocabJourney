@@ -1,7 +1,10 @@
 import { Target, Trophy } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import "./QuizBanner.css";
 
 export default function QuizBanner() {
+  const navigate = useNavigate();
+
   return (
     <div className="quiz-banner-container">
       <div className="quiz-banner-content">
@@ -14,7 +17,9 @@ export default function QuizBanner() {
         </div>
       </div>
       <div className="quiz-action">
-        <button className="start-quiz-btn">🏆 Bắt đầu kiểm tra</button>
+        <button className="start-quiz-btn" onClick={() => navigate("/quiz")}>
+          🏆 Bắt đầu kiểm tra
+        </button>
       </div>
     </div>
   );
