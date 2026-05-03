@@ -1,11 +1,41 @@
 import React from 'react';
-import { Button, Row, Col, Tag, Space, Typography } from 'antd';
+import { Button, Row, Col, Tag, Space, Typography, Modal, Form, Input, Select, message } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import './AdminVocabTab.css';
 
 const { Text } = Typography;
 
 const AdminVocabTab = () => {
+  const [isModalVisible, setIsModalVisible] = React.useState(false);
+  const [editingRecord, setEditingRecord] = React.useState(null);
+  const [form] = Form.useForm();
+
+  const showAddModal = () => {
+    setEditingRecord(null);
+    form.resetFields();
+    setIsModalVisible(true);
+  };
+
+  const showEditModal = (record) => {
+    setEditingRecord(record);
+    form.setFieldsValue(record);
+    setIsModalVisible(true);
+  };
+
+  const handleModalOk = () => {
+    form.validateFields().then((values) => {
+      console.log('Lưu từ vựng:', values);
+      message.success(editingRecord ? 'Cập nhật từ vựng thành công!' : 'Thêm từ vựng thành công!');
+      setIsModalVisible(false);
+    }).catch((info) => {
+      console.log('Lỗi validate:', info);
+    });
+  };
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+  };
+
   // Dữ liệu giả lập cho danh sách từ vựng
   const vocabData = [
     {
@@ -77,7 +107,7 @@ const AdminVocabTab = () => {
       {/* Header: Tiêu đề và Nút Thêm */}
       <div className="vocab-header">
         <h2 className="vocab-title">Quản Lý Từ Vựng</h2>
-        <Button type="primary" icon={<PlusOutlined />} className="add-vocab-btn">
+        <Button type="primary" icon={<PlusOutlined />} className="add-vocab-btn" onClick={showAddModal}>
           Thêm Từ
         </Button>
       </div>
@@ -109,7 +139,7 @@ const AdminVocabTab = () => {
                 
                 {/* Các nút hành động */}
                 <div className="vocab-actions">
-                  <Button type="text" icon={<EditOutlined />} className="action-btn edit-btn">
+                  <Button type="text" icon={<EditOutlined />} className="action-btn edit-btn" onClick={() => showEditModal(vocab)}>
                     Sửa
                   </Button>
                   <Button type="text" icon={<DeleteOutlined />} danger className="action-btn delete-btn">
@@ -121,6 +151,43 @@ const AdminVocabTab = () => {
           </Col>
         ))}
       </Row>
+
+      <Modal
+        title={editingRecord ? "Sửa Từ Vựng" : "Thêm Từ Vựng Mới"}
+        open={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+        okText="Lưu"
+        cancelText="Hủy"
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item name="word" label="Từ vựng" rules={[{ required: true, message: 'Vui lòng nhập từ vựng!' }]}>
+            <Input placeholder="Nhập từ vựng tiếng Anh" />
+          </Form.Item>
+          <Form.Item name="pronunciation" label="Phiên âm" rules={[{ required: true, message: 'Vui lòng nhập phiên âm!' }]}>
+            <Input placeholder="VD: /ˈlʌɡɪdʒ/" />
+          </Form.Item>
+          <Form.Item name="definition" label="Định nghĩa">
+            <Input.TextArea placeholder="Nhập định nghĩa của từ" rows={2} />
+          </Form.Item>
+          <Form.Item name="meaning" label="Nghĩa tiếng Việt" rules={[{ required: true, message: 'Vui lòng nhập nghĩa tiếng Việt!' }]}>
+            <Input.TextArea placeholder="Nhập ý nghĩa của từ" rows={2} />
+          </Form.Item>
+          <Form.Item name="example" label="Ví dụ minh họa">
+            <Input.TextArea placeholder="Nhập một câu ví dụ sử dụng từ này" rows={2} />
+          </Form.Item>
+          <Form.Item name="difficulty" label="Độ khó" rules={[{ required: true }]}>
+            <Select>
+              <Select.Option value="easy">Dễ (Easy)</Select.Option>
+              <Select.Option value="medium">Trung bình (Medium)</Select.Option>
+              <Select.Option value="hard">Khó (Hard)</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item name="imageUrl" label="Đường dẫn ảnh (URL)">
+            <Input placeholder="Nhập URL hình ảnh minh họa" />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

@@ -1,9 +1,39 @@
 import React from 'react';
-import { Button, Row, Col } from 'antd';
+import { Button, Row, Col, Modal, Form, Input, message } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import './AdminTopicTab.css';
 
 const AdminTopicTab = () => {
+  const [isModalVisible, setIsModalVisible] = React.useState(false);
+  const [editingRecord, setEditingRecord] = React.useState(null);
+  const [form] = Form.useForm();
+
+  const showAddModal = () => {
+    setEditingRecord(null);
+    form.resetFields();
+    setIsModalVisible(true);
+  };
+
+  const showEditModal = (record) => {
+    setEditingRecord(record);
+    form.setFieldsValue(record);
+    setIsModalVisible(true);
+  };
+
+  const handleModalOk = () => {
+    form.validateFields().then((values) => {
+      console.log('Lưu chủ đề:', values);
+      message.success(editingRecord ? 'Cập nhật chủ đề thành công!' : 'Thêm chủ đề thành công!');
+      setIsModalVisible(false);
+    }).catch((info) => {
+      console.log('Lỗi validate:', info);
+    });
+  };
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+  };
+
   const topicData = [
     {
       id: 1,
@@ -59,7 +89,7 @@ const AdminTopicTab = () => {
     <div className="admin-topic-tab">
       <div className="topic-header">
         <h2 className="topic-title">Quản Lý Chủ Đề</h2>
-        <Button type="primary" icon={<PlusOutlined />} className="add-topic-btn">
+        <Button type="primary" icon={<PlusOutlined />} className="add-topic-btn" onClick={showAddModal}>
           Thêm Chủ Đề
         </Button>
       </div>
@@ -82,7 +112,7 @@ const AdminTopicTab = () => {
                 </div>
                 
                 <div className="topic-actions">
-                  <Button type="default" icon={<EditOutlined />} className="action-btn-outline">
+                  <Button type="default" icon={<EditOutlined />} className="action-btn-outline" onClick={() => showEditModal(topic)}>
                     Sửa
                   </Button>
                   <Button type="default" danger icon={<DeleteOutlined />} className="action-btn-outline">
@@ -94,6 +124,27 @@ const AdminTopicTab = () => {
           </Col>
         ))}
       </Row>
+
+      <Modal
+        title={editingRecord ? "Sửa Chủ Đề" : "Thêm Chủ Đề Mới"}
+        open={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+        okText="Lưu"
+        cancelText="Hủy"
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item name="title" label="Tên chủ đề" rules={[{ required: true, message: 'Vui lòng nhập tên chủ đề!' }]}>
+            <Input placeholder="VD: Tiếng Anh Thương Mại" />
+          </Form.Item>
+          <Form.Item name="description" label="Mô tả" rules={[{ required: true, message: 'Vui lòng nhập mô tả!' }]}>
+            <Input.TextArea placeholder="Mô tả ngắn gọn về chủ đề này" rows={3} />
+          </Form.Item>
+          <Form.Item name="imageUrl" label="Đường dẫn ảnh bìa (URL)" rules={[{ required: true, message: 'Vui lòng cung cấp ảnh bìa!' }]}>
+            <Input placeholder="Nhập URL hình ảnh" />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Input, Button, Tag, Space, Tooltip, Avatar } from 'antd';
+import { Table, Input, Button, Tag, Space, Tooltip, Avatar, Modal, Form, Select, InputNumber, message } from 'antd';
 import { 
   SearchOutlined, 
   PlusOutlined, 
@@ -11,6 +11,35 @@ import './AdminUserTab.css';
 const AdminUserTab = () => {
   // Trạng thái (state) lưu trữ từ khóa tìm kiếm
   const [searchText, setSearchText] = useState('');
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingRecord, setEditingRecord] = useState(null);
+  const [form] = Form.useForm();
+
+  const showAddModal = () => {
+    setEditingRecord(null);
+    form.resetFields();
+    setIsModalVisible(true);
+  };
+
+  const showEditModal = (record) => {
+    setEditingRecord(record);
+    form.setFieldsValue(record);
+    setIsModalVisible(true);
+  };
+
+  const handleModalOk = () => {
+    form.validateFields().then((values) => {
+      console.log('Lưu người dùng:', values);
+      message.success(editingRecord ? 'Cập nhật người dùng thành công!' : 'Thêm người dùng thành công!');
+      setIsModalVisible(false);
+    }).catch((info) => {
+      console.log('Lỗi validate:', info);
+    });
+  };
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+  };
 
   // Dữ liệu giả lập (Mock data) cho bảng người dùng
   const dataSource = [
@@ -104,7 +133,7 @@ const AdminUserTab = () => {
             <Button 
               type="text" 
               icon={<EditOutlined style={{ color: '#475569' }} />} 
-              onClick={() => console.log('Edit', record.key)}
+              onClick={() => showEditModal(record)}
             />
           </Tooltip>
           <Tooltip title="Xóa">
@@ -126,7 +155,7 @@ const AdminUserTab = () => {
       {/* Header của Tab: Tiêu đề và Nút Thêm Mới */}
       <div className="tab-header">
         <h2 className="tab-title">Quản Lý Người Dùng</h2>
-        <Button type="primary" icon={<PlusOutlined />} className="add-user-btn">
+        <Button type="primary" icon={<PlusOutlined />} className="add-user-btn" onClick={showAddModal}>
           Thêm Người Dùng
         </Button>
       </div>
@@ -150,6 +179,47 @@ const AdminUserTab = () => {
         className="custom-table"
         rowClassName="custom-table-row"
       />
+
+      <Modal
+        title={editingRecord ? "Sửa Người Dùng" : "Thêm Người Dùng Mới"}
+        open={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+        okText="Lưu"
+        cancelText="Hủy"
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item name="name" label="Họ và Tên" rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}>
+            <Input placeholder="Nhập họ và tên" />
+          </Form.Item>
+          <Form.Item name="email" label="Email" rules={[{ required: true, message: 'Vui lòng nhập email!' }]}>
+            <Input placeholder="Nhập địa chỉ email" />
+          </Form.Item>
+          <Form.Item name="level" label="Cấp độ" rules={[{ required: true }]}>
+            <Select>
+              <Select.Option value="Cấp 1">Cấp 1</Select.Option>
+              <Select.Option value="Cấp 5">Cấp 5</Select.Option>
+              <Select.Option value="Cấp 8">Cấp 8</Select.Option>
+              <Select.Option value="Cấp 12">Cấp 12</Select.Option>
+              <Select.Option value="Cấp 15">Cấp 15</Select.Option>
+            </Select>
+          </Form.Item>
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <Form.Item name="xp" label="XP" style={{ flex: 1 }}>
+              <InputNumber style={{ width: '100%' }} min={0} />
+            </Form.Item>
+            <Form.Item name="wordsLearned" label="Từ đã học" style={{ flex: 1 }}>
+              <InputNumber style={{ width: '100%' }} min={0} />
+            </Form.Item>
+          </div>
+          <Form.Item name="status" label="Trạng thái" initialValue="active">
+            <Select>
+              <Select.Option value="active">Hoạt động</Select.Option>
+              <Select.Option value="inactive">Đã khóa</Select.Option>
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

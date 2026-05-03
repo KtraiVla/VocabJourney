@@ -1,9 +1,39 @@
 import React from 'react';
-import { Button, Row, Col } from 'antd';
+import { Button, Row, Col, Modal, Form, Input, message } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import './AdminGamificationTab.css';
 
 const AdminGamificationTab = () => {
+  const [isModalVisible, setIsModalVisible] = React.useState(false);
+  const [editingRecord, setEditingRecord] = React.useState(null);
+  const [form] = Form.useForm();
+
+  const showAddModal = () => {
+    setEditingRecord(null);
+    form.resetFields();
+    setIsModalVisible(true);
+  };
+
+  const showEditModal = (record) => {
+    setEditingRecord(record);
+    form.setFieldsValue(record);
+    setIsModalVisible(true);
+  };
+
+  const handleModalOk = () => {
+    form.validateFields().then((values) => {
+      console.log('Lưu huy hiệu:', values);
+      message.success(editingRecord ? 'Cập nhật huy hiệu thành công!' : 'Thêm huy hiệu thành công!');
+      setIsModalVisible(false);
+    }).catch((info) => {
+      console.log('Lỗi validate:', info);
+    });
+  };
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+  };
+
   const badgeData = [
     {
       id: 1,
@@ -63,7 +93,7 @@ const AdminGamificationTab = () => {
               </div>
               
               <div className="badge-actions">
-                <Button type="default" icon={<EditOutlined />} className="badge-action-btn edit">
+                <Button type="default" icon={<EditOutlined />} className="badge-action-btn edit" onClick={() => showEditModal(badge)}>
                   Sửa
                 </Button>
                 <Button type="default" danger icon={<DeleteOutlined />} className="badge-action-btn delete">
@@ -75,10 +105,31 @@ const AdminGamificationTab = () => {
       </Row>
       
       <div className="gamification-footer" style={{ marginTop: '24px' }}>
-         <Button type="primary" icon={<PlusOutlined />} className="add-badge-btn">
+         <Button type="primary" icon={<PlusOutlined />} className="add-badge-btn" onClick={showAddModal}>
           Thêm Huy Hiệu Mới
         </Button>
       </div>
+
+      <Modal
+        title={editingRecord ? "Sửa Huy Hiệu" : "Thêm Huy Hiệu Mới"}
+        open={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+        okText="Lưu"
+        cancelText="Hủy"
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item name="title" label="Tên huy hiệu" rules={[{ required: true, message: 'Vui lòng nhập tên huy hiệu!' }]}>
+            <Input placeholder="VD: Bước Đầu Tiên" />
+          </Form.Item>
+          <Form.Item name="description" label="Mô tả" rules={[{ required: true, message: 'Vui lòng nhập mô tả!' }]}>
+            <Input.TextArea placeholder="Mô tả điều kiện đạt huy hiệu" rows={3} />
+          </Form.Item>
+          <Form.Item name="icon" label="Biểu tượng (Icon)" rules={[{ required: true, message: 'Vui lòng nhập biểu tượng!' }]}>
+            <Input placeholder="Nhập một Emoji, VD: 🎯" />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };
