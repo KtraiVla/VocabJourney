@@ -16,6 +16,7 @@ namespace VocabJourney.Controllers
             string connectionString = configuration.GetConnectionString("DefaultConnection");
             _repo = new TienDoRepository(connectionString);
         }
+
         [HttpPost("luu-tu-vung")]
         public IActionResult LuuTuVung([FromBody] TienDoRequest request)
         {

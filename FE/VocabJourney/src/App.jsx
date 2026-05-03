@@ -27,7 +27,7 @@ function App() {
       <Route path="/phanthuong" element={<PhanThuongPage />} />
       <Route path="/tiendo" element={<TienDoPage />} />
       <Route path="/hoso" element={<HoSoPage />} />
-      <Route path="/chudechitiet" element={<ChuDeChiTietPage />}></Route>
+      <Route path="/chudechitiet/:id" element={<ChuDeChiTietPage />}></Route>
       <Route path="/hoctuvung" element={<HocTuVungPage />}></Route>
       <Route path="/quiz" element={<QuizPage />}></Route>
       <Route path="/admin" element={<AdminPage />} />

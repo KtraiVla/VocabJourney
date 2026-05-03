@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using VocabJourney.Models;
 
-
 namespace VocabJourney.Repositories
 {
     public class BaiHocRepository
     {
-        public readonly string _connectionString; 
+        private readonly string _connectionString;
+
+        // Viết chính xác theo cách cậu yêu cầu
         public BaiHocRepository(string connectionString)
         {
             _connectionString = connectionString;
@@ -17,15 +18,19 @@ namespace VocabJourney.Repositories
         public List<BaiHoc> GetDanhSachBaiHoc(int maChuDe)
         {
             List<BaiHoc> danhSachBaiHoc = new List<BaiHoc>();
+
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = @"SELECT MaBaiHoc, MaChuDe, TieuDe, MoTa, ThuTu 
-                                 FROM BaiHoc
-                                 WHERE MaChuDe = @MaChuDe 
-                                 ORDER BY ThuTu ASC";
-                using(SqlCommand cmd =  new SqlCommand(query, conn))
+                string query = @"
+                    SELECT MaBaiHoc, MaChuDe, TieuDe, MoTa, ThuTu 
+                    FROM BaiHoc 
+                    WHERE MaChuDe = @MaChuDe 
+                    ORDER BY ThuTu ASC";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@MaChuDe", maChuDe); 
+                    cmd.Parameters.AddWithValue("@MaChuDe", maChuDe);
+
                     conn.Open();
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
@@ -44,6 +49,7 @@ namespace VocabJourney.Repositories
                     }
                 }
             }
+            return danhSachBaiHoc;
         }
     }
 }

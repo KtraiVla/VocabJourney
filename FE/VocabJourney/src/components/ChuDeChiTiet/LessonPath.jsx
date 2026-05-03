@@ -1,44 +1,49 @@
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import LessonItem from "./LessonItem.jsx";
 import "./LessonPath.css";
+import baihocService from "../../services/baihocService.js";
 
 export default function LessonPath() {
-  const lessons = [
-    {
-      id: 1,
-      title: "Tại Sân Bay",
-      description: "Học từ vựng thiết yếu cho trải nghiệm tại sân bay",
-      vocabCount: 12,
-      status: "completed", // completed, current, locked
-    },
-    {
-      id: 2,
-      title: "Nhận Phòng Khách Sạn",
-      description: "Nắm vững ngôn ngữ đặt phòng khách sạn",
-      vocabCount: 10,
-      status: "completed",
-    },
-    {
-      id: 3,
-      title: "Hỏi Đường",
-      description: "Di chuyển trong thành phố một cách tự tin",
-      vocabCount: 15,
-      status: "current",
-      progress: 60,
-    },
-    {
-      id: 4,
-      title: "Phương Tiện Công Cộng",
-      description: "Từ vựng về xe buýt, tàu hỏa và taxi",
-      vocabCount: 14,
-      status: "locked",
-    },
-  ];
-  const lastCompletedIndex = lessons.findLastIndex(
-    (l) => l.status === "completed",
-  );
-  const totalNodes = lessons.length;
-  const activeLineHeight =
-    totalNodes > 1 ? `${(lastCompletedIndex / (totalNodes - 1)) * 100}%` : "0%";
+  const { id } = useParams();
+  const [baiHoc, setBaiHoc] = useState([]);
+  const [dangTai, setDangTai] = useState(true);
+
+  useEffect(() => {
+    const fetchBaiHoc = async () => {
+      try {
+        const response = await baihocService.getLessonsByTopic(id);
+        const ketQua = response.data;
+
+        if (ketQua.success) {
+          const duLieuDaBienDoi = ketQua.data.map((baihoc, index) => ({
+            id: baihoc.maBaiHoc,
+            title: baihoc.tieuDe,
+            description: baihoc.moTa,
+            vocabCount: 10,
+            status: index === 0 ? "current" : "locked",
+            progress: index === 0 ? 0 : null,
+          }));
+          setBaiHoc(duLieuDaBienDoi);
+        }
+      } catch (error) {
+        console.log("Lỗi khi gọi Service: ", error);
+      } finally {
+        setDangTai(false);
+      }
+    };
+    if (id) {
+      fetchBaiHoc();
+    }
+  }, [id]);
+
+  if (dangTai) return <div className="loading">Đang tải...</div>;
+
+  const lastCompletedIndex = baiHoc.findLastIndex((l) => l.status === "completed"); 
+  const totalNodes = baiHoc.length;
+  const activeLineHeight = totalNodes > 1 && lastCompletedIndex >= 0
+      ? `${(lastCompletedIndex / (totalNodes - 1)) * 100}%`
+      : "0%";
 
   return (
     <div className="lesson-path-container">
@@ -50,19 +55,19 @@ export default function LessonPath() {
       </div>
 
       <div className="lesson-items-wrapper">
-        {lessons.map((lesson, index) => {
+        {baiHoc.map((baihoc, index) => {
           // Alternate alignment: left, right, left, right
           const alignment = index % 2 === 0 ? "left" : "right";
 
           return (
             <LessonItem
-              key={lesson.id}
+              key={baihoc.id}
               number={index + 1}
-              title={lesson.title}
-              description={lesson.description}
-              vocabCount={lesson.vocabCount}
-              status={lesson.status}
-              progress={lesson.progress}
+              title={baihoc.title}
+              description={baihoc.description}
+              vocabCount={baihoc.vocabCount}
+              status={baihoc.status}
+              progress={baihoc.progress}
               alignment={alignment}
             />
           );

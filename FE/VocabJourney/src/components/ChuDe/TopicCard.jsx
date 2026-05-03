@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { BookOpen, Sparkles, Play } from "lucide-react";
 import "./TopicCard.css";
 
@@ -30,6 +31,7 @@ const overlayColors = {
 };
 
 export default function TopicCard({
+  id,
   image,
   title,
   description,
@@ -86,13 +88,16 @@ export default function TopicCard({
           </div>
         </div>
 
-        <button className="continue-btn" style={{ background: theme.gradient }}>
+        <Link 
+          to={`/chudechitiet/${id}`} 
+          state={{ title, description, lessons, words, percent, image, overlay }}
+          className="continue-btn" 
+          style={{ background: theme.gradient, textDecoration: 'none' }}
+        >
           <Play size={16} fill="white" />
-          <span>
-            <Link to = "">Tiếp tục</Link>
-          </span>
+          <span>Tiếp tục</span>
           <span className="arrow">→</span>
-        </button>
+        </Link>
       </div>
     </div>
   );

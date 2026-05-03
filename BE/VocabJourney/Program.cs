@@ -16,7 +16,7 @@
             {
                 options.AddPolicy("ChoPhepReact", policy =>
                 {
-                    policy.WithOrigins("http://localhost:5173") // Cổng của React
+                    policy.WithOrigins("http://localhost:5175") // Cổng của React
                           .AllowAnyHeader()
                           .AllowAnyMethod();
                 });
