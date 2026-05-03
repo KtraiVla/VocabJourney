@@ -12,6 +12,7 @@ import HoSoPage from "./pages/HoSoPage.jsx";
 import ChuDeChiTietPage from "./pages/ChuDeChiTietPage.jsx";
 import HocTuVungPage from "./pages/HocTuVungPage.jsx";
 import QuizPage from "./pages/QuizPage.jsx";
+import AdminPage from "./pages/AdminPage.jsx";
 
 import "./App.css";
 
@@ -29,6 +30,7 @@ function App() {
       <Route path="/chudechitiet" element={<ChuDeChiTietPage />}></Route>
       <Route path="/hoctuvung" element={<HocTuVungPage />}></Route>
       <Route path="/quiz" element={<QuizPage />}></Route>
+      <Route path="/admin" element={<AdminPage />} />
     </Routes>
   );
 }

@@ -1,0 +1,103 @@
+.admin-user-tab {
+  padding: 10px 0;
+}
+
+/* Header Tab */
+.tab-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.tab-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.add-user-btn {
+  background-color: #0ea5e9;
+  border-radius: 8px;
+  font-weight: 500;
+  height: 40px;
+  padding: 0 20px;
+  box-shadow: 0 2px 4px rgba(14, 165, 233, 0.2);
+}
+
+.add-user-btn:hover {
+  background-color: #0284c7 !important;
+}
+
+/* Search Bar */
+.search-container {
+  margin-bottom: 24px;
+}
+
+.search-input {
+  max-width: 100%;
+  border-radius: 8px;
+  padding: 8px 16px;
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.search-input:focus, .search-input:hover {
+  border-color: #cbd5e1;
+  background-color: white;
+}
+
+.search-input input {
+  background-color: transparent;
+}
+
+/* Table Customization */
+.custom-table .ant-table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.custom-table .ant-table-thead > tr > th {
+  background-color: white;
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 12px;
+  border-bottom: 1px solid #f1f5f9;
+  text-transform: uppercase;
+  padding: 16px;
+}
+
+.custom-table .ant-table-tbody > tr > td {
+  padding: 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #475569;
+}
+
+.custom-table-row:hover > td {
+  background-color: #f8fafc !important;
+}
+
+/* Cell Specific Styles */
+.user-info-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 14px;
+}
+
+.user-email {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.level-tag, .status-tag {
+  border-radius: 12px;
+  padding: 4px 12px;
+  font-weight: 600;
+  font-size: 12px;
+}

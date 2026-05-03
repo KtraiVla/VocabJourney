@@ -1,0 +1,135 @@
+.admin-vocab-tab {
+  padding: 10px 0;
+}
+
+/* Header */
+.vocab-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.vocab-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.add-vocab-btn {
+  background-color: #0ea5e9;
+  border-radius: 8px;
+  font-weight: 500;
+  height: 40px;
+  padding: 0 20px;
+  box-shadow: 0 2px 4px rgba(14, 165, 233, 0.2);
+}
+
+.add-vocab-btn:hover {
+  background-color: #0284c7 !important;
+}
+
+/* Vocab Card Layout */
+.vocab-card {
+  display: flex;
+  background-color: white;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  padding: 16px;
+  gap: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
+}
+
+.vocab-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+  border-color: #cbd5e1;
+}
+
+/* Image styling */
+.vocab-image-wrapper {
+  flex-shrink: 0;
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.vocab-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Content styling */
+.vocab-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.vocab-info-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.vocab-word {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.vocab-pronunciation {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 8px;
+  font-family: monospace;
+  background-color: #f8fafc;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.vocab-meaning {
+  font-size: 14px;
+  color: #475569;
+  margin-bottom: 12px;
+  flex-grow: 1; /* Pushes actions to the bottom */
+}
+
+/* Actions */
+.vocab-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.action-btn {
+  padding: 0;
+  height: auto;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.edit-btn {
+  color: #475569;
+}
+
+.edit-btn:hover {
+  color: #1e293b !important;
+}
+
+.delete-btn {
+  color: #ef4444;
+}
+
+.delete-btn:hover {
+  color: #dc2626 !important;
+}
