@@ -27,7 +27,7 @@ export default function LessonPath() {
               progress = 100;
             } else if (!foundCurrent) {
               status = "current";
-              progress = 0;
+              progress = baihoc.tienDo; // Lấy % thực tế từ BE
               foundCurrent = true;
             }
 

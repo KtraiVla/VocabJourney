@@ -1,13 +1,28 @@
+import React, { useState, useEffect } from "react";
 import "./ThanhTich.css";
 import { Trophy } from "lucide-react";
-
-const achievements = [
-  { icon: "🎯", label: "Bước Đầu\nTiên" },
-  { icon: "🔥", label: "Chiến Binh\n7 Ngày" },
-  { icon: "📚", label: "Bậc Thầy\nTừ Vựng" },
-];
+import badgeService from "../../services/badgeService";
 
 export default function ThanhTich() {
+  const [badges, setBadges] = useState([]);
+
+  useEffect(() => {
+    const fetchBadges = async () => {
+      try {
+        const maNguoiDung = localStorage.getItem("maNguoiDung");
+        if (maNguoiDung) {
+          const response = await badgeService.getUserBadges(maNguoiDung);
+          if (response.data && response.data.success) {
+            setBadges(response.data.data);
+          }
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy thành tích:", error);
+      }
+    };
+    fetchBadges();
+  }, []);
+
   return (
     <div className="achievements-block">
       <div className="achievements-header">
@@ -17,20 +32,26 @@ export default function ThanhTich() {
           </div>
           <h3>Thành Tích</h3>
         </div>
-        <a href="#!" className="db-view-all">
+        <a href="/phanthuong" className="db-view-all">
           Xem Tất Cả
         </a>
       </div>
       
       <div className="achievements-grid">
-        {achievements.map((a, i) => (
-          <div key={i} className="achievement-item">
-            <div className="achievement-icon-wrap">
-              <span className="achievement-icon">{a.icon}</span>
+        {badges.length > 0 ? (
+          badges.slice(0, 3).map((badge, i) => (
+            <div key={i} className="achievement-item" title={badge.moTa}>
+              <div className="achievement-icon-wrap">
+                <span className="achievement-icon">{badge.iconName || "🏅"}</span>
+              </div>
+              <p className="achievement-label">{badge.tenHuyHieu}</p>
             </div>
-            <p className="achievement-label">{a.label}</p>
-          </div>
-        ))}
+          ))
+        ) : (
+          <p style={{ fontSize: "0.9rem", color: "#64748b", gridColumn: "span 3", textAlign: "center", padding: "10px 0" }}>
+            Chưa có thành tích nào. Hãy tích cực học nhé!
+          </p>
+        )}
       </div>
     </div>
   );

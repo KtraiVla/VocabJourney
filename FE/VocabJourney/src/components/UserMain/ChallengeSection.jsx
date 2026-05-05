@@ -1,31 +1,28 @@
+import React, { useState, useEffect } from "react";
 import "./ChallengeSection.css";
 import ChallengeItem from "./ChallengeItem.jsx";
 import { Target } from "lucide-react";
+import challengeService from "../../services/challengeService";
 
 export default function ChallengesSection() {
-  const challenges = [
-    {
-      title: "Nhà Vô Địch Hàng Ngày",
-      desc: "Hoàn thành 5 bài học hôm nay",
-      reward: 100,
-      progress: 3,
-      total: 5,
-    },
-    {
-      title: "Bậc Thầy Quiz",
-      desc: "Đạt điểm 100% trong 3 bài kiểm tra",
-      reward: 250,
-      progress: 1,
-      total: 3,
-    },
-    {
-      title: "Ôn Tập Đều Đặn",
-      desc: "Ôn tập 50 từ trong tuần này",
-      reward: 200,
-      progress: 32,
-      total: 50,
-    },
-  ];
+  const [challenges, setChallenges] = useState([]);
+
+  useEffect(() => {
+    const fetchChallenges = async () => {
+      try {
+        const maNguoiDung = localStorage.getItem("maNguoiDung");
+        if (maNguoiDung) {
+          const response = await challengeService.getDailyChallenges(maNguoiDung);
+          if (response.data && response.data.success) {
+            setChallenges(response.data.data);
+          }
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy thử thách:", error);
+      }
+    };
+    fetchChallenges();
+  }, []);
 
   return (
     <section className="challenges-section">
@@ -37,16 +34,22 @@ export default function ChallengesSection() {
       </div>
 
       <div className="challenges-list">
-        {challenges.map((item, index) => (
-          <ChallengeItem
-            key={index}
-            title={item.title}
-            desc={item.desc}
-            reward={item.reward}
-            progress={item.progress}
-            total={item.total}
-          />
-        ))}
+        {challenges.length > 0 ? (
+          challenges.map((item, index) => (
+            <ChallengeItem
+              key={index}
+              title={item.title}
+              desc={item.desc}
+              reward={item.reward}
+              progress={item.progress}
+              total={item.total}
+            />
+          ))
+        ) : (
+          <p style={{ textAlign: "center", fontSize: "0.9rem", color: "#64748b", padding: "20px" }}>
+            Hiện chưa có thử thách nào hôm nay.
+          </p>
+        )}
       </div>
     </section>
   );

@@ -10,11 +10,13 @@ namespace VocabJourney.Controllers
     public class TienDoController : ControllerBase
     {
         private readonly TienDoRepository _repo;
+        private readonly ThongKeRepository _thongKeRepo;
 
         public TienDoController(IConfiguration configuration)
         {
             string connectionString = configuration.GetConnectionString("DefaultConnection");
             _repo = new TienDoRepository(connectionString);
+            _thongKeRepo = new ThongKeRepository(connectionString);
         }
 
         [HttpPost("luu-tu-vung")]
@@ -26,6 +28,7 @@ namespace VocabJourney.Controllers
 
                 if (ketQua)
                 {
+                    _thongKeRepo.CapNhatStreak(request.MaNguoiDung);
                     return Ok(new { success = true, message = "Đã lưu tiến độ!" });
                 }
                 return BadRequest(new { success = false, message = "Lưu thất bại." });
@@ -44,6 +47,7 @@ namespace VocabJourney.Controllers
                 bool ketQua = _repo.LuuTienDoBaiHoc(request.MaNguoiDung, request.MaBaiHoc);
                 if (ketQua)
                 {
+                    _thongKeRepo.CapNhatStreak(request.MaNguoiDung);
                     return Ok(new { success = true, message = "Đã lưu tiến độ bài học!" });
                 }
                 return BadRequest(new { success = false, message = "Lưu thất bại." });
@@ -51,6 +55,34 @@ namespace VocabJourney.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
+
+        [HttpGet("bai-hoc-gan-nhat/{maNguoiDung}")]
+        public IActionResult GetBaiHocGanNhat(int maNguoiDung)
+        {
+            try
+            {
+                var data = _repo.GetBaiHocGanNhat(maNguoiDung);
+                return Ok(new { success = true, data = data });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet("so-tu-on-tap/{maNguoiDung}")]
+        public IActionResult GetSoTuOnTap(int maNguoiDung)
+        {
+            try
+            {
+                var count = _repo.GetSoTuCanOnTap(maNguoiDung);
+                return Ok(new { success = true, count = count });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
     }

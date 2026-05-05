@@ -29,7 +29,7 @@ export default function LessonItem({
   const getButtonText = () => {
     if (status === "completed") return "Ôn tập lại";
     if (status === "locked") return "Hoàn thành bài học trước đã";
-    return "Tiếp tục học";
+    return progress > 0 ? "Tiếp tục học" : "Bắt đầu học";
   };
 
   const getButtonIcon = () => {

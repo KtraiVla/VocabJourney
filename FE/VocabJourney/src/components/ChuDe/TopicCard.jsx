@@ -95,7 +95,7 @@ export default function TopicCard({
           style={{ background: theme.gradient, textDecoration: 'none' }}
         >
           <Play size={16} fill="white" />
-          <span>Tiếp tục</span>
+          <span>{percent > 0 ? "Tiếp tục" : "Bắt đầu học"}</span>
           <span className="arrow">→</span>
         </Link>
       </div>

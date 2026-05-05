@@ -9,5 +9,6 @@ namespace VocabJourney.Models
         public int ThuTu {  get; set; }  
         public int SoTuVung { get; set; }
         public bool DaHoanThanh { get; set; }
+        public double TienDo { get; set; }
     }
 }

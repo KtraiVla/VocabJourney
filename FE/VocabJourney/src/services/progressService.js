@@ -7,7 +7,17 @@ const progressService = {
       maNguoiDung,
       maBaiHoc,
     });
-    return response.data;
+    return response;
+  },
+
+  getRecentLesson: async (maNguoiDung) => {
+    const response = await axiosUser.get(`/TienDo/bai-hoc-gan-nhat/${maNguoiDung}`);
+    return response;
+  },
+
+  getReviewCount: async (maNguoiDung) => {
+    const response = await axiosUser.get(`/TienDo/so-tu-on-tap/${maNguoiDung}`);
+    return response;
   },
 
   // Lưu tiến độ cho từng từ vựng (nếu cần dùng sau này cho Leitner)

@@ -1,42 +1,40 @@
+import React, { useState, useEffect } from "react";
 import "./TopicSection.css";
 import TopicCard from "./TopicCard.jsx";
-import img1 from "../../assets/images/dulich.jpg";
-import img2 from "../../assets/images/dongvat.jpg";
-import img3 from "../../assets/images/nhahang.jpg";
+import imgDefault from "../../assets/images/dulich.jpg";
+import topicService from "../../services/topicService";
 
 export default function TopicsSection() {
-  const topics = [
-    {
-      image: img1,
-      title: "Du Lịch & Khám Phá",
-      lessons: 8,
-      words: 96,
-      percent: 75,
-      overlay: "blue",
-    },
-    {
-      image: img2,
-      title: "Thế giới động vật",
-      lessons: 12,
-      words: 144,
-      percent: 45,
-      overlay: "yellow",
-    },
-    {
-      image: img3,
-      title: "Ẩm Thực & Nhà Hàng",
-      lessons: 6,
-      words: 72,
-      percent: 90,
-      overlay: "green",
-    },
-  ];
+  const [topics, setTopics] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTopics = async () => {
+      try {
+        const maNguoiDung = localStorage.getItem("maNguoiDung");
+        const response = await topicService.getAllTopics(maNguoiDung);
+        if (response.data) {
+          // Lấy 3 chủ đề đầu tiên để hiển thị ở trang chủ
+          setTopics(response.data.slice(0, 3));
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách chủ đề:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTopics();
+  }, []);
+
+  if (loading) return <div className="topics-section">Đang tải chủ đề...</div>;
+
+  const overlays = ["blue", "yellow", "green", "purple"];
 
   return (
     <section className="topics-section">
       <div className="topics-header">
         <h2>Khám Phá Chủ Đề</h2>
-        <a href="#!" className="view-all-link">
+        <a href="/chude" className="view-all-link">
           Xem Tất Cả →
         </a>
       </div>
@@ -44,13 +42,14 @@ export default function TopicsSection() {
       <div className="topics-section-grid">
         {topics.map((topic, index) => (
           <TopicCard
-            key={index}
-            image={topic.image}
-            title={topic.title}
-            lessons={topic.lessons}
-            words={topic.words}
-            percent={topic.percent}
-            overlay={topic.overlay}
+            key={topic.maChuDe}
+            id={topic.maChuDe}
+            image={topic.anhMinhHoa || imgDefault}
+            title={topic.tenChuDe}
+            lessons={topic.soBaiHoc}
+            words={topic.soTuVung}
+            percent={topic.tienDo}
+            overlay={overlays[index % overlays.length]}
           />
         ))}
       </div>
