@@ -17,6 +17,10 @@ const authService = {
       email: email, 
       password: matkhau 
     });
+  },
+
+  getUserInfo: (userId) => {
+    return axiosClient.get(`/Auth/user/${userId}`);
   }
 };
 

@@ -20,17 +20,13 @@
   background-color: white;
   border-radius: 20px;
   padding: 2rem 1.75rem;
-  /* Increased vertical and horizontal padding slightly */
   width: 100%;
   max-width: 420px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   position: relative;
   z-index: 2;
   border: 3px solid transparent;
-  /* Thicker border */
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .lesson-item-card:hover {
@@ -41,21 +37,18 @@
 /* Status variants */
 .lesson-item-card.status-completed {
   border-color: #10b981;
-  /* Green */
 }
 
 .lesson-item-card.status-current {
   border-color: #ec4899;
-  /* Pink */
 }
 
 .lesson-item-card.status-locked {
   border-color: #e2e8f0;
-  /* Gray */
   background-color: #f8fafc;
 }
 
-/* Status Icon (The circle on top left) */
+/* Status Icon */
 .node-status-icon {
   position: absolute;
   top: -15px;
@@ -74,18 +67,9 @@
   border: 3px solid white;
 }
 
-.status-completed .node-status-icon {
-  background-color: #10b981;
-}
-
-.status-current .node-status-icon {
-  background-color: #ec4899;
-}
-
-.status-locked .node-status-icon {
-  background-color: #cbd5e1;
-  color: white;
-}
+.status-completed .node-status-icon { background-color: #10b981; }
+.status-current .node-status-icon { background-color: #ec4899; }
+.status-locked .node-status-icon { background-color: #cbd5e1; }
 
 /* Content */
 .node-title {
@@ -95,15 +79,12 @@
   margin: 0 0 0.5rem 0;
 }
 
-.status-locked .node-title {
-  color: #64748b;
-}
+.status-locked .node-title { color: #64748b; }
 
 .node-description {
   font-size: 0.95rem;
   color: #475569;
   margin: 0 0 1.75rem 0;
-  /* Tăng khoảng cách để thẻ cao hơn */
   line-height: 1.5;
 }
 
@@ -125,21 +106,12 @@
   gap: 0.35rem;
 }
 
-.badge-vocab {
-  background-color: #e0f2fe;
-  color: #0284c7;
-}
+.badge-vocab { background-color: #e0f2fe; color: #0284c7; }
+.badge-completed { background-color: #d1fae5; color: #059669; }
+.badge-quiz-info { background-color: #f3e8ff; color: #7c3aed; }
 
-.badge-completed {
-  background-color: #d1fae5;
-  color: #059669;
-}
-
-/* Current state progress */
-.node-progress-wrapper {
-  margin-bottom: 1.25rem;
-}
-
+/* Progress */
+.node-progress-wrapper { margin-bottom: 1.25rem; }
 .node-progress-header {
   display: flex;
   justify-content: space-between;
@@ -148,22 +120,16 @@
   margin-bottom: 0.5rem;
   color: #475569;
 }
-
-.node-progress-percentage {
-  color: #ec4899;
-}
-
+.node-progress-percentage { color: #ec4899; }
 .node-progress-bar {
   height: 8px;
   background-color: #f1f5f9;
   border-radius: 4px;
   overflow: hidden;
 }
-
 .node-progress-fill {
   height: 100%;
   background-color: #1e293b;
-  /* Dark fill */
   border-radius: 4px;
 }
 
@@ -185,27 +151,11 @@
   transition: all 0.2s ease;
 }
 
-.btn-completed {
-  background-color: #475569;
-  color: white;
-}
-
-.btn-completed:hover {
-  background-color: #334155;
-  transform: translateY(-1px);
-}
-
+.btn-completed { background-color: #475569; color: white; }
 .btn-current {
   background: linear-gradient(135deg, #d946ef 0%, #ec4899 100%);
   color: white;
 }
-
-.btn-current:hover {
-  opacity: 0.9;
-  box-shadow: 0 6px 15px rgba(217, 70, 239, 0.3);
-  transform: translateY(-1px);
-}
-
 .btn-locked {
   background-color: transparent;
   color: #94a3b8;
@@ -213,8 +163,35 @@
   cursor: not-allowed;
 }
 
-@media (max-width: 640px) {
+/* Quiz Special Styling */
+.lesson-item-card.quiz-card-special {
+  background: linear-gradient(to bottom right, #ffffff, #faf5ff);
+  border-style: solid;
+}
 
+.lesson-item-card.quiz-card-special.status-completed { border-color: #8b5cf6; }
+.lesson-item-card.quiz-card-special.status-current {
+  border-color: #a855f7;
+  animation: pulse-purple 2s infinite;
+}
+
+@keyframes pulse-purple {
+  0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(168, 85, 247, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
+}
+
+.btn-quiz.btn-current {
+  background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.status-completed.quiz-card-special .node-status-icon { background-color: #8b5cf6; }
+.status-current.quiz-card-special .node-status-icon { background-color: #a855f7; }
+
+.type-quiz { margin: 40px 0; }
+
+@media (max-width: 640px) {
   .lesson-item-container.align-left,
   .lesson-item-container.align-right {
     padding: 0;

@@ -178,6 +178,43 @@ namespace VocabJourney.Repositories
             return null;
         }
 
+        public bool LuuKetQuaKiemTra(int maNguoiDung, int soCauDung, int tongCauHoi)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = @"
+                    INSERT INTO KetQuaKiemTra (MaNguoiDung, SoCauDung, TongCauHoi, NgayLam) 
+                    VALUES (@MaNguoiDung, @SoCauDung, @TongCauHoi, GETDATE())";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaNguoiDung", maNguoiDung);
+                    cmd.Parameters.AddWithValue("@SoCauDung", soCauDung);
+                    cmd.Parameters.AddWithValue("@TongCauHoi", tongCauHoi);
+
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        // Tính toán XP theo đúng bản thiết kế
+                        // Mỗi câu đúng +4 XP, Hoàn thành +20 XP, Perfect +20 XP
+                        int xpGoc = (soCauDung * 4) + 20;
+                        if (soCauDung == tongCauHoi && tongCauHoi >= 10) // Điều kiện Perfect
+                        {
+                            xpGoc += 20;
+                        }
+
+                        var thongKeRepo = new ThongKeRepository(_connectionString);
+                        thongKeRepo.CongXP(maNguoiDung, "QUIZ", xpGoc);
+                        thongKeRepo.CapNhatStreak(maNguoiDung);
+                    }
+
+                    return rowsAffected > 0;
+                }
+            }
+        }
+
         public int GetSoTuCanOnTap(int maNguoiDung)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))

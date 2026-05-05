@@ -33,6 +33,9 @@ namespace VocabJourney.Repositories
                         t.NgayCapNhatXP,
                         ISNULL((SELECT COUNT(*) + 1 FROM ThongKeNguoiDung WHERE DiemKinhNghiem > ISNULL(t.DiemKinhNghiem, 0)), (SELECT COUNT(*) + 1 FROM ThongKeNguoiDung)) AS ThuHang,
                         (SELECT COUNT(*) FROM TienDoTuVung WHERE MaNguoiDung = @MaNguoiDung AND DaHoc = 1) AS TongTuDaHoc,
+                        (SELECT COUNT(*) FROM TienDoBaiHoc WHERE MaNguoiDung = @MaNguoiDung AND TrangThai = 1) AS TongBaiHocDaXong,
+                        (SELECT ISNULL(AVG(CAST(SoCauDung AS FLOAT) / CAST(TongCauHoi AS FLOAT) * 100), 0) FROM KetQuaKiemTra WHERE MaNguoiDung = @MaNguoiDung) AS DoChinhXacTB,
+                        (SELECT COUNT(*) FROM NguoiDungHuyHieu WHERE MaNguoiDung = @MaNguoiDung) AS TongHuyHieu,
                         (SELECT COUNT(*) FROM TienDoTuVung WHERE MaNguoiDung = @MaNguoiDung) AS TongTuDaGap,
                         (SELECT COUNT(*) FROM KetQuaKiemTra WHERE MaNguoiDung = @MaNguoiDung) AS TongQuizDaLam
                     FROM (SELECT 1 AS x) dummy
@@ -61,6 +64,9 @@ namespace VocabJourney.Repositories
                                 NgayCapNhatXP = reader["NgayCapNhatXP"] != DBNull.Value ? Convert.ToDateTime(reader["NgayCapNhatXP"]) : (DateTime?)null,
                                 ThuHang = Convert.ToInt32(reader["ThuHang"]),
                                 TongTuDaHoc = Convert.ToInt32(reader["TongTuDaHoc"]),
+                                TongBaiHocDaXong = Convert.ToInt32(reader["TongBaiHocDaXong"]),
+                                DoChinhXacTB = Convert.ToDouble(reader["DoChinhXacTB"]),
+                                TongHuyHieu = Convert.ToInt32(reader["TongHuyHieu"]),
                                 TongTuDaGap = Convert.ToInt32(reader["TongTuDaGap"]),
                                 TongQuizDaLam = Convert.ToInt32(reader["TongQuizDaLam"])
                             };
@@ -116,7 +122,7 @@ namespace VocabJourney.Repositories
                     challengeStatus = 0;
                 }
 
-                // 3. Tính hệ số Streak
+                // 3. Tính hệ số Streak (x1.0, x1.2, x1.4, x1.6)
                 double multiplier = 1.0;
                 if (currentStreak >= 15) multiplier = 1.6;
                 else if (currentStreak >= 8) multiplier = 1.4;
@@ -128,34 +134,38 @@ namespace VocabJourney.Repositories
                 // 4. Xử lý từng loại hành động
                 switch (actionType.ToUpper())
                 {
-                    case "LEARN": // Học từ mới
-                        xpToAdd = 4; // Học bài mới không nhân streak theo yêu cầu
+                    case "LEARN": // Học từ mới (+4 XP)
+                        xpToAdd = 4; // Không nhân streak theo yêu cầu
                         soTuHoc++;
+                        // Challenge: Học 5 từ -> +20 XP
                         if (soTuHoc == 5 && (challengeStatus & 1) == 0) { bonusXP += 20; challengeStatus |= 1; }
                         break;
-
-                    case "REVIEW": // Ôn tập
-                        if (soTuOn < 50) 
+ 
+                    case "REVIEW": // Ôn tập (+3 XP/từ)
+                        if (soTuOn < 50) // Giới hạn 50 từ/ngày
                         {
                             xpToAdd = (int)(3 * multiplier);
                             soTuOn++;
+                            // Challenge: Ôn 10 từ -> +30 XP
                             if (soTuOn == 10 && (challengeStatus & 2) == 0) { bonusXP += 30; challengeStatus |= 2; }
                         }
                         break;
 
-                    case "LESSON": // Xong bài học
-                        xpToAdd = 20;
+                    case "LESSON": // Xong bài học (+20 XP)
+                        xpToAdd = 20; // Không nhân streak
                         break;
 
-                    case "QUIZ": // Làm Quiz
+                    case "QUIZ": // Làm Quiz (xpGoc = câu đúng * 4 + 20 hoàn thành + 20 perfect)
+                        // Giả định xpGoc đã bao gồm (câu đúng * 4 + 20 + perfect) từ Controller
                         xpToAdd = (int)(xpGoc * multiplier);
                         soQuiz++;
+                        // Challenge: Làm 1 quiz -> +40 XP
                         if (soQuiz == 1 && (challengeStatus & 4) == 0) { bonusXP += 40; challengeStatus |= 4; }
                         break;
                 }
 
-                // Thưởng Combo hoàn thành cả 3 nhiệm vụ
-                if (challengeStatus == 7 && (challengeStatus & 8) == 0)
+                // Thưởng combo hoàn thành cả 3 nhiệm vụ (+50 XP)
+                if ((challengeStatus & 7) == 7 && (challengeStatus & 8) == 0)
                 {
                     bonusXP += 50;
                     challengeStatus |= 8;
@@ -277,6 +287,179 @@ namespace VocabJourney.Repositories
                     cmd.ExecuteNonQuery();
                 }
             }
+        }
+        public List<object> GetHoatDongTuan(int maNguoiDung)
+        {
+            List<object> dsHoatDong = new List<object>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = @"
+                    SELECT 
+                        FORMAT(NgayHoc, 'dd/MM') AS Ngay,
+                        COUNT(*) AS SoTu
+                    FROM TienDoTuVung
+                    WHERE MaNguoiDung = @MaNguoiDung 
+                      AND DaHoc = 1 
+                      AND NgayHoc >= DATEADD(day, -7, GETDATE())
+                    GROUP BY FORMAT(NgayHoc, 'dd/MM')
+                    ORDER BY MIN(NgayHoc) ASC";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaNguoiDung", maNguoiDung);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            dsHoatDong.Add(new
+                            {
+                                day = reader["Ngay"].ToString(),
+                                value = Convert.ToInt32(reader["SoTu"])
+                            });
+                        }
+                    }
+                }
+            }
+            return dsHoatDong;
+        }
+        public List<object> GetXuHuongDoChinhXac(int maNguoiDung)
+        {
+            List<object> dsChinhXac = new List<object>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                // Lấy 5 kết quả bài kiểm tra gần nhất
+                string query = @"
+                    SELECT TOP 5 
+                        FORMAT(NgayLam, 'dd/MM') AS Ngay,
+                        ROUND(CAST(SoCauDung AS FLOAT) / CAST(TongCauHoi AS FLOAT) * 100, 0) AS TiLe
+                    FROM KetQuaKiemTra
+                    WHERE MaNguoiDung = @MaNguoiDung
+                    ORDER BY NgayLam ASC";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaNguoiDung", maNguoiDung);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            dsChinhXac.Add(new
+                            {
+                                label = reader["Ngay"].ToString(),
+                                value = Convert.ToInt32(reader["TiLe"])
+                            });
+                        }
+                    }
+                }
+            }
+            return dsChinhXac;
+        }
+        public List<object> GetPhanBoHocTap(int maNguoiDung)
+        {
+            List<object> dsPhanBo = new List<object>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = @"
+                    SELECT 
+                        c.TenChuDe,
+                        COUNT(*) AS SoTu
+                    FROM TienDoTuVung t
+                    JOIN TuVung v ON t.MaTuVung = v.MaTuVung
+                    JOIN ChuDe c ON v.MaChuDe = c.MaChuDe
+                    WHERE t.MaNguoiDung = @MaNguoiDung AND t.DaHoc = 1
+                    GROUP BY c.TenChuDe";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaNguoiDung", maNguoiDung);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            dsPhanBo.Add(new
+                            {
+                                name = reader["TenChuDe"].ToString(),
+                                value = Convert.ToInt32(reader["SoTu"])
+                            });
+                        }
+                    }
+                }
+            }
+            return dsPhanBo;
+        }
+        public List<object> GetHoatDongGanDay(int maNguoiDung)
+        {
+            List<object> dsHoatDong = new List<object>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                // Tổng hợp 5 hoạt động gần nhất từ 3 nguồn: Từ vựng, Bài kiểm tra, Huy hiệu
+                string query = @"
+                    SELECT TOP 5 * FROM (
+                        SELECT 
+                            'VOCAB' AS Loai, 
+                            N'Đã học từ: ' + v.Tu AS NoiDung, 
+                            t.NgayCapNhat AS ThoiGian,
+                            4 AS DiemXP
+                        FROM TienDoTuVung t
+                        JOIN TuVung v ON t.MaTuVung = v.MaTuVung
+                        WHERE t.MaNguoiDung = @MaNguoiDung AND t.DaHoc = 1
+
+                        UNION ALL
+
+                        SELECT 
+                            'LESSON' AS Loai, 
+                            N'Hoàn thành bài học' AS NoiDung, 
+                            NgayCapNhat AS ThoiGian,
+                            20 AS DiemXP
+                        FROM TienDoBaiHoc
+                        WHERE MaNguoiDung = @MaNguoiDung AND TrangThai = 1
+
+                        UNION ALL
+
+                        SELECT 
+                            'QUIZ' AS Loai, 
+                            N'Hoàn thành bài kiểm tra' AS NoiDung, 
+                            NgayLam AS ThoiGian,
+                            20 AS DiemXP -- Giả định trung bình hoặc lấy từ CongXP
+                        FROM KetQuaKiemTra
+                        WHERE MaNguoiDung = @MaNguoiDung
+
+                        UNION ALL
+
+                        SELECT 
+                            'BADGE' AS Loai, 
+                            N'Đạt huy hiệu: ' + h.TenHuyHieu AS NoiDung, 
+                            n.NgayDatDuoc AS ThoiGian,
+                            50 AS DiemXP
+                        FROM NguoiDungHuyHieu n
+                        JOIN HuyHieu h ON n.MaHuyHieu = h.MaHuyHieu
+                        WHERE n.MaNguoiDung = @MaNguoiDung
+                    ) AS Activities
+                    ORDER BY ThoiGian DESC";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaNguoiDung", maNguoiDung);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            dsHoatDong.Add(new
+                            {
+                                type = reader["Loai"].ToString(),
+                                title = reader["NoiDung"].ToString(),
+                                time = reader["ThoiGian"],
+                                xp = Convert.ToInt32(reader["DiemXP"])
+                            });
+                        }
+                    }
+                }
+            }
+            return dsHoatDong;
         }
     }
 }

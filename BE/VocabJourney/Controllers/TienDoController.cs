@@ -39,6 +39,14 @@ namespace VocabJourney.Controllers
             return BadRequest(new { success = false, message = "Lưu thất bại" });
         }
 
+        [HttpPost("luu-ket-qua-quiz")]
+        public IActionResult LuuKetQuaQuiz([FromBody] KetQuaQuizRequest request)
+        {
+            bool success = _repo.LuuKetQuaKiemTra(request.MaNguoiDung, request.SoCauDung, request.TongCauHoi);
+            if (success) return Ok(new { success = true, message = "Lưu kết quả Quiz thành công" });
+            return BadRequest(new { success = false, message = "Lưu kết quả Quiz thất bại" });
+        }
+
         [HttpGet("bai-hoc-gan-nhat/{maNguoiDung}")]
         public IActionResult GetBaiHocGanNhat(int maNguoiDung)
         {

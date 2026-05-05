@@ -1,21 +1,52 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import BadgeItem from './BadgeItem';
 import './RecentBadges.css';
+import badgeService from '../../services/badgeService';
 
 const RecentBadges = () => {
-  const badges = [
-    { id: 1, title: 'Bước Đầu Tiên', desc: 'Hoàn thành bài học đầu tiên', date: '16/12/2025', bgColor: '#fffbeb' },
-    { id: 2, title: 'Chiến Binh 7 Ngày', desc: 'Duy trì chuỗi ngày học 7 ngày', date: '5/1/2026', bgColor: '#fffbeb' },
-    { id: 3, title: 'Bậc Thầy Từ Vựng', desc: 'Học 100 từ vựng', date: '10/2/2026', bgColor: '#fffbeb' },
-  ];
+  const [badges, setBadges] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBadges = async () => {
+      try {
+        const maNguoiDung = localStorage.getItem("maNguoiDung");
+        if (maNguoiDung) {
+          const response = await badgeService.getUserBadges(maNguoiDung);
+          if (response && response.data) {
+            // Lấy 3 huy hiệu mới nhất
+            const formattedBadges = response.data.slice(0, 3).map(b => ({
+              id: b.maHuyHieu,
+              title: b.tenHuyHieu,
+              desc: b.moTa,
+              date: b.ngayDatDuoc ? new Date(b.ngayDatDuoc).toLocaleDateString('vi-VN') : 'Đã đạt được',
+              bgColor: '#fffbeb'
+            }));
+            setBadges(formattedBadges);
+          }
+        }
+      } catch (error) {
+        console.error("Lỗi khi tải huy hiệu gần đây:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBadges();
+  }, []);
+
+  if (loading) return <div className="loading-badges">Đang tải...</div>;
 
   return (
     <div className="recent-badges-card">
       <h2 className="section-title">Huy hiệu gần đây</h2>
       <div className="badges-list">
-        {badges.map(badge => (
-          <BadgeItem key={badge.id} {...badge} />
-        ))}
+        {badges.length > 0 ? (
+          badges.map(badge => (
+            <BadgeItem key={badge.id} {...badge} />
+          ))
+        ) : (
+          <p className="no-data">Bạn chưa đạt được huy hiệu nào.</p>
+        )}
       </div>
     </div>
   );

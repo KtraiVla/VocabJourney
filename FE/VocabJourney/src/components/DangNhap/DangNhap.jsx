@@ -43,6 +43,7 @@ function DangNhap() {
       const data = response.data;
       localStorage.setItem("vocabToken", data.token); 
       localStorage.setItem("maNguoiDung", data.userId); 
+      localStorage.setItem("tenNguoiDung", email.split('@')[0]); // Tạm thời dùng email nếu API chưa trả về username
 
       alert("Bạn đã đăng nhập thành công!");
       navigate("/homeuser"); // Chuyển sang trang chủ

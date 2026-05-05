@@ -18,80 +18,62 @@ export default function LessonPath() {
 
         if (ketQua.success) {
           let foundCurrent = false;
-          const duLieuDaBienDoi = ketQua.data.map((baihoc, index) => {
+          const duLieuDaBienDoi = ketQua.data.map((bh) => {
             let status = "locked";
-            let progress = null;
-
-            if (baihoc.daHoanThanh) {
+            if (bh.daHoanThanh) {
               status = "completed";
-              progress = 100;
             } else if (!foundCurrent) {
               status = "current";
-              progress = baihoc.tienDo; // Lấy % thực tế từ BE
               foundCurrent = true;
             }
 
             return {
-              id: baihoc.maBaiHoc,
-              title: baihoc.tieuDe,
-              description: baihoc.moTa,
-              vocabCount: baihoc.soTuVung,
+              id: bh.maBaiHoc,
+              title: bh.tieuDe,
+              description: bh.moTa,
+              vocabCount: bh.soTuVung,
               status: status,
-              progress: progress,
+              progress: bh.tienDo,
             };
           });
           setBaiHoc(duLieuDaBienDoi);
         }
       } catch (error) {
-        console.log("Lỗi khi gọi Service: ", error);
+        console.log("Lỗi khi tải bài học: ", error);
       } finally {
         setDangTai(false);
       }
     };
-    if (id) {
-      fetchBaiHoc();
-    }
+    if (id) fetchBaiHoc();
   }, [id]);
 
-  if (dangTai) return <div className="loading">Đang tải...</div>;
+  if (dangTai) return <div className="loading">Đang tải bài học...</div>;
 
-  const lastCompletedIndex = baiHoc.findLastIndex(
-    (l) => l.status === "completed",
-  );
-  const totalNodes = baiHoc.length;
-  const activeLineHeight =
-    totalNodes > 1 && lastCompletedIndex >= 0
-      ? `${(lastCompletedIndex / (totalNodes - 1)) * 100}%`
-      : "0%";
+  const lastCompletedIndex = baiHoc.findLastIndex(l => l.status === "completed");
+  const activeLineHeight = baiHoc.length > 1 && lastCompletedIndex >= 0
+    ? `${(lastCompletedIndex / (baiHoc.length - 1)) * 100}%`
+    : "0%";
 
   return (
     <div className="lesson-path-container">
       <div className="lesson-path-line">
-        <div
-          className="lesson-path-line-active"
-          style={{ height: activeLineHeight }}
-        ></div>
+        <div className="lesson-path-line-active" style={{ height: activeLineHeight }}></div>
       </div>
 
       <div className="lesson-items-wrapper">
-        {baiHoc.map((baihoc, index) => {
-          // Alternate alignment: left, right, left, right
-          const alignment = index % 2 === 0 ? "left" : "right";
-
-          return (
-            <LessonItem
-              key={baihoc.id}
-              lessonId={baihoc.id}
-              number={index + 1}
-              title={baihoc.title}
-              description={baihoc.description}
-              vocabCount={baihoc.vocabCount}
-              status={baihoc.status}
-              progress={baihoc.progress}
-              alignment={alignment}
-            />
-          );
-        })}
+        {baiHoc.map((bh, index) => (
+          <LessonItem
+            key={bh.id}
+            lessonId={bh.id}
+            number={index + 1}
+            title={bh.title}
+            description={bh.description}
+            vocabCount={bh.vocabCount}
+            status={bh.status}
+            progress={bh.progress}
+            alignment={index % 2 === 0 ? "left" : "right"}
+          />
+        ))}
       </div>
     </div>
   );

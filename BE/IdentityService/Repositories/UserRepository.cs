@@ -1,4 +1,4 @@
-﻿using System.Data.SqlClient;
+using System.Data.SqlClient;
 using Microsoft.Data.SqlClient;
 using IdentityService.Models;
 
@@ -72,6 +72,29 @@ namespace IdentityService.Repositories
                 }
             }
             return (null, 0, null);
+        }
+
+        public (string username, string email, DateTime joinDate) GetUserById(int userId)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT TenDangNhap, Email, NgayTao FROM NguoiDung WHERE MaNguoiDung = @UserId";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return (reader["TenDangNhap"].ToString(), 
+                                    reader["Email"].ToString(), 
+                                    Convert.ToDateTime(reader["NgayTao"]));
+                        }
+                    }
+                }
+            }
+            return (null, null, DateTime.MinValue);
         }
     }
 }

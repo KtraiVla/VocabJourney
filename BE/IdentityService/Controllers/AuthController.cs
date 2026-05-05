@@ -50,5 +50,19 @@ namespace IdentityService.Controllers
 
             return Ok(new { token = token, userId = user.userId, message = "Đăng nhập thành công!" });
         }
+
+        [HttpGet("user/{id}")]
+        public IActionResult GetUserInfo(int id)
+        {
+            var user = _repo.GetUserById(id);
+            if (user.username == null) return NotFound(new { message = "Không tìm thấy người dùng" });
+
+            return Ok(new
+            {
+                username = user.username,
+                email = user.email,
+                joinDate = user.joinDate
+            });
+        }
     }
 }

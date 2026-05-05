@@ -1,0 +1,89 @@
+.xp-history-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  margin-top: 24px;
+}
+
+.xp-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.xp-history-header .section-title {
+  margin-bottom: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.xp-total-badge {
+  background: #fff7ed;
+  color: #f97316;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.xp-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.xp-history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed #f1f5f9;
+}
+
+.xp-history-item:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.xp-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.xp-icon-circle {
+  width: 36px;
+  height: 36px;
+  background: #f8fafc;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
+.xp-item-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.xp-item-time {
+  margin: 0;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.xp-item-value {
+  font-weight: 700;
+  color: #f59e0b;
+  font-size: 15px;
+}

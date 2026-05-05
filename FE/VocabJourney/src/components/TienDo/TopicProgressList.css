@@ -18,5 +18,27 @@
 .topic-progress-list {
   display: flex;
   flex-direction: column;
-  gap: 8px; /* Extra gap if needed, mostly handled by item margin */
+  gap: 8px;
+}
+
+.show-more-btn {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.2s;
+  border-radius: 10px;
+}
+
+.show-more-btn:hover {
+  background: #eff6ff;
+  color: #2563eb;
 }

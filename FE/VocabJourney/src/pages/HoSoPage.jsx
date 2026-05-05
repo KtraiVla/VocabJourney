@@ -3,8 +3,10 @@ import ProfileHeader from "../components/HoSo/ProfileHeader.jsx";
 import ProfileStats from "../components/HoSo/ProfileStats.jsx";
 import RecentActivities from "../components/HoSo/RecentActivities.jsx";
 import RecentBadges from "../components/HoSo/RecentBadges.jsx";
+import XPHistory from "../components/HoSo/XPHistory.jsx";
 import LearningSetting from "../components/HoSo/LearningSetting.jsx";
 import "./HoSoPage.css";
+
 export default function HoSoPage() {
   return (
     <div className="profile-page">
@@ -16,6 +18,7 @@ export default function HoSoPage() {
         <div className="profile-bottom-grid">
           <div className="profile-bottom-left">
             <RecentActivities></RecentActivities>
+            <XPHistory></XPHistory>
           </div>
           <div className="profile-bottom-right">
             <RecentBadges></RecentBadges>

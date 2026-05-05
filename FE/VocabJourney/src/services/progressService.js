@@ -29,6 +29,15 @@ const progressService = {
     });
     return response.data;
   },
+
+  saveQuizResult: async (maNguoiDung, soCauDung, tongCauHoi) => {
+    const response = await axiosUser.post("/TienDo/luu-ket-qua-quiz", {
+      maNguoiDung,
+      soCauDung,
+      tongCauHoi,
+    });
+    return response.data;
+  },
 };
 
 export default progressService;

@@ -35,11 +35,13 @@ namespace VocabJourney.Repositories
                                            JOIN TuVung tv ON tdtv.MaTuVung = tv.MaTuVung 
                                            WHERE tv.MaBaiHoc = b.MaBaiHoc AND tdtv.MaNguoiDung = @MaNguoiDung AND tdtv.DaHoc = 1) AS FLOAT) 
                                       / NULLIF((SELECT COUNT(*) FROM TuVung WHERE MaBaiHoc = b.MaBaiHoc), 0) * 100)
-                           END AS TienDo";
+                           END AS TienDo,
+                           (SELECT MaBaiKiemTra FROM BaiKiemTra WHERE MaBaiHoc = b.MaBaiHoc) AS MaBaiKiemTra,
+                           CAST(CASE WHEN EXISTS (SELECT 1 FROM KetQuaKiemTra kq JOIN BaiKiemTra bk ON kq.MaBaiKiemTra = bk.MaBaiKiemTra WHERE bk.MaBaiHoc = b.MaBaiHoc AND kq.MaNguoiDung = @MaNguoiDung) THEN 1 ELSE 0 END AS BIT) AS QuizHoanThanh";
                 }
                 else
                 {
-                    query += ", 0 AS DaHoanThanh, 0 AS TienDo";
+                    query += ", 0 AS DaHoanThanh, 0 AS TienDo, NULL AS MaBaiKiemTra, 0 AS QuizHoanThanh";
                 }
 
                 query += @"
@@ -69,6 +71,8 @@ namespace VocabJourney.Repositories
                             bh.SoTuVung = reader["SoTuVung"] != DBNull.Value ? Convert.ToInt32(reader["SoTuVung"]) : 0;
                             bh.DaHoanThanh = Convert.ToBoolean(reader["DaHoanThanh"]);
                             bh.TienDo = reader["TienDo"] != DBNull.Value ? Math.Round(Convert.ToDouble(reader["TienDo"]), 0) : 0;
+                            bh.MaBaiKiemTra = reader["MaBaiKiemTra"] != DBNull.Value ? Convert.ToInt32(reader["MaBaiKiemTra"]) : (int?)null;
+                            bh.QuizHoanThanh = Convert.ToBoolean(reader["QuizHoanThanh"]);
 
                             danhSachBaiHoc.Add(bh);
                         }

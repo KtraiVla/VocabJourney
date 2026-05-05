@@ -35,12 +35,39 @@ namespace VocabJourney.Controllers
                 chuoiNgayHoc = stats.ChuoiNgayHoc,
                 ngayHocCuoi = stats.NgayHocCuoi,
                 tongTuDaHoc = stats.TongTuDaHoc,
+                tongBaiHocDaXong = stats.TongBaiHocDaXong,
+                doChinhXacTB = Math.Round(stats.DoChinhXacTB, 1),
+                tongHuyHieu = stats.TongHuyHieu,
                 tongTuDaGap = stats.TongTuDaGap,
                 tongQuizDaLam = stats.TongQuizDaLam,
                 thuHang = stats.ThuHang,
                 xpTarget = xpTarget,
                 xpProgress = Math.Round((double)stats.DiemKinhNghiem / xpTarget * 100, 1)
             });
+        }
+        [HttpGet("hoatdong/{maNguoiDung}")]
+        public IActionResult GetHoatDong(int maNguoiDung)
+        {
+            var data = _repo.GetHoatDongTuan(maNguoiDung);
+            return Ok(new { success = true, data = data });
+        }
+        [HttpGet("accuracy/{maNguoiDung}")]
+        public IActionResult GetAccuracy(int maNguoiDung)
+        {
+            var data = _repo.GetXuHuongDoChinhXac(maNguoiDung);
+            return Ok(new { success = true, data = data });
+        }
+        [HttpGet("distribution/{maNguoiDung}")]
+        public IActionResult GetDistribution(int maNguoiDung)
+        {
+            var data = _repo.GetPhanBoHocTap(maNguoiDung);
+            return Ok(new { success = true, data = data });
+        }
+        [HttpGet("recent/{maNguoiDung}")]
+        public IActionResult GetRecentActivities(int maNguoiDung)
+        {
+            var data = _repo.GetHoatDongGanDay(maNguoiDung);
+            return Ok(new { success = true, data = data });
         }
     }
 }

@@ -22,6 +22,9 @@ namespace VocabJourney.Models
         // Thuộc tính tính toán (không lưu DB)
         public int ThuHang { get; set; }
         public int TongTuDaHoc { get; set; }
+        public int TongBaiHocDaXong { get; set; }
+        public double DoChinhXacTB { get; set; }
+        public int TongHuyHieu { get; set; }
         public int TongTuDaGap { get; set; }
         public int TongQuizDaLam { get; set; }
     }

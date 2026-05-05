@@ -23,21 +23,21 @@ export default function LessonItem({
   const getStatusIcon = () => {
     if (status === "completed") return <Check size={20} strokeWidth={4} />;
     if (status === "locked") return <Lock size={18} strokeWidth={2.5} />;
-    return number; // 'current' shows the number
+    return number; 
   };
 
   const getButtonText = () => {
     if (status === "completed") return "Ôn tập lại";
-    if (status === "locked") return "Hoàn thành bài học trước đã";
+    if (status === "locked") return "Hoàn thành bài trước";
     return progress > 0 ? "Tiếp tục học" : "Bắt đầu học";
   };
 
   const getButtonIcon = () => {
-    if (status === "completed")
-      return <RotateCcw size={16} strokeWidth={2.5} />;
+    if (status === "completed") return <RotateCcw size={16} strokeWidth={2.5} />;
     if (status === "locked") return <Lock size={16} strokeWidth={2.5} />;
     return <Play size={16} fill="white" />;
   };
+
   return (
     <div className={`lesson-item-container align-${alignment}`}>
       <div className={`lesson-item-card status-${status}`}>
@@ -66,10 +66,7 @@ export default function LessonItem({
               <span className="node-progress-percentage">{progress}%</span>
             </div>
             <div className="node-progress-bar">
-              <div
-                className="node-progress-fill"
-                style={{ width: `${progress}%` }}
-              ></div>
+              <div className="node-progress-fill" style={{ width: `${progress}%` }}></div>
             </div>
           </div>
         )}
@@ -79,12 +76,7 @@ export default function LessonItem({
           disabled={status === "locked"}
           onClick={handleStartLesson}
         >
-          <span
-            className="btn-icon"
-            style={{ display: "flex", alignItems: "center" }}
-          >
-            {getButtonIcon()}
-          </span>
+          <span className="btn-icon">{getButtonIcon()}</span>
           {getButtonText()}
         </button>
       </div>
