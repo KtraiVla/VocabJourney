@@ -1,56 +1,60 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/common/Navbar.jsx";
 import FlashCard from "../components/TuVung/FlashCard.jsx";
 import LearningControls from "../components/TuVung/LearningControls.jsx";
 import LearningProgress from "../components/TuVung/LearningProgress.jsx";
+import vocabService from "../services/vocabService.js";
 import "./HocTuVungPage.css";
-
-const MOCK_VOCABULARY = [
-  {
-    id: 1,
-    word: "Luggage",
-    phonetic: "/ˈlʌɡ.ɪdʒ/",
-    type: "Danh từ",
-    translation: "Hành lý",
-    definition: "Túi xách và vali mà bạn mang theo khi đi du lịch",
-    exampleEn: "Where can I claim my luggage?",
-    exampleVi: "Tôi có thể nhận hành lý ở đâu?",
-    image: "https://images.unsplash.com/photo-1551522435-a13afa10f103?q=80&w=2070&auto=format&fit=crop", // Placeholder ảnh vali/sân bay
-  },
-  {
-    id: 2,
-    word: "Passport",
-    phonetic: "/ˈpæs.pɔːrt/",
-    type: "Danh từ",
-    translation: "Hộ chiếu",
-    definition: "Tài liệu chính thức do chính phủ cấp để đi lại quốc tế",
-    exampleEn: "Don't forget to bring your passport.",
-    exampleVi: "Đừng quên mang theo hộ chiếu của bạn.",
-    image: "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?q=80&w=2070&auto=format&fit=crop",
-  },
-];
 
 export default function HocTuVungPage() {
   const navigate = useNavigate();
+  // Lấy ID bài học từ URL (do bạn đã sửa trong App.jsx thành /hoctuvung/:lessonId)
+  const { lessonId } = useParams(); 
+
+  // State quản lý việc học
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [score, setScore] = useState({ correct: 0, incorrect: 0 });
 
-  // Lấy ra từ vựng hiện tại
-  const currentWord = MOCK_VOCABULARY[currentIndex];
-  const totalWords = MOCK_VOCABULARY.length;
+  // State quản lý dữ liệu API
+  const [vocabularyList, setVocabularyList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Gọi API khi component vừa load hoặc khi lessonId thay đổi
+  useEffect(() => {
+    const fetchVocab = async () => {
+      try {
+        setIsLoading(true);
+        const response = await vocabService.getTuVungByBaiHoc(lessonId);
+        const ketQua = response.data;
+
+        // Cập nhật danh sách từ vựng vào state
+        if (ketQua && ketQua.success) {
+          setVocabularyList(ketQua.data);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy từ vựng: ", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (lessonId) {
+      fetchVocab();
+    }
+  }, [lessonId]);
 
   // Hàm xử lý khi người dùng nhấn nút "Chưa thuộc" hoặc "Đã thuộc"
   const handleNextWord = (status) => {
     if (status === "remembered") {
-      setScore(prev => ({ ...prev, correct: prev.correct + 1 }));
+      setScore((prev) => ({ ...prev, correct: prev.correct + 1 }));
     } else if (status === "forgot") {
-      setScore(prev => ({ ...prev, incorrect: prev.incorrect + 1 }));
+      setScore((prev) => ({ ...prev, incorrect: prev.incorrect + 1 }));
     }
 
-    if (currentIndex < totalWords - 1) {
+    if (currentIndex < vocabularyList.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
       setIsFinished(true);
@@ -58,10 +62,39 @@ export default function HocTuVungPage() {
   };
 
   const handleBack = () => {
-    navigate("/chudechitiet"); // Hoặc trang chủ đề tùy ý
+    navigate(-1); // Quay lại trang trước đó
   };
 
-  // Nếu đã học xong, hiển thị màn hình chúc mừng
+  // --- CÁC MÀN HÌNH HIỂN THỊ ---
+
+  // 1. Màn hình loading khi đang gọi API
+  if (isLoading) {
+    return (
+      <div className="hoc-tu-vung-page">
+        <Navbar />
+        <div style={{ textAlign: "center", marginTop: "100px", fontSize: "1.2rem" }}>
+          Đang tải từ vựng...
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Màn hình trống (khi bài học chưa có từ vựng nào)
+  if (vocabularyList.length === 0) {
+    return (
+      <div className="hoc-tu-vung-page">
+        <Navbar />
+        <div style={{ textAlign: "center", marginTop: "100px" }}>
+          <h2>Bài học này chưa có từ vựng!</h2>
+          <button onClick={handleBack} style={{ marginTop: "20px", padding: "10px 20px" }}>
+            Quay lại
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. Màn hình hoàn thành bài học
   if (isFinished) {
     return (
       <div className="hoc-tu-vung-page">
@@ -72,7 +105,7 @@ export default function HocTuVungPage() {
           <div className="final-score">
             <span>💚 {score.correct}</span> | <span>❌ {score.incorrect}</span>
           </div>
-          <button 
+          <button
             className="btn-restart"
             onClick={() => {
               setCurrentIndex(0);
@@ -82,25 +115,34 @@ export default function HocTuVungPage() {
           >
             Học lại từ đầu
           </button>
+          <button
+            onClick={handleBack}
+            style={{ marginLeft: "10px", padding: "12px 24px", borderRadius: "8px", border: "1px solid #ddd", background: "white", cursor: "pointer" }}
+          >
+            Quay về danh sách
+          </button>
         </div>
       </div>
     );
   }
 
+  // 4. Màn hình đang học (Hiển thị Flashcard)
+  const currentWord = vocabularyList[currentIndex];
+  const totalWords = vocabularyList.length;
+
   return (
     <div className="hoc-tu-vung-page">
       <Navbar />
-      
-      {/* Header riêng cho phần học */}
+
       <div className="learning-top-header">
         <div className="learning-header-content">
           <button className="learning-back-btn" onClick={handleBack}>
             <ArrowLeft size={18} />
             <span>Quay lại</span>
           </button>
-          
+
           <h1 className="learning-title">Học Từ Vựng</h1>
-          
+
           <div className="learning-stats">
             <div className="learning-counter">
               {currentIndex + 1}/{totalWords}
@@ -112,29 +154,28 @@ export default function HocTuVungPage() {
             </div>
           </div>
         </div>
-        
-        {/* Component hiển thị tiến độ (đường kẻ ngang mỏng) */}
-        <LearningProgress 
-          currentIndex={currentIndex + 1} 
-          totalWords={totalWords} 
-        />
+
+        <LearningProgress currentIndex={currentIndex + 1} totalWords={totalWords} />
       </div>
 
       <main className="learning-main-container">
-        {/* Component hiển thị thẻ Flashcard */}
-        <FlashCard 
-          key={currentWord.id} 
-          word={currentWord.word}
-          phonetic={currentWord.phonetic}
-          type={currentWord.type}
-          translation={currentWord.translation}
-          definition={currentWord.definition}
-          exampleEn={currentWord.exampleEn}
-          exampleVi={currentWord.exampleVi}
-          image={currentWord.image}
+        {/* Truyen cac props vao FlashCard.
+            Lưu ý: Bạn có thể cần điều chỉnh tên biến (ví dụ: currentWord.tuVungTiengAnh)
+            sao cho khớp chính xác với dữ liệu API BE trả về nhé!
+        */}
+        <FlashCard
+          key={currentWord.maTuVung || currentIndex}
+          word={currentWord.tuTiengAnh}
+          phonetic={currentWord.phienAm}
+          type={""} // Backend hiện chưa có trường Từ Loại (Danh từ, Động từ...)
+          translation={currentWord.nghiaTiengViet}
+          definition={currentWord.dinhNghia || "Đang cập nhật định nghĩa..."}
+          exampleEn={currentWord.viDu || "Đang cập nhật ví dụ..."}
+          exampleVi={""} // Backend hiện chưa có trường Ví dụ Tiếng Việt
+          image={currentWord.anhMinhHoa}
+          difficulty={currentWord.doKho}
         />
 
-        {/* Component hiển thị các nút điều khiển */}
         <LearningControls onNext={handleNextWord} />
       </main>
     </div>

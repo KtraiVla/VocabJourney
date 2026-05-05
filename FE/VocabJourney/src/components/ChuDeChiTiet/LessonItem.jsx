@@ -3,6 +3,7 @@ import { Check, Lock, Play, RotateCcw, BookOpen } from "lucide-react";
 import "./LessonItem.css";
 
 export default function LessonItem({
+  lessonId,
   number,
   title,
   description,
@@ -15,7 +16,7 @@ export default function LessonItem({
 
   const handleStartLesson = () => {
     if (status !== "locked") {
-      navigate("/dashboard/learning");
+      navigate(`/hoctuvung/${lessonId}`);
     }
   };
 

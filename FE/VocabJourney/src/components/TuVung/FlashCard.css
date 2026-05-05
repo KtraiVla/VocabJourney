@@ -99,7 +99,7 @@
 .phonetic-text {
   font-size: 1.2rem;
   color: #64748b;
-  font-family: monospace;
+  font-family: 'Segoe UI', 'Lucida Sans Unicode', 'Arial Unicode MS', 'Times New Roman', sans-serif;
 }
 
 .speaker-btn {

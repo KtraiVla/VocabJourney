@@ -39,9 +39,12 @@ export default function LessonPath() {
 
   if (dangTai) return <div className="loading">Đang tải...</div>;
 
-  const lastCompletedIndex = baiHoc.findLastIndex((l) => l.status === "completed"); 
+  const lastCompletedIndex = baiHoc.findLastIndex(
+    (l) => l.status === "completed",
+  );
   const totalNodes = baiHoc.length;
-  const activeLineHeight = totalNodes > 1 && lastCompletedIndex >= 0
+  const activeLineHeight =
+    totalNodes > 1 && lastCompletedIndex >= 0
       ? `${(lastCompletedIndex / (totalNodes - 1)) * 100}%`
       : "0%";
 
@@ -62,6 +65,7 @@ export default function LessonPath() {
           return (
             <LessonItem
               key={baihoc.id}
+              lessonId={baihoc.id}
               number={index + 1}
               title={baihoc.title}
               description={baihoc.description}

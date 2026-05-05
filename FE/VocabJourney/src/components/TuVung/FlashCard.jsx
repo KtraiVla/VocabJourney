@@ -10,8 +10,22 @@ export default function FlashCard({
   exampleEn,
   exampleVi,
   image,
+  difficulty,
 }) {
+
   const [isFlipped, setIsFlipped] = useState(false);
+
+  // Helper hàm để lấy thông tin hiển thị của độ khó
+  const getDifficultyInfo = (level) => {
+    switch (level) {
+      case 1: return { label: "Dễ", color: "#10b981" }; // Xanh lá
+      case 2: return { label: "Vừa", color: "#f59e0b" }; // Vàng cam
+      case 3: return { label: "Khó", color: "#ef4444" }; // Đỏ
+      default: return { label: "Dễ", color: "#10b981" };
+    }
+  };
+
+  const diffInfo = getDifficultyInfo(difficulty);
 
   // Hàm xử lý sự kiện khi nhấn vào thẻ
   const handleFlip = () => {
@@ -24,11 +38,16 @@ export default function FlashCard({
         {/* Mặt trước của thẻ */}
         <div className="flashcard-front">
           {/* Nửa trên: Hình ảnh */}
-          <div 
+          <div
             className="flashcard-image-section"
             style={{ backgroundImage: `url(${image})` }}
           >
-            <div className="difficulty-badge">Dễ</div>
+            <div
+              className="difficulty-badge"
+              style={{ backgroundColor: diffInfo.color, boxShadow: `0 4px 10px ${diffInfo.color}4D` }}
+            >
+              {diffInfo.label}
+            </div>
             <div className="flashcard-hint-pill">
               👆 Chạm để xem nghĩa
             </div>
