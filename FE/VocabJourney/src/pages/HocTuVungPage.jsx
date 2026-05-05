@@ -11,7 +11,7 @@ import "./HocTuVungPage.css";
 export default function HocTuVungPage() {
   const navigate = useNavigate();
   // Lấy ID bài học từ URL (do bạn đã sửa trong App.jsx thành /hoctuvung/:lessonId)
-  const { lessonId } = useParams(); 
+  const { lessonId } = useParams();
 
   // State quản lý việc học
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -72,7 +72,13 @@ export default function HocTuVungPage() {
     return (
       <div className="hoc-tu-vung-page">
         <Navbar />
-        <div style={{ textAlign: "center", marginTop: "100px", fontSize: "1.2rem" }}>
+        <div
+          style={{
+            textAlign: "center",
+            marginTop: "100px",
+            fontSize: "1.2rem",
+          }}
+        >
           Đang tải từ vựng...
         </div>
       </div>
@@ -86,7 +92,10 @@ export default function HocTuVungPage() {
         <Navbar />
         <div style={{ textAlign: "center", marginTop: "100px" }}>
           <h2>Bài học này chưa có từ vựng!</h2>
-          <button onClick={handleBack} style={{ marginTop: "20px", padding: "10px 20px" }}>
+          <button
+            onClick={handleBack}
+            style={{ marginTop: "20px", padding: "10px 20px" }}
+          >
             Quay lại
           </button>
         </div>
@@ -117,7 +126,14 @@ export default function HocTuVungPage() {
           </button>
           <button
             onClick={handleBack}
-            style={{ marginLeft: "10px", padding: "12px 24px", borderRadius: "8px", border: "1px solid #ddd", background: "white", cursor: "pointer" }}
+            style={{
+              marginLeft: "10px",
+              padding: "12px 24px",
+              borderRadius: "8px",
+              border: "1px solid #ddd",
+              background: "white",
+              cursor: "pointer",
+            }}
           >
             Quay về danh sách
           </button>
@@ -155,7 +171,10 @@ export default function HocTuVungPage() {
           </div>
         </div>
 
-        <LearningProgress currentIndex={currentIndex + 1} totalWords={totalWords} />
+        <LearningProgress
+          currentIndex={currentIndex + 1}
+          totalWords={totalWords}
+        />
       </div>
 
       <main className="learning-main-container">
