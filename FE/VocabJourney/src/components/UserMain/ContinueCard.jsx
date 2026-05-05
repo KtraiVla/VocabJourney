@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import bgDuLich from "../../assets/images/dulich.jpg";
-import { ArrowRight, BookOpen } from "lucide-react";
+import bgDefault from "../../assets/images/dulich.jpg";
+import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "./ContinueCard.css";
 import progressService from "../../services/progressService";
@@ -29,16 +29,16 @@ export default function ContinueCard() {
     fetchRecent();
   }, []);
 
-  if (loading) return <div className="continue-card loading">Đang tải...</div>;
+  if (loading) return <div className="continue-card loading-state">Đang tải...</div>;
 
   if (!recentLesson) {
     return (
-      <div className="continue-card empty">
+      <div className="continue-card empty-state">
         <div className="continue-content">
-          <h3>Bắt đầu hành trình!</h3>
-          <p>Bạn chưa tham gia bài học nào. Hãy chọn một chủ đề để bắt đầu nhé.</p>
+          <h3>Bắt đầu học ngay!</h3>
+          <p>Bạn chưa học bài nào. Hãy chọn một chủ đề để khám phá nhé.</p>
           <button className="continue-btn" onClick={() => navigate("/chude")}>
-            Khám phá ngay <ArrowRight size={20} />
+            Khám phá <ArrowRight size={20} />
           </button>
         </div>
       </div>
@@ -50,8 +50,8 @@ export default function ContinueCard() {
       <div className="continue-image-box">
         <span className="continue-tag">Đang Học</span>
         <img
-          src={bgDuLich} // Có thể thay bằng ảnh của chủ đề nếu có
-          alt="Continue learning"
+          src={recentLesson.anhMinhHoa || bgDefault}
+          alt={recentLesson.tieuDe}
           className="continue-image"
         />
       </div>
@@ -64,7 +64,7 @@ export default function ContinueCard() {
           </div>
           <div className="continue-percent">
             <strong>{recentLesson.tienDo}%</strong>
-            <span>Tiến độ bài</span>
+            <span>Hoàn Thành</span>
           </div>
         </div>
 
@@ -74,7 +74,8 @@ export default function ContinueCard() {
 
         <div className="continue-bottom">
           <div className="continue-info-list">
-             <div className="continue-info-pill pill-purple">📍 {recentLesson.tenChuDe}</div>
+            <div className="continue-info-pill pill-purple">📍 {recentLesson.tenChuDe}</div>
+            <div className="continue-info-pill pill-blue">📖 Bài học hiện tại</div>
           </div>
 
           <button 

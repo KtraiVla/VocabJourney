@@ -19,7 +19,7 @@ namespace VocabJourney.Repositories
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                // SQL: Tính % dựa trên số BÀI HỌC đã hoàn thành trong chủ đề (để khớp với mong muốn của người dùng)
+                // SQL Logic: Tiến độ chủ đề = (Số bài học đã hoàn thành / Tổng số bài học) * 100
                 string query = @"
                     SELECT c.MaChuDe, c.TenChuDe, c.MoTa, c.AnhMinhHoa, c.NgayTao,
                            (SELECT COUNT(*) FROM BaiHoc b WHERE b.MaChuDe = c.MaChuDe) AS SoBaiHoc,
@@ -63,7 +63,7 @@ namespace VocabJourney.Repositories
                                 NgayTao = reader["NgayTao"] != DBNull.Value ? Convert.ToDateTime(reader["NgayTao"]) : DateTime.Now,
                                 SoBaiHoc = Convert.ToInt32(reader["SoBaiHoc"]),
                                 SoTuVung = Convert.ToInt32(reader["SoTuVung"]),
-                                TienDo = reader["TienDo"] != DBNull.Value ? Math.Round(Convert.ToDouble(reader["TienDo"]), 1) : 0
+                                TienDo = reader["TienDo"] != DBNull.Value ? Math.Round(Convert.ToDouble(reader["TienDo"]), 0) : 0
                             });
                         }
                     }
@@ -120,7 +120,7 @@ namespace VocabJourney.Repositories
                                 NgayTao = reader["NgayTao"] != DBNull.Value ? Convert.ToDateTime(reader["NgayTao"]) : DateTime.Now,
                                 SoBaiHoc = Convert.ToInt32(reader["SoBaiHoc"]),
                                 SoTuVung = Convert.ToInt32(reader["SoTuVung"]),
-                                TienDo = reader["TienDo"] != DBNull.Value ? Math.Round(Convert.ToDouble(reader["TienDo"]), 1) : 0
+                                TienDo = reader["TienDo"] != DBNull.Value ? Math.Round(Convert.ToDouble(reader["TienDo"]), 0) : 0
                             };
                         }
                     }

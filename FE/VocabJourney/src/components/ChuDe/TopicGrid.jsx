@@ -4,10 +4,11 @@ import TopicCard from "./TopicCard";
 import topicService from "../../services/topicService";
 
 
-export default function TopicGird() {
+export default function TopicGird({ searchTerm = "" }) {
   const [chude, setChuDe] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
+
   useEffect(function () {
     async function fetchTopics() {
       try {
@@ -15,16 +16,8 @@ export default function TopicGird() {
         const response = await topicService.getAllTopics(maNguoiDung);
         const dataFromDB = response.data;
         const colors = [
-          "blue",
-          "yellow",
-          "green",
-          "purple",
-          "pink",
-          "teal",
-          "orange",
-          "indigo",
-          "red",
-          "cyan",
+          "blue", "yellow", "green", "purple", "pink", 
+          "teal", "orange", "indigo", "red", "cyan",
         ];
 
         const formattedData = dataFromDB.map(function (item, index) {
@@ -35,7 +28,7 @@ export default function TopicGird() {
             image: item.anhMinhHoa,
             lessons: item.soBaiHoc,
             words: item.soTuVung,
-            percent: item.tienDo || 0, // Dùng dữ liệu tiến độ thật từ BE
+            percent: item.tienDo || 0,
             overlay: colors[index % colors.length],
           };
         });
@@ -47,10 +40,20 @@ export default function TopicGird() {
     fetchTopics();
   }, []);
 
+  // reset về trang 1 khi tìm kiếm
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  // Lọc dữ liệu dựa trên từ khóa tìm kiếm
+  const filteredTopics = chude.filter(topic => 
+    topic.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const viTriCuoiCung = currentPage * itemsPerPage;
   const viTriDauTien = viTriCuoiCung - itemsPerPage;
-  const currentTopics = chude.slice(viTriDauTien, viTriCuoiCung);
-  const tongSoTrang = Math.ceil(chude.length / itemsPerPage);
+  const currentTopics = filteredTopics.slice(viTriDauTien, viTriCuoiCung);
+  const tongSoTrang = Math.ceil(filteredTopics.length / itemsPerPage);
 
   function thayDoiTrang(pageNumber) {
     setCurrentPage(pageNumber);
@@ -75,9 +78,15 @@ export default function TopicGird() {
   return (
     <div className="topics-grid-container">
       <div className="topics-grid">
-        {currentTopics.map((topic, index) => (
-          <TopicCard key={topic.id} {...topic} />
-        ))}
+        {currentTopics.length > 0 ? (
+          currentTopics.map((topic) => (
+            <TopicCard key={topic.id} {...topic} />
+          ))
+        ) : (
+          <div className="no-results" style={{ gridColumn: "1 / -1", textAlign: "center", padding: "40px", color: "#64748b" }}>
+            Không tìm thấy chủ đề nào phù hợp với "{searchTerm}"
+          </div>
+        )}
       </div>
 
       {tongSoTrang > 1 && (
@@ -90,7 +99,6 @@ export default function TopicGird() {
             marginBottom: "20px",
           }}
         >
-          {/* Nút Trước (Gọi thẳng hàm bamNutTruoc) */}
           <button
             onClick={bamNutTruoc}
             disabled={currentPage === 1}
@@ -102,7 +110,6 @@ export default function TopicGird() {
             Trước
           </button>
 
-          {/* Lặp qua danh sách [1, 2...] để vẽ nút bấm số */}
           {danhSachCacTrang.map(function (page) {
             return (
               <button
@@ -124,7 +131,6 @@ export default function TopicGird() {
             );
           })}
 
-          {/* Nút Sau (Gọi thẳng hàm bamNutSau) */}
           <button
             onClick={bamNutSau}
             disabled={currentPage === tongSoTrang}

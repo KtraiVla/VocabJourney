@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import "./ReviewCard.css";
 import { Clock } from "lucide-react";
+import "./ReviewCard.css";
 import progressService from "../../services/progressService";
 
 export default function ReviewCard() {
   const [reviewCount, setReviewCount] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchReviewCount = async () => {
@@ -17,7 +18,9 @@ export default function ReviewCard() {
           }
         }
       } catch (error) {
-        console.error("Lỗi khi lấy số từ cần ôn tập:", error);
+        console.error("Lỗi khi lấy số lượng ôn tập:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchReviewCount();
@@ -28,7 +31,7 @@ export default function ReviewCard() {
       <div className="review-content-wrapper">
         <div className="review-top-part">
           <div className="review-icon-circle">
-            <Clock size={24} color="white" />
+            <Clock size={32} strokeWidth={2.5} />
           </div>
           <div className="review-text-info">
             <h3>Giờ Ôn Tập!</h3>
@@ -37,19 +40,15 @@ export default function ReviewCard() {
         </div>
 
         <div className="review-count-badge">
-          <strong>{reviewCount} từ vựng</strong>
+          <strong>{loading ? "..." : reviewCount} từ vựng</strong>
           <span>cần ôn tập hôm nay</span>
         </div>
       </div>
 
-      <button 
-        className="review-action-btn"
-        disabled={reviewCount === 0}
-      >
-        {reviewCount > 0 ? "Bắt Đầu Ôn Tập" : "Đã Hoàn Thành!"} <span className="rocket-emoji">🚀</span>
+      <button className="review-action-btn">
+        Bắt Đầu Ôn Tập <span className="rocket-emoji">🚀</span>
       </button>
-      
-      {/* Decorative circles */}
+
       <div className="review-deco deco-top-right"></div>
       <div className="review-deco deco-bottom-left"></div>
     </div>

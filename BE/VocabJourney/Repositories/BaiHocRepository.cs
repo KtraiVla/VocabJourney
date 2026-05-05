@@ -20,7 +20,7 @@ namespace VocabJourney.Repositories
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                // SQL mới: Tính % dựa trên số từ đã học (DaHoc = 1) trong bảng TienDoTuVung
+                // SQL: Ưu tiên DaHoanThanh trong bảng TienDoBaiHoc. Nếu đã xong thì ép 100%.
                 string query = @"
                     SELECT b.MaBaiHoc, b.MaChuDe, b.TieuDe, b.MoTa, b.ThuTu,
                            (SELECT COUNT(*) FROM TuVung t WHERE t.MaBaiHoc = b.MaBaiHoc) AS SoTuVung";
@@ -29,10 +29,13 @@ namespace VocabJourney.Repositories
                 {
                     query += @",
                            ISNULL((SELECT DaHoanThanh FROM TienDoBaiHoc WHERE MaNguoiDung = @MaNguoiDung AND MaBaiHoc = b.MaBaiHoc), 0) AS DaHoanThanh,
-                           (CAST((SELECT COUNT(*) FROM TienDoTuVung tdtv 
-                                  JOIN TuVung tv ON tdtv.MaTuVung = tv.MaTuVung 
-                                  WHERE tv.MaBaiHoc = b.MaBaiHoc AND tdtv.MaNguoiDung = @MaNguoiDung AND tdtv.DaHoc = 1) AS FLOAT) 
-                            / NULLIF((SELECT COUNT(*) FROM TuVung WHERE MaBaiHoc = b.MaBaiHoc), 0) * 100) AS TienDo";
+                           CASE 
+                                WHEN EXISTS (SELECT 1 FROM TienDoBaiHoc WHERE MaNguoiDung = @MaNguoiDung AND MaBaiHoc = b.MaBaiHoc AND DaHoanThanh = 1) THEN 100
+                                ELSE (CAST((SELECT COUNT(*) FROM TienDoTuVung tdtv 
+                                           JOIN TuVung tv ON tdtv.MaTuVung = tv.MaTuVung 
+                                           WHERE tv.MaBaiHoc = b.MaBaiHoc AND tdtv.MaNguoiDung = @MaNguoiDung AND tdtv.DaHoc = 1) AS FLOAT) 
+                                      / NULLIF((SELECT COUNT(*) FROM TuVung WHERE MaBaiHoc = b.MaBaiHoc), 0) * 100)
+                           END AS TienDo";
                 }
                 else
                 {
@@ -65,7 +68,7 @@ namespace VocabJourney.Repositories
                             bh.ThuTu = reader["ThuTu"] != DBNull.Value ? Convert.ToInt32(reader["ThuTu"]) : 0;
                             bh.SoTuVung = reader["SoTuVung"] != DBNull.Value ? Convert.ToInt32(reader["SoTuVung"]) : 0;
                             bh.DaHoanThanh = Convert.ToBoolean(reader["DaHoanThanh"]);
-                            bh.TienDo = reader["TienDo"] != DBNull.Value ? Math.Round(Convert.ToDouble(reader["TienDo"]), 1) : 0;
+                            bh.TienDo = reader["TienDo"] != DBNull.Value ? Math.Round(Convert.ToDouble(reader["TienDo"]), 0) : 0;
 
                             danhSachBaiHoc.Add(bh);
                         }

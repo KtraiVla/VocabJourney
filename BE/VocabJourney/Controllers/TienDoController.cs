@@ -10,52 +10,33 @@ namespace VocabJourney.Controllers
     public class TienDoController : ControllerBase
     {
         private readonly TienDoRepository _repo;
-        private readonly ThongKeRepository _thongKeRepo;
 
         public TienDoController(IConfiguration configuration)
         {
             string connectionString = configuration.GetConnectionString("DefaultConnection");
             _repo = new TienDoRepository(connectionString);
-            _thongKeRepo = new ThongKeRepository(connectionString);
         }
 
         [HttpPost("luu-tu-vung")]
-        public IActionResult LuuTuVung([FromBody] TienDoRequest request)
+        public IActionResult LuuTienDoTuVung([FromBody] TienDoTuVungRequest request)
         {
-            try
+            bool success = _repo.LuuTienDoTuVung(request.MaNguoiDung, request.MaTuVung, request.DaHoc);
+            if (success)
             {
-                bool ketQua = _repo.LuuTienDoTuVung(request.MaNguoiDung, request.MaTuVung, request.DaHoc);
-
-                if (ketQua)
-                {
-                    _thongKeRepo.CapNhatStreak(request.MaNguoiDung);
-                    return Ok(new { success = true, message = "Đã lưu tiến độ!" });
-                }
-                return BadRequest(new { success = false, message = "Lưu thất bại." });
+                // Sau khi lưu tiến độ từ vựng, tự động cập nhật streak
+                var thongKeRepo = new ThongKeRepository(new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetConnectionString("DefaultConnection"));
+                thongKeRepo.CapNhatStreak(request.MaNguoiDung);
+                return Ok(new { success = true, message = "Lưu tiến độ thành công" });
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = "Lỗi hệ thống: " + ex.Message });
-            }
+            return BadRequest(new { success = false, message = "Lưu tiến độ thất bại" });
         }
 
-        [HttpPost("luu-bai-hoc")]
-        public IActionResult LuuBaiHoc([FromBody] TienDoRequest request)
+        [HttpPost("hoan-thanh-bai-hoc")]
+        public IActionResult LuuTienDoBaiHoc([FromBody] TienDoBaiHocRequest request)
         {
-            try
-            {
-                bool ketQua = _repo.LuuTienDoBaiHoc(request.MaNguoiDung, request.MaBaiHoc);
-                if (ketQua)
-                {
-                    _thongKeRepo.CapNhatStreak(request.MaNguoiDung);
-                    return Ok(new { success = true, message = "Đã lưu tiến độ bài học!" });
-                }
-                return BadRequest(new { success = false, message = "Lưu thất bại." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = "Lỗi hệ thống: " + ex.Message });
-            }
+            bool success = _repo.LuuTienDoBaiHoc(request.MaNguoiDung, request.MaBaiHoc);
+            if (success) return Ok(new { success = true, message = "Hoàn thành bài học" });
+            return BadRequest(new { success = false, message = "Lưu thất bại" });
         }
 
         [HttpGet("bai-hoc-gan-nhat/{maNguoiDung}")]
@@ -63,8 +44,10 @@ namespace VocabJourney.Controllers
         {
             try
             {
-                var data = _repo.GetBaiHocGanNhat(maNguoiDung);
-                return Ok(new { success = true, data = data });
+                var result = _repo.GetBaiHocGanNhat(maNguoiDung);
+                if (result == null) return Ok(new { success = false, message = "Chưa có tiến độ" });
+
+                return Ok(new { success = true, data = result });
             }
             catch (Exception ex)
             {
@@ -75,15 +58,8 @@ namespace VocabJourney.Controllers
         [HttpGet("so-tu-on-tap/{maNguoiDung}")]
         public IActionResult GetSoTuOnTap(int maNguoiDung)
         {
-            try
-            {
-                var count = _repo.GetSoTuCanOnTap(maNguoiDung);
-                return Ok(new { success = true, count = count });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
+            int count = _repo.GetSoTuCanOnTap(maNguoiDung);
+            return Ok(new { success = true, count = count });
         }
     }
 }

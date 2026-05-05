@@ -18,19 +18,18 @@ namespace VocabJourney.Repositories
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                // Cập nhật logic Leitner cơ bản
-                // Nếu thuộc (daHoc=true): Tăng số lần ôn đúng, ngày ôn tiếp theo = hôm nay + (2^số lần ôn đúng)
-                // Nếu chưa thuộc: Reset số lần ôn đúng, ngày ôn tiếp theo = ngày mai
+                // Lấy số lần ôn đúng cũ để phân biệt là Học mới hay Ôn tập
+                string checkSql = "SELECT ISNULL(SoLanOnDung, 0) FROM TienDoTuVung WHERE MaNguoiDung = @MaNguoiDung AND MaTuVung = @MaTuVung";
+                int oldSoLanOnDung = 0;
+                
                 string query = @"
                     DECLARE @SoLanOnDung INT = 0;
                     SELECT @SoLanOnDung = ISNULL(SoLanOnDung, 0) FROM TienDoTuVung WHERE MaNguoiDung = @MaNguoiDung AND MaTuVung = @MaTuVung;
 
-                    IF @SoLanOnDung IS NULL SET @SoLanOnDung = 0;
-
-                    DECLARE @NextReview DAYS INT = 1;
+                    DECLARE @NextReview INT = 1;
                     IF @daHoc = 1 
                     BEGIN
-                        SET @SoLanOnDung = @SoLanOnDung + 1;
+                        SET @SoLanOnDung = ISNULL(@SoLanOnDung, 0) + 1;
                         SET @NextReview = POWER(2, @SoLanOnDung - 1);
                     END
                     ELSE
@@ -46,7 +45,7 @@ namespace VocabJourney.Repositories
                             NgayOnCuoi = GETDATE(),
                             SoLanOnDung = @SoLanOnDung,
                             NgayOnTiepTheo = DATEADD(day, @NextReview, GETDATE()),
-                            SoLanOn = SoLanOn + 1
+                            SoLanOn = ISNULL(SoLanOn, 0) + 1
                         WHERE MaNguoiDung = @MaNguoiDung AND MaTuVung = @MaTuVung
                     END
                     ELSE
@@ -62,7 +61,30 @@ namespace VocabJourney.Repositories
                     cmd.Parameters.AddWithValue("@DaHoc", daHoc ? 1 : 0);
 
                     conn.Open();
+                    
+                    // Lấy giá trị cũ trước khi thực hiện Query
+                    using (SqlCommand checkCmd = new SqlCommand(checkSql, conn))
+                    {
+                        checkCmd.Parameters.AddWithValue("@MaNguoiDung", maNguoiDung);
+                        checkCmd.Parameters.AddWithValue("@MaTuVung", maTuVung);
+                        var res = checkCmd.ExecuteScalar();
+                        oldSoLanOnDung = res != null ? Convert.ToInt32(res) : 0;
+                    }
+
                     int rowsAffected = cmd.ExecuteNonQuery();
+                    
+                    if (rowsAffected > 0 && daHoc)
+                    {
+                        var thongKeRepo = new ThongKeRepository(_connectionString);
+                        
+                        // Phân biệt: Nếu là lần đầu tiên bấm "Đã thuộc" (old=0) thì là LEARN, ngược lại là REVIEW
+                        string actionType = (oldSoLanOnDung == 0) ? "LEARN" : "REVIEW";
+                        thongKeRepo.CongXP(maNguoiDung, actionType);
+                        
+                        // Luôn cập nhật Streak khi có hoạt động học tập
+                        thongKeRepo.CapNhatStreak(maNguoiDung);
+                    }
+                    
                     return rowsAffected > 0;
                 }
             }
@@ -92,28 +114,45 @@ namespace VocabJourney.Repositories
 
                     conn.Open();
                     int rowsAffected = cmd.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        var thongKeRepo = new ThongKeRepository(_connectionString);
+                        thongKeRepo.CongXP(maNguoiDung, "LESSON");
+                    }
+
                     return rowsAffected > 0;
                 }
             }
         }
 
-        // Lấy bài học gần nhất đang học dở hoặc vừa học xong
         public object GetBaiHocGanNhat(int maNguoiDung)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 string query = @"
-                    SELECT TOP 1 b.MaBaiHoc, b.TieuDe, c.TenChuDe, b.MaChuDe,
-                           (CAST((SELECT COUNT(*) FROM TienDoTuVung tdtv 
-                                  JOIN TuVung tv ON tdtv.MaTuVung = tv.MaTuVung 
-                                  WHERE tv.MaBaiHoc = b.MaBaiHoc AND tdtv.MaNguoiDung = @MaNguoiDung AND tdtv.DaHoc = 1) AS FLOAT) 
-                            / NULLIF((SELECT COUNT(*) FROM TuVung WHERE MaBaiHoc = b.MaBaiHoc), 0) * 100) AS TienDo
-                    FROM TienDoTuVung tdtv
-                    JOIN TuVung tv ON tdtv.MaTuVung = tv.MaTuVung
-                    JOIN BaiHoc b ON tv.MaBaiHoc = b.MaBaiHoc
+                    SELECT TOP 1 
+                        b.MaBaiHoc, 
+                        b.TieuDe, 
+                        c.TenChuDe, 
+                        b.MaChuDe,
+                        c.AnhMinhHoa,
+                        (SELECT MAX(val) FROM (VALUES 
+                            (ISNULL((SELECT MAX(NgayOnCuoi) FROM TienDoTuVung WHERE MaNguoiDung = @MaNguoiDung AND MaTuVung IN (SELECT MaTuVung FROM TuVung WHERE MaBaiHoc = b.MaBaiHoc)), '1900-01-01')),
+                            (ISNULL((SELECT NgayHoanThanh FROM TienDoBaiHoc WHERE MaNguoiDung = @MaNguoiDung AND MaBaiHoc = b.MaBaiHoc), '1900-01-01'))
+                        ) AS v(val)) AS NgayGanNhat,
+                        CASE 
+                            WHEN EXISTS (SELECT 1 FROM TienDoBaiHoc WHERE MaNguoiDung = @MaNguoiDung AND MaBaiHoc = b.MaBaiHoc AND DaHoanThanh = 1) THEN 100
+                            ELSE (CAST((SELECT COUNT(*) FROM TienDoTuVung tdtv2 
+                                       JOIN TuVung tv2 ON tdtv2.MaTuVung = tv2.MaTuVung 
+                                       WHERE tv2.MaBaiHoc = b.MaBaiHoc AND tdtv2.MaNguoiDung = @MaNguoiDung AND tdtv2.DaHoc = 1) AS FLOAT) 
+                                 / NULLIF((SELECT COUNT(*) FROM TuVung WHERE MaBaiHoc = b.MaBaiHoc), 0) * 100)
+                        END AS TienDo
+                    FROM BaiHoc b
                     JOIN ChuDe c ON b.MaChuDe = c.MaChuDe
-                    WHERE tdtv.MaNguoiDung = @MaNguoiDung
-                    ORDER BY tdtv.NgayOnCuoi DESC";
+                    WHERE EXISTS (SELECT 1 FROM TienDoTuVung WHERE MaNguoiDung = @MaNguoiDung AND MaTuVung IN (SELECT MaTuVung FROM TuVung WHERE MaBaiHoc = b.MaBaiHoc))
+                       OR EXISTS (SELECT 1 FROM TienDoBaiHoc WHERE MaNguoiDung = @MaNguoiDung AND MaBaiHoc = b.MaBaiHoc)
+                    ORDER BY NgayGanNhat DESC";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -125,11 +164,12 @@ namespace VocabJourney.Repositories
                         {
                             return new
                             {
-                                MaBaiHoc = Convert.ToInt32(reader["MaBaiHoc"]),
-                                TieuDe = reader["TieuDe"].ToString(),
-                                TenChuDe = reader["TenChuDe"].ToString(),
-                                MaChuDe = Convert.ToInt32(reader["MaChuDe"]),
-                                TienDo = reader["TienDo"] != DBNull.Value ? Math.Round(Convert.ToDouble(reader["TienDo"]), 0) : 0
+                                maBaiHoc = Convert.ToInt32(reader["MaBaiHoc"]),
+                                tieuDe = reader["TieuDe"].ToString(),
+                                tenChuDe = reader["TenChuDe"].ToString(),
+                                maChuDe = Convert.ToInt32(reader["MaChuDe"]),
+                                anhMinhHoa = reader["AnhMinhHoa"] != DBNull.Value ? reader["AnhMinhHoa"].ToString() : null,
+                                tienDo = reader["TienDo"] != DBNull.Value ? Math.Round(Convert.ToDouble(reader["TienDo"]), 0) : 0
                             };
                         }
                     }
@@ -138,7 +178,6 @@ namespace VocabJourney.Repositories
             return null;
         }
 
-        // Đếm số từ vựng cần ôn tập hôm nay
         public int GetSoTuCanOnTap(int maNguoiDung)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using VocabJourney.Models;
 using VocabJourney.Repositories;
 
 namespace VocabJourney.Controllers
@@ -17,29 +16,30 @@ namespace VocabJourney.Controllers
             _repo = new ThongKeRepository(connectionString);
         }
 
-        [HttpGet("nguoidung/{maNguoiDung}")]
+        [HttpGet("{maNguoiDung}")]
         public IActionResult GetThongKe(int maNguoiDung)
         {
-            try
+            var stats = _repo.GetThongKe(maNguoiDung);
+            if (stats == null) return NotFound(new { message = "Không tìm thấy thống kê" });
+
+            // Tính toán XP cần thiết để lên cấp tiếp theo dựa trên Level hiện tại
+            // Công thức: 120 + 80 * (Level ^ 1.5)
+            int xpTarget = 120 + (int)(80 * Math.Pow(stats.CapDo, 1.5));
+
+            // Trả về thêm thông tin XP Target để FE vẽ Progress Bar
+            return Ok(new
             {
-                var thongKe = _repo.GetThongKe(maNguoiDung);
-                if (thongKe == null)
-                {
-                    // Trả về mặc định nếu chưa có thống kê
-                    return Ok(new ThongKeNguoiDung
-                    {
-                        MaNguoiDung = maNguoiDung,
-                        ChuoiNgayHoc = 0,
-                        DiemKinhNghiem = 0,
-                        CapDo = 1
-                    });
-                }
-                return Ok(thongKe);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
-            }
+                maNguoiDung = stats.MaNguoiDung,
+                diemKinhNghiem = stats.DiemKinhNghiem,
+                capDo = stats.CapDo,
+                chuoiNgayHoc = stats.ChuoiNgayHoc,
+                ngayHocCuoi = stats.NgayHocCuoi,
+                tongTuDaHoc = stats.TongTuDaHoc,
+                tongTuDaGap = stats.TongTuDaGap,
+                tongQuizDaLam = stats.TongQuizDaLam,
+                xpTarget = xpTarget,
+                xpProgress = Math.Round((double)stats.DiemKinhNghiem / xpTarget * 100, 1)
+            });
         }
     }
 }
