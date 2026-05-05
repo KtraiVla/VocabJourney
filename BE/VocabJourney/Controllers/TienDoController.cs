@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VocabJourney.Models;
 using VocabJourney.Repositories;
@@ -27,6 +27,24 @@ namespace VocabJourney.Controllers
                 if (ketQua)
                 {
                     return Ok(new { success = true, message = "Đã lưu tiến độ!" });
+                }
+                return BadRequest(new { success = false, message = "Lưu thất bại." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
+
+        [HttpPost("luu-bai-hoc")]
+        public IActionResult LuuBaiHoc([FromBody] TienDoRequest request)
+        {
+            try
+            {
+                bool ketQua = _repo.LuuTienDoBaiHoc(request.MaNguoiDung, request.MaBaiHoc);
+                if (ketQua)
+                {
+                    return Ok(new { success = true, message = "Đã lưu tiến độ bài học!" });
                 }
                 return BadRequest(new { success = false, message = "Lưu thất bại." });
             }

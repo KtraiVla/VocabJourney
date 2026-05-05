@@ -1,4 +1,4 @@
-﻿namespace VocabJourney.Models
+namespace VocabJourney.Models
 {
     public class BaiHoc
     {
@@ -7,5 +7,7 @@
         public string TieuDe { get; set; }
         public string MoTa {  get; set; }
         public int ThuTu {  get; set; }  
+        public int SoTuVung { get; set; }
+        public bool DaHoanThanh { get; set; }
     }
 }

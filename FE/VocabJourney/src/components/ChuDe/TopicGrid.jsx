@@ -11,7 +11,8 @@ export default function TopicGird() {
   useEffect(function () {
     async function fetchTopics() {
       try {
-        const response = await topicService.getAllTopics();
+        const maNguoiDung = localStorage.getItem("maNguoiDung");
+        const response = await topicService.getAllTopics(maNguoiDung);
         const dataFromDB = response.data;
         const colors = [
           "blue",
@@ -32,9 +33,9 @@ export default function TopicGird() {
             title: item.tenChuDe,
             description: item.moTa,
             image: item.anhMinhHoa,
-            lessons: Math.floor(Math.random() * 5) + 5,
-            words: Math.floor(Math.random() * 50) + 50,
-            percent: Math.floor(Math.random() * 100),
+            lessons: item.soBaiHoc,
+            words: item.soTuVung,
+            percent: item.tienDo || 0, // Dùng dữ liệu tiến độ thật từ BE
             overlay: colors[index % colors.length],
           };
         });

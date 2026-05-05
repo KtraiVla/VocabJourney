@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Data.SqlClient;
 using VocabJourney.Models;
 namespace VocabJourney.Repositories
@@ -40,6 +40,34 @@ namespace VocabJourney.Repositories
 
                     conn.Open();
                     // ExecuteNonQuery dùng cho các lệnh INSERT, UPDATE, DELETE (không trả về bảng)
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+        }
+        public bool LuuTienDoBaiHoc(int maNguoiDung, int maBaiHoc)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = @"
+                    IF EXISTS (SELECT 1 FROM TienDoBaiHoc WHERE MaNguoiDung = @MaNguoiDung AND MaBaiHoc = @MaBaiHoc)
+                    BEGIN
+                        UPDATE TienDoBaiHoc 
+                        SET DaHoanThanh = 1, NgayHoanThanh = GETDATE()
+                        WHERE MaNguoiDung = @MaNguoiDung AND MaBaiHoc = @MaBaiHoc
+                    END
+                    ELSE
+                    BEGIN
+                        INSERT INTO TienDoBaiHoc (MaNguoiDung, MaBaiHoc, DaHoanThanh, NgayHoanThanh) 
+                        VALUES (@MaNguoiDung, @MaBaiHoc, 1, GETDATE())
+                    END";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaNguoiDung", maNguoiDung);
+                    cmd.Parameters.AddWithValue("@MaBaiHoc", maBaiHoc);
+
+                    conn.Open();
                     int rowsAffected = cmd.ExecuteNonQuery();
                     return rowsAffected > 0;
                 }

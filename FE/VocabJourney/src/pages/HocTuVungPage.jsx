@@ -6,6 +6,7 @@ import FlashCard from "../components/TuVung/FlashCard.jsx";
 import LearningControls from "../components/TuVung/LearningControls.jsx";
 import LearningProgress from "../components/TuVung/LearningProgress.jsx";
 import vocabService from "../services/vocabService.js";
+import progressService from "../services/progressService.js";
 import "./HocTuVungPage.css";
 
 export default function HocTuVungPage() {
@@ -47,7 +48,19 @@ export default function HocTuVungPage() {
   }, [lessonId]);
 
   // Hàm xử lý khi người dùng nhấn nút "Chưa thuộc" hoặc "Đã thuộc"
-  const handleNextWord = (status) => {
+  const handleNextWord = async (status) => {
+    const currentWord = vocabularyList[currentIndex];
+    const maNguoiDung = localStorage.getItem("maNguoiDung");
+    
+    // 1. Lưu tiến độ từng từ vựng vào Database
+    try {
+      if (maNguoiDung) {
+        await progressService.saveVocabProgress(maNguoiDung, currentWord.maTuVung, status === "remembered");
+      }
+    } catch (error) {
+      console.error("Lỗi khi lưu tiến độ từ vựng:", error);
+    }
+
     if (status === "remembered") {
       setScore((prev) => ({ ...prev, correct: prev.correct + 1 }));
     } else if (status === "forgot") {
@@ -58,6 +71,14 @@ export default function HocTuVungPage() {
       setCurrentIndex(currentIndex + 1);
     } else {
       setIsFinished(true);
+      // 2. Khi hoàn thành cả bài, lưu tiến độ bài học
+      try {
+        if (maNguoiDung) {
+          await progressService.saveLessonProgress(maNguoiDung, lessonId);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lưu tiến độ bài học:", error);
+      }
     }
   };
 

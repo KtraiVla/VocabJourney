@@ -6,10 +6,14 @@ export default function TopicDetailBanner({
   description,
   stats,
   progress,
+  image, // Thêm prop image
 }) {
   return (
     <div className="topic-banner">
-      <div className="topic-banner-image-section">
+      <div 
+        className="topic-banner-image-section"
+        style={image ? { backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url(${image})` } : {}}
+      >
         <div className="topic-banner-content">
           <div className="topic-banner-header">
             <div className="topic-title-group">

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using IdentityService.Models;
 using IdentityService.Repositories;
 using IdentityService.Services;
@@ -48,7 +48,7 @@ namespace IdentityService.Controllers
             // Tạo Token cho phiên làm việc
             string token = _tokenGen.GenerateToken(user.userId, request.Username, user.role);
 
-            return Ok(new { token = token, message = "Đăng nhập thành công!" });
+            return Ok(new { token = token, userId = user.userId, message = "Đăng nhập thành công!" });
         }
     }
 }

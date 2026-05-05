@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using VocabJourney.Models;
@@ -9,27 +9,44 @@ namespace VocabJourney.Repositories
     {
         private readonly string _connectionString;
 
-        // Viết chính xác theo cách cậu yêu cầu
         public BaiHocRepository(string connectionString)
         {
             _connectionString = connectionString;
         }
 
-        public List<BaiHoc> GetDanhSachBaiHoc(int maChuDe)
+        public List<BaiHoc> GetDanhSachBaiHoc(int maChuDe, int? maNguoiDung = null)
         {
             List<BaiHoc> danhSachBaiHoc = new List<BaiHoc>();
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
+                // Câu lệnh JOIN để lấy thêm trạng thái hoàn thành của từng bài học cho User
                 string query = @"
-                    SELECT MaBaiHoc, MaChuDe, TieuDe, MoTa, ThuTu 
-                    FROM BaiHoc 
-                    WHERE MaChuDe = @MaChuDe 
-                    ORDER BY ThuTu ASC";
+                    SELECT b.MaBaiHoc, b.MaChuDe, b.TieuDe, b.MoTa, b.ThuTu,
+                           (SELECT COUNT(*) FROM TuVung t WHERE t.MaBaiHoc = b.MaBaiHoc) AS SoTuVung";
+
+                if (maNguoiDung.HasValue)
+                {
+                    query += @",
+                           ISNULL((SELECT DaHoanThanh FROM TienDoBaiHoc WHERE MaNguoiDung = @MaNguoiDung AND MaBaiHoc = b.MaBaiHoc), 0) AS DaHoanThanh";
+                }
+                else
+                {
+                    query += ", 0 AS DaHoanThanh";
+                }
+
+                query += @"
+                    FROM BaiHoc b
+                    WHERE b.MaChuDe = @MaChuDe 
+                    ORDER BY b.ThuTu ASC";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@MaChuDe", maChuDe);
+                    if (maNguoiDung.HasValue)
+                    {
+                        cmd.Parameters.AddWithValue("@MaNguoiDung", maNguoiDung.Value);
+                    }
 
                     conn.Open();
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -40,9 +57,10 @@ namespace VocabJourney.Repositories
                             bh.MaBaiHoc = Convert.ToInt32(reader["MaBaiHoc"]);
                             bh.MaChuDe = Convert.ToInt32(reader["MaChuDe"]);
                             bh.TieuDe = reader["TieuDe"].ToString();
-
                             bh.MoTa = reader["MoTa"] != DBNull.Value ? reader["MoTa"].ToString() : "";
                             bh.ThuTu = reader["ThuTu"] != DBNull.Value ? Convert.ToInt32(reader["ThuTu"]) : 0;
+                            bh.SoTuVung = reader["SoTuVung"] != DBNull.Value ? Convert.ToInt32(reader["SoTuVung"]) : 0;
+                            bh.DaHoanThanh = Convert.ToBoolean(reader["DaHoanThanh"]);
 
                             danhSachBaiHoc.Add(bh);
                         }

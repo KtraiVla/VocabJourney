@@ -42,6 +42,7 @@ function DangNhap() {
       const response = await authService.login(email, matkhau);
       const data = response.data;
       localStorage.setItem("vocabToken", data.token); 
+      localStorage.setItem("maNguoiDung", data.userId); 
 
       alert("Bạn đã đăng nhập thành công!");
       navigate("/homeuser"); // Chuyển sang trang chủ

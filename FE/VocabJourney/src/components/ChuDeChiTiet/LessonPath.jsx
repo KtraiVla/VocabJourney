@@ -12,18 +12,34 @@ export default function LessonPath() {
   useEffect(() => {
     const fetchBaiHoc = async () => {
       try {
-        const response = await baihocService.getLessonsByTopic(id);
+        const maNguoiDung = localStorage.getItem("maNguoiDung");
+        const response = await baihocService.getLessonsByTopic(id, maNguoiDung);
         const ketQua = response.data;
 
         if (ketQua.success) {
-          const duLieuDaBienDoi = ketQua.data.map((baihoc, index) => ({
-            id: baihoc.maBaiHoc,
-            title: baihoc.tieuDe,
-            description: baihoc.moTa,
-            vocabCount: 10,
-            status: index === 0 ? "current" : "locked",
-            progress: index === 0 ? 0 : null,
-          }));
+          let foundCurrent = false;
+          const duLieuDaBienDoi = ketQua.data.map((baihoc, index) => {
+            let status = "locked";
+            let progress = null;
+
+            if (baihoc.daHoanThanh) {
+              status = "completed";
+              progress = 100;
+            } else if (!foundCurrent) {
+              status = "current";
+              progress = 0;
+              foundCurrent = true;
+            }
+
+            return {
+              id: baihoc.maBaiHoc,
+              title: baihoc.tieuDe,
+              description: baihoc.moTa,
+              vocabCount: baihoc.soTuVung,
+              status: status,
+              progress: progress,
+            };
+          });
           setBaiHoc(duLieuDaBienDoi);
         }
       } catch (error) {

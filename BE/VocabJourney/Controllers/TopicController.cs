@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VocabJourney.Models;
 using VocabJourney.Repositories;
@@ -21,12 +21,12 @@ namespace VocabJourney.Controllers
 
         // GET: api/topics
         [HttpGet]
-        public IActionResult GetTopics()
+        public IActionResult GetTopics([FromQuery] int? maNguoiDung = null)
         {
             try
             {
                 // Gọi repository lấy danh sách chủ đề (đã có AnhMinhHoa và NgayTao)
-                List<Topic> topics = _topicRepo.GetAllTopics();
+                List<Topic> topics = _topicRepo.GetAllTopics(maNguoiDung);
 
                 if (topics == null || topics.Count == 0)
                 {
@@ -43,5 +43,22 @@ namespace VocabJourney.Controllers
             }
         }
 
+        [HttpGet("{id}")]
+        public IActionResult GetTopic(int id, [FromQuery] int? maNguoiDung = null)
+        {
+            try
+            {
+                Topic topic = _topicRepo.GetTopicById(id, maNguoiDung);
+                if (topic == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy chủ đề này!" });
+                }
+                return Ok(topic);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
     }
 }

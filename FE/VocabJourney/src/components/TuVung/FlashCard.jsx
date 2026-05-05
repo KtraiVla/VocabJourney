@@ -34,16 +34,17 @@ export default function FlashCard({
   const handleFlip = () => {
     setIsFlipped(!isFlipped);
   };
-
   function handleSpeak(text) {
     if ("speechSynthesis" in window) {
       window.speechSynthesis.cancel();
+
       const utterThis = new SpeechSynthesisUtterance(text);
       utterThis.lang = "en-US";
-      utterThis.rate = 0.8; // tốc độ đọc
+      utterThis.rate = 0.8; // Tốc độ
+
       window.speechSynthesis.speak(utterThis);
     } else {
-      alert("Trình duyệt của bạn không hỗ trợ tính năng phát âm");
+      alert("Trình duyệt của bạn không hỗ trợ tính năng phát âm!");
     }
   }
 
@@ -107,7 +108,6 @@ export default function FlashCard({
           <div className="flashcard-back-content">
             <div className="info-box box-translation">
               <div className="info-label">
-                <span className="info-icon">🇻🇳</span>
                 <span>Tiếng Việt</span>
               </div>
               <h3 className="info-translation-text">{translation}</h3>
