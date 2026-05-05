@@ -31,6 +31,7 @@ namespace VocabJourney.Repositories
                         t.SoQuizHomNay,
                         t.DailyChallengeStatus,
                         t.NgayCapNhatXP,
+                        ISNULL((SELECT COUNT(*) + 1 FROM ThongKeNguoiDung WHERE DiemKinhNghiem > ISNULL(t.DiemKinhNghiem, 0)), (SELECT COUNT(*) + 1 FROM ThongKeNguoiDung)) AS ThuHang,
                         (SELECT COUNT(*) FROM TienDoTuVung WHERE MaNguoiDung = @MaNguoiDung AND DaHoc = 1) AS TongTuDaHoc,
                         (SELECT COUNT(*) FROM TienDoTuVung WHERE MaNguoiDung = @MaNguoiDung) AS TongTuDaGap,
                         (SELECT COUNT(*) FROM KetQuaKiemTra WHERE MaNguoiDung = @MaNguoiDung) AS TongQuizDaLam
@@ -58,6 +59,7 @@ namespace VocabJourney.Repositories
                                 SoQuizHomNay = reader["SoQuizHomNay"] != DBNull.Value ? Convert.ToInt32(reader["SoQuizHomNay"]) : 0,
                                 DailyChallengeStatus = reader["DailyChallengeStatus"] != DBNull.Value ? Convert.ToInt32(reader["DailyChallengeStatus"]) : 0,
                                 NgayCapNhatXP = reader["NgayCapNhatXP"] != DBNull.Value ? Convert.ToDateTime(reader["NgayCapNhatXP"]) : (DateTime?)null,
+                                ThuHang = Convert.ToInt32(reader["ThuHang"]),
                                 TongTuDaHoc = Convert.ToInt32(reader["TongTuDaHoc"]),
                                 TongTuDaGap = Convert.ToInt32(reader["TongTuDaGap"]),
                                 TongQuizDaLam = Convert.ToInt32(reader["TongQuizDaLam"])

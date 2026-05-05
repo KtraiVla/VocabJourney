@@ -1,63 +1,42 @@
+import React, { useState, useEffect } from "react";
 import BadgeCard from "./BadgeCard.jsx";
 import { Award } from "lucide-react";
 import "./BadgeSection.css";
+import badgeService from "../../services/badgeService";
+
 export default function BadgeSection() {
-  const badges = [
-    {
-      id: 1,
-      name: "Bước Đầu Tiên",
-      description: "Hoàn thành bài học đầu tiên",
-      date: "16/12/2025",
-      icon: "🎯",
-      unlocked: true,
-      bgColor: "#fffbeb",
-      borderColor: "#fde68a",
-    },
-    {
-      id: 2,
-      name: "Chiến Binh 7 Ngày",
-      description: "Duy trì chuỗi ngày học 7 ngày",
-      date: "5/1/2026",
-      icon: "🔥",
-      unlocked: true,
-      bgColor: "#fffbeb",
-      borderColor: "#fde68a",
-    },
-    {
-      id: 3,
-      name: "Bậc Thầy Từ Vựng",
-      description: "Học 100 từ vựng",
-      date: "10/2/2026",
-      icon: "📚",
-      unlocked: true,
-      bgColor: "#fffbeb",
-      borderColor: "#fde68a",
-    },
-    {
-      id: 4,
-      name: "Nhà Vô Địch Quiz",
-      description: "Đạt 100% trong 10 bài kiểm tra",
-      date: null,
-      icon: "🏆",
-      unlocked: false,
-    },
-    {
-      id: 5,
-      name: "Bậc Thầy 30 Ngày",
-      description: "Duy trì chuỗi ngày học 30 ngày",
-      date: null,
-      icon: "⭐",
-      unlocked: false,
-    },
-    {
-      id: 6,
-      name: "Học Viên Siêu Đẳng",
-      description: "Học 500 từ vựng",
-      date: null,
-      icon: "💎",
-      unlocked: false,
-    },
-  ];
+  const [badges, setBadges] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBadges = async () => {
+      try {
+        const maNguoiDung = localStorage.getItem("maNguoiDung");
+        if (maNguoiDung) {
+          const response = await badgeService.getUserBadges(maNguoiDung);
+          if (response.data && response.data.success) {
+            const formattedBadges = response.data.data.map(item => ({
+              id: item.maHuyHieu,
+              name: item.tenHuyHieu,
+              description: item.moTa,
+              icon: item.iconName || "🏅", // Sử dụng IconName từ DB hoặc icon mặc định
+              unlocked: true,
+              date: null // Tạm thời để null nếu DB chưa lưu ngày đạt được
+            }));
+            setBadges(formattedBadges);
+          }
+        }
+      } catch (error) {
+        console.error("Lỗi khi tải huy hiệu:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBadges();
+  }, []);
+
+  if (loading) return <div className="loading-badges">Đang tải huy hiệu...</div>;
+
   return (
     <section className="badges-section reward-card-base">
       <div className="section-header">
@@ -65,13 +44,17 @@ export default function BadgeSection() {
           <Award size={20} color="#f59e0b" />
           <h3>Huy Hiệu & Thành Tích</h3>
         </div>
-        <span className="badge-count">3 / 6 đã đạt</span>
+        <span className="badge-count">{badges.length} đã đạt</span>
       </div>
 
       <div className="badges-grid">
-        {badges.map((badge) => (
-          <BadgeCard key={badge.id} {...badge} />
-        ))}
+        {badges.length > 0 ? (
+          badges.map((badge) => (
+            <BadgeCard key={badge.id} {...badge} />
+          ))
+        ) : (
+          <p className="no-badges">Bạn chưa đạt được huy hiệu nào. Hãy cố gắng lên!</p>
+        )}
       </div>
     </section>
   );

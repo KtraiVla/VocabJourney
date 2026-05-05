@@ -37,6 +37,7 @@ namespace VocabJourney.Controllers
                 tongTuDaHoc = stats.TongTuDaHoc,
                 tongTuDaGap = stats.TongTuDaGap,
                 tongQuizDaLam = stats.TongQuizDaLam,
+                thuHang = stats.ThuHang,
                 xpTarget = xpTarget,
                 xpProgress = Math.Round((double)stats.DiemKinhNghiem / xpTarget * 100, 1)
             });

@@ -1,10 +1,9 @@
 import axiosUser from "./axiosUser";
 
 const badgeService = {
-  getUserBadges: async (maNguoiDung) => {
-    const response = await axiosUser.get(`/HuyHieu/nguoidung/${maNguoiDung}`);
-    return response;
-  },
+  getUserBadges: (maNguoiDung) => {
+    return axiosUser.get(`/HuyHieu/nguoidung/${maNguoiDung}`);
+  }
 };
 
 export default badgeService;

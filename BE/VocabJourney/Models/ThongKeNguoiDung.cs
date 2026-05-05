@@ -20,6 +20,7 @@ namespace VocabJourney.Models
         public DateTime? NgayCapNhatXP { get; set; }
 
         // Thuộc tính tính toán (không lưu DB)
+        public int ThuHang { get; set; }
         public int TongTuDaHoc { get; set; }
         public int TongTuDaGap { get; set; }
         public int TongQuizDaLam { get; set; }
