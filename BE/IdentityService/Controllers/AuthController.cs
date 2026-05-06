@@ -70,5 +70,14 @@ namespace IdentityService.Controllers
             var users = _repo.GetAllUsers();
             return Ok(users);
         }
+
+        [HttpPost("delete-user/{id}")]
+        public IActionResult DeleteUser(int id)
+        {
+            if (_repo.DeleteUser(id))
+                return Ok(new { message = "Xóa người dùng thành công!" });
+
+            return NotFound(new { message = "Không tìm thấy người dùng hoặc lỗi hệ thống." });
+        }
     }
 }

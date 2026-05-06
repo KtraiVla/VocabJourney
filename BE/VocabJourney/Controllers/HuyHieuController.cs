@@ -55,6 +55,9 @@ namespace VocabJourney.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
+            if (_repo.HasOwners(id))
+                return BadRequest(new { success = false, message = "Không thể xóa huy hiệu này vì đã có người dùng sở hữu. Xóa sẽ mất dữ liệu thưởng của họ." });
+
             if (_repo.DeleteHuyHieu(id)) return Ok(new { success = true, message = "Xóa thành công" });
             return BadRequest(new { success = false, message = "Lỗi khi xóa" });
         }

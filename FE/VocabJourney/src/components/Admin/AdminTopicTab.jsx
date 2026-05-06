@@ -76,7 +76,8 @@ const AdminTopicTab = () => {
       message.success('Xóa chủ đề thành công!');
       fetchTopics();
     } catch (error) {
-      message.error('Xóa thất bại: ' + (error.response?.data?.message || error.message));
+      const msg = error.response?.data?.message || 'Xóa thất bại, vui lòng thử lại.';
+      message.error(msg);
     }
   };
 

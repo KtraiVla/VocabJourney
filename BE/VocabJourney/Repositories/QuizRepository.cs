@@ -125,6 +125,20 @@ namespace VocabJourney.Repositories
             return ds;
         }
 
+        public bool HasCompletedResults(int quizId)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT COUNT(1) FROM KetQuaKiemTra WHERE MaBaiKiemTra = @Id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", quizId);
+                    conn.Open();
+                    return (int)cmd.ExecuteScalar() > 0;
+                }
+            }
+        }
+
         public bool DeleteQuiz(int id)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))

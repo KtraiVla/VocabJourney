@@ -59,7 +59,8 @@ const AdminGamificationTab = () => {
       message.success('Xóa huy hiệu thành công!');
       fetchBadges();
     } catch (error) {
-      message.error('Xóa thất bại');
+      const msg = error.response?.data?.message || 'Xóa thất bại, vui lòng thử lại.';
+      message.error(msg);
     }
   };
 

@@ -78,6 +78,9 @@ namespace VocabJourney.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteTopic(int id)
         {
+            if (_topicRepo.HasLessons(id))
+                return BadRequest(new { success = false, message = "Không thể xóa chủ đề này vì vẫn còn bài học bên trong. Hãy xóa hết các bài học trước!" });
+
             if (_topicRepo.DeleteTopic(id)) return Ok(new { success = true, message = "Xóa chủ đề thành công" });
             return BadRequest(new { success = false, message = "Không thể xóa chủ đề" });
         }

@@ -140,5 +140,61 @@ namespace IdentityService.Repositories
             }
             return users;
         }
+
+        public bool DeleteUser(int userId)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        // 1. Danh sách các bảng có liên quan cần xóa dữ liệu trước (để tránh lỗi khóa ngoại)
+                        string[] relatedTables = {
+                            "ThongKeNguoiDung",
+                            "TienDoTuVung",
+                            "TienDoBaiHoc",
+                            "KetQuaKiemTra",
+                            "HuyHieuNguoiDung",
+                            "TienDoThuThachNgay"
+                        };
+
+                        foreach (string table in relatedTables)
+                        {
+                            string deleteQuery = $"DELETE FROM {table} WHERE MaNguoiDung = @UserId";
+                            using (SqlCommand cmd = new SqlCommand(deleteQuery, conn, transaction))
+                            {
+                                cmd.Parameters.AddWithValue("@UserId", userId);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        // 2. Sau khi đã dọn dẹp dữ liệu liên quan, tiến hành xóa người dùng
+                        string deleteUserQuery = "DELETE FROM NguoiDung WHERE MaNguoiDung = @UserId";
+                        using (SqlCommand cmd = new SqlCommand(deleteUserQuery, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@UserId", userId);
+                            int result = cmd.ExecuteNonQuery();
+                            
+                            if (result > 0)
+                            {
+                                transaction.Commit();
+                                return true;
+                            }
+                        }
+
+                        transaction.Rollback();
+                        return false;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Lỗi khi xóa người dùng: " + ex.Message);
+                        transaction.Rollback();
+                        return false;
+                    }
+                }
+            }
+        }
     }
 }

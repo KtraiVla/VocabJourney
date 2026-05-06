@@ -44,6 +44,34 @@ const AdminUserTab = () => {
     user.email?.toLowerCase().includes(searchText.toLowerCase())
   );
 
+  const handleDelete = (record) => {
+    const currentUserId = localStorage.getItem('userId');
+    
+    if (record.id.toString() === currentUserId) {
+      message.error('Bạn không thể tự xóa tài khoản của chính mình!');
+      return;
+    }
+
+    Modal.confirm({
+      title: 'Xác nhận xóa',
+      content: `Bạn có chắc chắn muốn xóa người dùng "${record.username}"? Mọi dữ liệu học tập, tiến độ và huy hiệu của người dùng này sẽ bị xóa vĩnh viễn.`,
+      okText: 'Xóa',
+      okType: 'danger',
+      cancelText: 'Hủy',
+      onOk: async () => {
+        try {
+          await authService.deleteUser(record.id);
+          message.success('Xóa người dùng thành công');
+          fetchUsers(); // Tải lại danh sách
+        } catch (error) {
+          console.error('Lỗi khi xóa người dùng:', error);
+          const errorMsg = error.response?.data?.message || 'Không thể xóa người dùng do ràng buộc dữ liệu hoặc lỗi hệ thống.';
+          message.error(errorMsg);
+        }
+      },
+    });
+  };
+
   const columns = [
     {
       title: 'NGƯỜI DÙNG',
@@ -118,7 +146,7 @@ const AdminUserTab = () => {
               type="text" 
               danger 
               icon={<DeleteOutlined />} 
-              onClick={() => message.warning('Tính năng xóa đang được bảo trì')}
+              onClick={() => handleDelete(record)}
             />
           </Tooltip>
         </Space>

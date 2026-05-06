@@ -108,6 +108,20 @@ namespace VocabJourney.Repositories
             }
         }
 
+        public bool HasOwners(int badgeId)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT COUNT(1) FROM HuyHieuNguoiDung WHERE MaHuyHieu = @Id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", badgeId);
+                    conn.Open();
+                    return (int)cmd.ExecuteScalar() > 0;
+                }
+            }
+        }
+
         public bool DeleteHuyHieu(int id)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))

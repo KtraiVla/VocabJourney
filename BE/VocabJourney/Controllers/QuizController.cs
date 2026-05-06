@@ -45,6 +45,9 @@ namespace VocabJourney.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
+            if (_repo.HasCompletedResults(id))
+                return BadRequest(new { success = false, message = "Không thể xóa bài kiểm tra này vì đã có người dùng làm bài. Việc xóa sẽ mất lịch sử kết quả của họ." });
+
             if (_repo.DeleteQuiz(id)) return Ok(new { success = true, message = "Xóa bài Quiz thành công" });
             return BadRequest(new { success = false, message = "Lỗi khi xóa bài Quiz" });
         }

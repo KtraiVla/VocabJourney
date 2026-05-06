@@ -25,6 +25,10 @@ const authService = {
   
   getAllUsers: () => {
     return axiosClient.get("/Auth/users");
+  },
+
+  deleteUser: (userId) => {
+    return axiosClient.post(`/Auth/delete-user/${userId}`);
   }
 };
 

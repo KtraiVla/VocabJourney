@@ -162,6 +162,20 @@ namespace VocabJourney.Repositories
             }
         }
 
+        public bool HasLessons(int topicId)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT COUNT(1) FROM BaiHoc WHERE MaChuDe = @Id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", topicId);
+                    conn.Open();
+                    return (int)cmd.ExecuteScalar() > 0;
+                }
+            }
+        }
+
         public bool DeleteTopic(int id)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))

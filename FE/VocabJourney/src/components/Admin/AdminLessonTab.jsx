@@ -76,7 +76,8 @@ const AdminLessonTab = () => {
       message.success('Xóa bài học thành công!');
       fetchData();
     } catch (error) {
-      message.error('Xóa thất bại');
+      const msg = error.response?.data?.message || 'Xóa thất bại, vui lòng thử lại.';
+      message.error(msg);
     }
   };
 

@@ -151,6 +151,34 @@ namespace VocabJourney.Repositories
             }
         }
 
+        public bool HasVocab(int lessonId)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT COUNT(1) FROM TuVung WHERE MaBaiHoc = @Id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", lessonId);
+                    conn.Open();
+                    return (int)cmd.ExecuteScalar() > 0;
+                }
+            }
+        }
+
+        public bool HasQuiz(int lessonId)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT COUNT(1) FROM BaiKiemTra WHERE MaBaiHoc = @Id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", lessonId);
+                    conn.Open();
+                    return (int)cmd.ExecuteScalar() > 0;
+                }
+            }
+        }
+
         public bool DeleteBaiHoc(int id)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
