@@ -64,5 +64,11 @@ namespace IdentityService.Controllers
                 joinDate = user.joinDate
             });
         }
+        [HttpGet("users")]
+        public IActionResult GetAllUsers()
+        {
+            var users = _repo.GetAllUsers();
+            return Ok(users);
+        }
     }
 }

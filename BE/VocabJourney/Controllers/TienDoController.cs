@@ -42,7 +42,7 @@ namespace VocabJourney.Controllers
         [HttpPost("luu-ket-qua-quiz")]
         public IActionResult LuuKetQuaQuiz([FromBody] KetQuaQuizRequest request)
         {
-            bool success = _repo.LuuKetQuaKiemTra(request.MaNguoiDung, request.SoCauDung, request.TongCauHoi);
+            bool success = _repo.LuuKetQuaKiemTra(request.MaNguoiDung, request.MaBaiKiemTra, request.SoCauDung, request.TongCauHoi);
             if (success) return Ok(new { success = true, message = "Lưu kết quả Quiz thành công" });
             return BadRequest(new { success = false, message = "Lưu kết quả Quiz thất bại" });
         }
@@ -69,5 +69,26 @@ namespace VocabJourney.Controllers
             int count = _repo.GetSoTuCanOnTap(maNguoiDung);
             return Ok(new { success = true, count = count });
         }
+    }
+
+    public class TienDoTuVungRequest
+    {
+        public int MaNguoiDung { get; set; }
+        public int MaTuVung { get; set; }
+        public bool DaHoc { get; set; }
+    }
+
+    public class TienDoBaiHocRequest
+    {
+        public int MaNguoiDung { get; set; }
+        public int MaBaiHoc { get; set; }
+    }
+
+    public class KetQuaQuizRequest
+    {
+        public int MaNguoiDung { get; set; }
+        public int MaBaiKiemTra { get; set; }
+        public int SoCauDung { get; set; }
+        public int TongCauHoi { get; set; }
     }
 }

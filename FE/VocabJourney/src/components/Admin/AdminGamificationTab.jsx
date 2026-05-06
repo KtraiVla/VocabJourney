@@ -1,132 +1,173 @@
-import React from 'react';
-import { Button, Row, Col, Modal, Form, Input, message } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Table, Button, Tag, Space, Tooltip, message, Spin, Popconfirm, Modal, Form, Input } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, TrophyOutlined } from '@ant-design/icons';
 import './AdminGamificationTab.css';
+import badgeService from '../../services/badgeService';
 
 const AdminGamificationTab = () => {
-  const [isModalVisible, setIsModalVisible] = React.useState(false);
-  const [editingRecord, setEditingRecord] = React.useState(null);
+  const [badges, setBadges] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingRecord, setEditingRecord] = useState(null);
   const [form] = Form.useForm();
 
-  const showAddModal = () => {
-    setEditingRecord(null);
-    form.resetFields();
-    setIsModalVisible(true);
+  const fetchBadges = async () => {
+    try {
+      setLoading(true);
+      const response = await badgeService.getAllBadges();
+      setBadges(response.data || []);
+    } catch (error) {
+      console.error('Lỗi khi tải huy hiệu:', error);
+      message.error('Không thể tải danh sách huy hiệu');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const showEditModal = (record) => {
-    setEditingRecord(record);
-    form.setFieldsValue(record);
-    setIsModalVisible(true);
-  };
+  useEffect(() => {
+    fetchBadges();
+  }, []);
 
   const handleModalOk = () => {
-    form.validateFields().then((values) => {
-      console.log('Lưu huy hiệu:', values);
-      message.success(editingRecord ? 'Cập nhật huy hiệu thành công!' : 'Thêm huy hiệu thành công!');
-      setIsModalVisible(false);
-    }).catch((info) => {
-      console.log('Lỗi validate:', info);
+    form.validateFields().then(async (values) => {
+      try {
+        const payload = {
+          tenHuyHieu: values.tenHuyHieu,
+          moTa: values.moTa,
+          iconName: values.iconName,
+          dieuKien: values.dieuKien
+        };
+
+        if (editingRecord) {
+          await badgeService.updateBadge(editingRecord.maHuyHieu, payload);
+          message.success('Cập nhật huy hiệu thành công!');
+        } else {
+          await badgeService.createBadge(payload);
+          message.success('Thêm huy hiệu mới thành công!');
+        }
+        setIsModalVisible(false);
+        fetchBadges();
+      } catch (error) {
+        message.error('Lưu thất bại');
+      }
     });
   };
 
-  const handleModalCancel = () => {
-    setIsModalVisible(false);
+  const handleDelete = async (id) => {
+    try {
+      await badgeService.deleteBadge(id);
+      message.success('Xóa huy hiệu thành công!');
+      fetchBadges();
+    } catch (error) {
+      message.error('Xóa thất bại');
+    }
   };
 
-  const badgeData = [
+  const columns = [
     {
-      id: 1,
-      title: 'Bước Đầu Tiên',
-      description: 'Hoàn thành bài học đầu tiên',
-      icon: '🎯'
+      title: 'HUY HIỆU',
+      key: 'badge',
+      render: (_, record) => (
+        <div className="badge-info-cell">
+          <div className="badge-icon-preview">
+             <TrophyOutlined style={{ fontSize: '24px', color: '#f59e0b' }} />
+          </div>
+          <div className="badge-text-info">
+            <div className="badge-name">{record.tenHuyHieu}</div>
+            <div className="badge-desc">{record.moTa}</div>
+          </div>
+        </div>
+      ),
     },
     {
-      id: 2,
-      title: 'Chiến Binh 7 Ngày',
-      description: 'Duy trì chuỗi ngày học 7 ngày',
-      icon: '🔥'
+      title: 'ICON NAME',
+      dataIndex: 'iconName',
+      key: 'iconName',
+      render: (text) => <code className="icon-code">{text}</code>,
     },
     {
-      id: 3,
-      title: 'Bậc Thầy Từ Vựng',
-      description: 'Học 100 từ vựng',
-      icon: '📚'
+      title: 'ĐIỀU KIỆN',
+      dataIndex: 'dieuKien',
+      key: 'dieuKien',
+      render: (text) => <Tag color="orange">{text}</Tag>,
     },
     {
-      id: 4,
-      title: 'Nhà Vô Địch Quiz',
-      description: 'Đạt 100% trong 10 bài kiểm tra',
-      icon: '🏆'
+      title: 'HÀNH ĐỘNG',
+      key: 'action',
+      render: (_, record) => (
+        <Space size="middle">
+          <Tooltip title="Chỉnh sửa">
+            <Button 
+              type="text" 
+              icon={<EditOutlined style={{ color: '#475569' }} />} 
+              onClick={() => {
+                setEditingRecord(record);
+                form.setFieldsValue(record);
+                setIsModalVisible(true);
+              }}
+            />
+          </Tooltip>
+          <Popconfirm
+            title="Xóa huy hiệu"
+            description="Bạn có chắc chắn muốn xóa huy hiệu này không?"
+            onConfirm={() => handleDelete(record.maHuyHieu)}
+            okText="Xóa"
+            cancelText="Hủy"
+            okButtonProps={{ danger: true }}
+          >
+            <Button type="text" danger icon={<DeleteOutlined />} />
+          </Popconfirm>
+        </Space>
+      ),
     },
-    {
-      id: 5,
-      title: 'Bậc Thầy 30 Ngày',
-      description: 'Duy trì chuỗi ngày học 30 ngày',
-      icon: '⭐'
-    },
-    {
-      id: 6,
-      title: 'Học Viên Siêu Đẳng',
-      description: 'Học 500 từ vựng',
-      icon: '💎'
-    }
   ];
 
   return (
     <div className="admin-gamification-tab">
-      <div className="gamification-header">
-        <h2 className="gamification-title">Quản Lý Trò Chơi Hóa</h2>
-      </div>
-
-      <Row gutter={[24, 24]}>
-        {badgeData.map((badge) => (
-          <Col xs={24} md={12} lg={8} key={badge.id}>
-            <div className="badge-card">
-              <div className="badge-icon-display">
-                {badge.icon}
-              </div>
-              
-              <div className="badge-info">
-                <h3 className="badge-name">{badge.title}</h3>
-                <p className="badge-desc">{badge.description}</p>
-              </div>
-              
-              <div className="badge-actions">
-                <Button type="default" icon={<EditOutlined />} className="badge-action-btn edit" onClick={() => showEditModal(badge)}>
-                  Sửa
-                </Button>
-                <Button type="default" danger icon={<DeleteOutlined />} className="badge-action-btn delete">
-                </Button>
-              </div>
-            </div>
-          </Col>
-        ))}
-      </Row>
-      
-      <div className="gamification-footer" style={{ marginTop: '24px' }}>
-         <Button type="primary" icon={<PlusOutlined />} className="add-badge-btn" onClick={showAddModal}>
-          Thêm Huy Hiệu Mới
+      <div className="tab-header">
+        <h2 className="tab-title">Quản Lý Huy Hiệu ({badges.length})</h2>
+        <Button type="primary" icon={<PlusOutlined />} className="add-btn" onClick={() => {
+          setEditingRecord(null);
+          form.resetFields();
+          setIsModalVisible(true);
+        }}>
+          Thêm Huy Hiệu
         </Button>
       </div>
+
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '50px' }}><Spin size="large" /></div>
+      ) : (
+        <Table 
+          columns={columns} 
+          dataSource={badges} 
+          rowKey="maHuyHieu"
+          pagination={{ pageSize: 8 }} 
+          className="custom-table"
+        />
+      )}
 
       <Modal
         title={editingRecord ? "Sửa Huy Hiệu" : "Thêm Huy Hiệu Mới"}
         open={isModalVisible}
         onOk={handleModalOk}
-        onCancel={handleModalCancel}
+        onCancel={() => setIsModalVisible(false)}
         okText="Lưu"
         cancelText="Hủy"
+        destroyOnHidden
       >
         <Form form={form} layout="vertical">
-          <Form.Item name="title" label="Tên huy hiệu" rules={[{ required: true, message: 'Vui lòng nhập tên huy hiệu!' }]}>
-            <Input placeholder="VD: Bước Đầu Tiên" />
+          <Form.Item name="tenHuyHieu" label="Tên huy hiệu" rules={[{ required: true }]}>
+            <Input placeholder="VD: Nhà Chinh Phục" />
           </Form.Item>
-          <Form.Item name="description" label="Mô tả" rules={[{ required: true, message: 'Vui lòng nhập mô tả!' }]}>
-            <Input.TextArea placeholder="Mô tả điều kiện đạt huy hiệu" rows={3} />
+          <Form.Item name="moTa" label="Mô tả" rules={[{ required: true }]}>
+            <Input.TextArea placeholder="VD: Hoàn thành 10 bài học đầu tiên" rows={2} />
           </Form.Item>
-          <Form.Item name="icon" label="Biểu tượng (Icon)" rules={[{ required: true, message: 'Vui lòng nhập biểu tượng!' }]}>
-            <Input placeholder="Nhập một Emoji, VD: 🎯" />
+          <Form.Item name="iconName" label="Mã Icon" rules={[{ required: true }]}>
+            <Input placeholder="VD: trophy, star, medal..." />
+          </Form.Item>
+          <Form.Item name="dieuKien" label="Điều kiện (Logic)" rules={[{ required: true }]}>
+            <Input placeholder="VD: lessons_completed >= 10" />
           </Form.Item>
         </Form>
       </Modal>

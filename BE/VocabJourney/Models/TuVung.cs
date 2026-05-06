@@ -1,4 +1,4 @@
-﻿namespace VocabJourney.Models
+namespace VocabJourney.Models
 {
     public class TuVung
     {
@@ -10,5 +10,6 @@
         public string DinhNghia { get; set; }
         public int DoKho { get; set; }
         public string ViDu { get; set; }
+        public int MaBaiHoc { get; set; }
     }
 }

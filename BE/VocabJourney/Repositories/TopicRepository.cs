@@ -128,5 +128,52 @@ namespace VocabJourney.Repositories
             }
             return null;
         }
+
+        public bool AddTopic(Topic topic)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "INSERT INTO ChuDe (TenChuDe, MoTa, AnhMinhHoa, NgayTao) VALUES (@Ten, @MoTa, @Anh, GETDATE())";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Ten", topic.TenChuDe);
+                    cmd.Parameters.AddWithValue("@MoTa", topic.MoTa);
+                    cmd.Parameters.AddWithValue("@Anh", (object)topic.AnhMinhHoa ?? DBNull.Value);
+                    conn.Open();
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+        public bool UpdateTopic(Topic topic)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "UPDATE ChuDe SET TenChuDe = @Ten, MoTa = @MoTa, AnhMinhHoa = @Anh WHERE MaChuDe = @Id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", topic.MaChuDe);
+                    cmd.Parameters.AddWithValue("@Ten", topic.TenChuDe);
+                    cmd.Parameters.AddWithValue("@MoTa", topic.MoTa);
+                    cmd.Parameters.AddWithValue("@Anh", (object)topic.AnhMinhHoa ?? DBNull.Value);
+                    conn.Open();
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+        public bool DeleteTopic(int id)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "DELETE FROM ChuDe WHERE MaChuDe = @Id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    conn.Open();
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
     }
 }

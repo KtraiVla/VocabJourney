@@ -1,95 +1,56 @@
-import React, { useState } from 'react';
-import { Table, Input, Button, Tag, Space, Tooltip, Avatar, Modal, Form, Select, InputNumber, message } from 'antd';
-import { 
-  SearchOutlined, 
-  PlusOutlined, 
-  EditOutlined, 
-  DeleteOutlined 
-} from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Table, Input, Button, Tag, Space, Tooltip, Modal, Form, Select, message, Spin } from 'antd';
+import { SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import './AdminUserTab.css';
+import authService from '../../services/authService';
 
 const AdminUserTab = () => {
-  // Trạng thái (state) lưu trữ từ khóa tìm kiếm
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [form] = Form.useForm();
 
-  const showAddModal = () => {
-    setEditingRecord(null);
-    form.resetFields();
-    setIsModalVisible(true);
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await authService.getAllUsers();
+      if (response && response.data) {
+        setUsers(response.data);
+      }
+    } catch (error) {
+      console.error('Lỗi khi tải người dùng:', error);
+      message.error('Không thể tải danh sách người dùng');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const showEditModal = (record) => {
-    setEditingRecord(record);
-    form.setFieldsValue(record);
-    setIsModalVisible(true);
-  };
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const handleModalOk = () => {
     form.validateFields().then((values) => {
       console.log('Lưu người dùng:', values);
-      message.success(editingRecord ? 'Cập nhật người dùng thành công!' : 'Thêm người dùng thành công!');
+      message.info('Tính năng Thêm/Sửa người dùng từ Admin đang được phát triển');
       setIsModalVisible(false);
-    }).catch((info) => {
-      console.log('Lỗi validate:', info);
     });
   };
 
-  const handleModalCancel = () => {
-    setIsModalVisible(false);
-  };
+  const filteredUsers = users.filter(user => 
+    user.username?.toLowerCase().includes(searchText.toLowerCase()) || 
+    user.email?.toLowerCase().includes(searchText.toLowerCase())
+  );
 
-  // Dữ liệu giả lập (Mock data) cho bảng người dùng
-  const dataSource = [
-    {
-      key: '1',
-      name: 'Nguyễn Văn An',
-      email: 'nguyenvanan@example.com',
-      level: 'Cấp 8',
-      xp: 2450,
-      wordsLearned: 347,
-      status: 'active',
-    },
-    {
-      key: '2',
-      name: 'Trần Thị Bình',
-      email: 'tranthibinh@example.com',
-      level: 'Cấp 12',
-      xp: 4200,
-      wordsLearned: 589,
-      status: 'active',
-    },
-    {
-      key: '3',
-      name: 'Lê Minh Cường',
-      email: 'leminhcuong@example.com',
-      level: 'Cấp 5',
-      xp: 1350,
-      wordsLearned: 178,
-      status: 'active',
-    },
-    {
-      key: '4',
-      name: 'Phạm Thu Dung',
-      email: 'phamthudung@example.com',
-      level: 'Cấp 15',
-      xp: 6100,
-      wordsLearned: 823,
-      status: 'active',
-    },
-  ];
-
-  // Định nghĩa các cột (Columns) cho bảng Ant Design
   const columns = [
     {
       title: 'NGƯỜI DÙNG',
-      dataIndex: 'user', // Cột này sẽ gộp name và email lại
       key: 'user',
       render: (_, record) => (
         <div className="user-info-cell">
-          <div className="user-name">{record.name}</div>
+          <div className="user-name">{record.username}</div>
           <div className="user-email">{record.email}</div>
         </div>
       ),
@@ -100,7 +61,7 @@ const AdminUserTab = () => {
       key: 'level',
       render: (level) => (
         <Tag className="level-tag" color="#f3e8ff" style={{ color: '#9333ea', border: 'none' }}>
-          {level}
+          Cấp {level}
         </Tag>
       ),
     },
@@ -108,19 +69,31 @@ const AdminUserTab = () => {
       title: 'XP',
       dataIndex: 'xp',
       key: 'xp',
+      sorter: (a, b) => a.xp - b.xp,
     },
     {
       title: 'TỪ ĐÃ HỌC',
       dataIndex: 'wordsLearned',
       key: 'wordsLearned',
+      sorter: (a, b) => a.wordsLearned - b.wordsLearned,
     },
     {
       title: 'TRẠNG THÁI',
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
-        <Tag className="status-tag" color="#dcfce7" style={{ color: '#16a34a', border: 'none' }}>
-          {status}
+        <Tag className="status-tag" color={status === 'active' ? "#dcfce7" : "#fee2e2"} style={{ color: status === 'active' ? '#16a34a' : '#dc2626', border: 'none' }}>
+          {status === 'active' ? 'Hoạt động' : 'Đã khóa'}
+        </Tag>
+      ),
+    },
+    {
+      title: 'VAI TRÒ',
+      dataIndex: 'role',
+      key: 'role',
+      render: (role) => (
+        <Tag color={role === 'admin' ? 'gold' : 'blue'}>
+          {role.toUpperCase()}
         </Tag>
       ),
     },
@@ -133,7 +106,11 @@ const AdminUserTab = () => {
             <Button 
               type="text" 
               icon={<EditOutlined style={{ color: '#475569' }} />} 
-              onClick={() => showEditModal(record)}
+              onClick={() => {
+                setEditingRecord(record);
+                form.setFieldsValue(record);
+                setIsModalVisible(true);
+              }}
             />
           </Tooltip>
           <Tooltip title="Xóa">
@@ -141,7 +118,7 @@ const AdminUserTab = () => {
               type="text" 
               danger 
               icon={<DeleteOutlined />} 
-              onClick={() => console.log('Delete', record.key)}
+              onClick={() => message.warning('Tính năng xóa đang được bảo trì')}
             />
           </Tooltip>
         </Space>
@@ -151,19 +128,20 @@ const AdminUserTab = () => {
 
   return (
     <div className="admin-user-tab">
-      
-      {/* Header của Tab: Tiêu đề và Nút Thêm Mới */}
       <div className="tab-header">
-        <h2 className="tab-title">Quản Lý Người Dùng</h2>
-        <Button type="primary" icon={<PlusOutlined />} className="add-user-btn" onClick={showAddModal}>
+        <h2 className="tab-title">Quản Lý Người Dùng ({filteredUsers.length})</h2>
+        <Button type="primary" icon={<PlusOutlined />} className="add-user-btn" onClick={() => {
+          setEditingRecord(null);
+          form.resetFields();
+          setIsModalVisible(true);
+        }}>
           Thêm Người Dùng
         </Button>
       </div>
 
-      {/* Thanh Tìm Kiếm */}
       <div className="search-container">
         <Input
-          placeholder="Tìm kiếm người dùng..."
+          placeholder="Tìm kiếm theo tên hoặc email..."
           prefix={<SearchOutlined style={{ color: '#94a3b8' }} />}
           className="search-input"
           value={searchText}
@@ -171,51 +149,43 @@ const AdminUserTab = () => {
         />
       </div>
 
-      {/* Bảng Hiển Thị Dữ Liệu */}
-      <Table 
-        columns={columns} 
-        dataSource={dataSource} 
-        pagination={{ pageSize: 5 }} 
-        className="custom-table"
-        rowClassName="custom-table-row"
-      />
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '50px' }}><Spin size="large" /></div>
+      ) : (
+        <Table 
+          columns={columns} 
+          dataSource={filteredUsers} 
+          rowKey="id"
+          pagination={{ pageSize: 8 }} 
+          className="custom-table"
+        />
+      )}
 
       <Modal
         title={editingRecord ? "Sửa Người Dùng" : "Thêm Người Dùng Mới"}
         open={isModalVisible}
         onOk={handleModalOk}
-        onCancel={handleModalCancel}
+        onCancel={() => setIsModalVisible(false)}
         okText="Lưu"
         cancelText="Hủy"
       >
         <Form form={form} layout="vertical">
-          <Form.Item name="name" label="Họ và Tên" rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}>
-            <Input placeholder="Nhập họ và tên" />
+          <Form.Item name="username" label="Tên đăng nhập" rules={[{ required: true }]}>
+            <Input disabled={!!editingRecord} />
           </Form.Item>
-          <Form.Item name="email" label="Email" rules={[{ required: true, message: 'Vui lòng nhập email!' }]}>
-            <Input placeholder="Nhập địa chỉ email" />
+          <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email' }]}>
+            <Input />
           </Form.Item>
-          <Form.Item name="level" label="Cấp độ" rules={[{ required: true }]}>
+          <Form.Item name="role" label="Vai trò" initialValue="User">
             <Select>
-              <Select.Option value="Cấp 1">Cấp 1</Select.Option>
-              <Select.Option value="Cấp 5">Cấp 5</Select.Option>
-              <Select.Option value="Cấp 8">Cấp 8</Select.Option>
-              <Select.Option value="Cấp 12">Cấp 12</Select.Option>
-              <Select.Option value="Cấp 15">Cấp 15</Select.Option>
+              <Select.Option value="User">Người dùng</Select.Option>
+              <Select.Option value="admin">Quản trị viên</Select.Option>
             </Select>
           </Form.Item>
-          <div style={{ display: 'flex', gap: '16px' }}>
-            <Form.Item name="xp" label="XP" style={{ flex: 1 }}>
-              <InputNumber style={{ width: '100%' }} min={0} />
-            </Form.Item>
-            <Form.Item name="wordsLearned" label="Từ đã học" style={{ flex: 1 }}>
-              <InputNumber style={{ width: '100%' }} min={0} />
-            </Form.Item>
-          </div>
           <Form.Item name="status" label="Trạng thái" initialValue="active">
             <Select>
               <Select.Option value="active">Hoạt động</Select.Option>
-              <Select.Option value="inactive">Đã khóa</Select.Option>
+              <Select.Option value="inactive">Khóa tài khoản</Select.Option>
             </Select>
           </Form.Item>
         </Form>

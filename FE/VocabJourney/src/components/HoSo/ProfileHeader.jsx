@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Mail, Calendar, Zap, Edit2 } from "lucide-react";
+import { Mail, Calendar, Zap, Edit2, LogOut } from "lucide-react";
 import "./ProfileHeader.css";
 import authService from "../../services/authService";
 import statsService from "../../services/statsService";
@@ -8,6 +8,11 @@ export default function ProfileHeader() {
   const [userInfo, setUserInfo] = useState(null);
   const [userStats, setUserStats] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.href = "/dangnhap";
+  };
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -84,7 +89,10 @@ export default function ProfileHeader() {
           <Edit2 size={16} />
           Chỉnh sửa hồ sơ
         </button>
-        <div className="profile-header-placeholder"></div>
+        <button className="profile-logout-btn" onClick={handleLogout}>
+          <LogOut size={16} />
+          Đăng xuất
+        </button>
       </div>
     </div>
   );

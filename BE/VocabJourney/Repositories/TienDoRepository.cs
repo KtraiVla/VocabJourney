@@ -44,14 +44,14 @@ namespace VocabJourney.Repositories
                         SET DaHoc = @DaHoc, 
                             NgayOnCuoi = GETDATE(),
                             SoLanOnDung = @SoLanOnDung,
-                            NgayOnTiepTheo = DATEADD(day, @NextReview, GETDATE()),
+                            NgayOnTiepTheo = CAST(DATEADD(day, @NextReview, GETDATE()) AS DATE),
                             SoLanOn = ISNULL(SoLanOn, 0) + 1
                         WHERE MaNguoiDung = @MaNguoiDung AND MaTuVung = @MaTuVung
                     END
                     ELSE
                     BEGIN
                         INSERT INTO TienDoTuVung (MaNguoiDung, MaTuVung, DaHoc, NgayOnCuoi, SoLanOnDung, NgayOnTiepTheo, SoLanOn) 
-                        VALUES (@MaNguoiDung, @MaTuVung, @DaHoc, GETDATE(), @SoLanOnDung, DATEADD(day, @NextReview, GETDATE()), 1)
+                        VALUES (@MaNguoiDung, @MaTuVung, @DaHoc, GETDATE(), @SoLanOnDung, CAST(DATEADD(day, @NextReview, GETDATE()) AS DATE), 1)
                     END";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -73,15 +73,18 @@ namespace VocabJourney.Repositories
 
                     int rowsAffected = cmd.ExecuteNonQuery();
                     
-                    if (rowsAffected > 0 && daHoc)
+                    if (rowsAffected > 0)
                     {
                         var thongKeRepo = new ThongKeRepository(_connectionString);
                         
-                        // Phân biệt: Nếu là lần đầu tiên bấm "Đã thuộc" (old=0) thì là LEARN, ngược lại là REVIEW
-                        string actionType = (oldSoLanOnDung == 0) ? "LEARN" : "REVIEW";
-                        thongKeRepo.CongXP(maNguoiDung, actionType);
+                        if (daHoc)
+                        {
+                            // Phân biệt: Nếu là lần đầu tiên bấm "Đã thuộc" (old=0) thì là LEARN, ngược lại là REVIEW
+                            string actionType = (oldSoLanOnDung == 0) ? "LEARN" : "REVIEW";
+                            thongKeRepo.CongXP(maNguoiDung, actionType);
+                        }
                         
-                        // Luôn cập nhật Streak khi có hoạt động học tập
+                        // Luôn cập nhật Streak khi có hoạt động tương tác từ vựng (bất kể thuộc hay chưa)
                         thongKeRepo.CapNhatStreak(maNguoiDung);
                     }
                     
@@ -119,6 +122,7 @@ namespace VocabJourney.Repositories
                     {
                         var thongKeRepo = new ThongKeRepository(_connectionString);
                         thongKeRepo.CongXP(maNguoiDung, "LESSON");
+                        thongKeRepo.CapNhatStreak(maNguoiDung);
                     }
 
                     return rowsAffected > 0;
@@ -178,19 +182,21 @@ namespace VocabJourney.Repositories
             return null;
         }
 
-        public bool LuuKetQuaKiemTra(int maNguoiDung, int soCauDung, int tongCauHoi)
+        public bool LuuKetQuaKiemTra(int maNguoiDung, int maBaiKiemTra, int soCauDung, int tongCauHoi)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 string query = @"
-                    INSERT INTO KetQuaKiemTra (MaNguoiDung, SoCauDung, TongCauHoi, NgayLam) 
-                    VALUES (@MaNguoiDung, @SoCauDung, @TongCauHoi, GETDATE())";
+                    INSERT INTO KetQuaKiemTra (MaNguoiDung, MaBaiKiemTra, SoCauDung, TongSoCau, DiemSo, NgayLamBai) 
+                    VALUES (@MaNguoiDung, @MaBaiKiemTra, @SoCauDung, @TongSoCau, @DiemSo, GETDATE())";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@MaNguoiDung", maNguoiDung);
+                    cmd.Parameters.AddWithValue("@MaBaiKiemTra", maBaiKiemTra);
                     cmd.Parameters.AddWithValue("@SoCauDung", soCauDung);
-                    cmd.Parameters.AddWithValue("@TongCauHoi", tongCauHoi);
+                    cmd.Parameters.AddWithValue("@TongSoCau", tongCauHoi);
+                    cmd.Parameters.AddWithValue("@DiemSo", soCauDung); // Giả định điểm số = số câu đúng
 
                     conn.Open();
                     int rowsAffected = cmd.ExecuteNonQuery();
@@ -200,7 +206,7 @@ namespace VocabJourney.Repositories
                         // Tính toán XP theo đúng bản thiết kế
                         // Mỗi câu đúng +4 XP, Hoàn thành +20 XP, Perfect +20 XP
                         int xpGoc = (soCauDung * 4) + 20;
-                        if (soCauDung == tongCauHoi && tongCauHoi >= 10) // Điều kiện Perfect
+                        if (soCauDung == tongCauHoi && tongCauHoi >= 5) // Điều kiện Perfect (đúng 100% và bài có ít nhất 5 câu)
                         {
                             xpGoc += 20;
                         }
@@ -223,7 +229,7 @@ namespace VocabJourney.Repositories
                     SELECT COUNT(*) 
                     FROM TienDoTuVung 
                     WHERE MaNguoiDung = @MaNguoiDung 
-                    AND NgayOnTiepTheo <= GETDATE()";
+                    AND CAST(NgayOnTiepTheo AS DATE) <= CAST(GETDATE() AS DATE)";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {

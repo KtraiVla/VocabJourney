@@ -1,12 +1,34 @@
-import React from 'react';
-import { Button, Row, Col, Modal, Form, Input, message } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Button, Row, Col, Modal, Form, Input, message, Popconfirm, Spin } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import './AdminTopicTab.css';
+import topicService from '../../services/topicService';
 
 const AdminTopicTab = () => {
-  const [isModalVisible, setIsModalVisible] = React.useState(false);
-  const [editingRecord, setEditingRecord] = React.useState(null);
+  const [topics, setTopics] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingRecord, setEditingRecord] = useState(null);
   const [form] = Form.useForm();
+
+  const fetchTopics = async () => {
+    try {
+      setLoading(true);
+      const response = await topicService.getAllTopics();
+      if (response && response.data) {
+        setTopics(response.data);
+      }
+    } catch (error) {
+      console.error('Lỗi khi tải chủ đề:', error);
+      message.error('Không thể tải danh sách chủ đề');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTopics();
+  }, []);
 
   const showAddModal = () => {
     setEditingRecord(null);
@@ -16,108 +38,98 @@ const AdminTopicTab = () => {
 
   const showEditModal = (record) => {
     setEditingRecord(record);
-    form.setFieldsValue(record);
+    form.setFieldsValue({
+      title: record.tenChuDe,
+      description: record.moTa,
+      imageUrl: record.anhMinhHoa
+    });
     setIsModalVisible(true);
   };
 
   const handleModalOk = () => {
-    form.validateFields().then((values) => {
-      console.log('Lưu chủ đề:', values);
-      message.success(editingRecord ? 'Cập nhật chủ đề thành công!' : 'Thêm chủ đề thành công!');
-      setIsModalVisible(false);
-    }).catch((info) => {
-      console.log('Lỗi validate:', info);
+    form.validateFields().then(async (values) => {
+      try {
+        const topicData = {
+          tenChuDe: values.title,
+          moTa: values.description,
+          anhMinhHoa: values.imageUrl
+        };
+
+        if (editingRecord) {
+          await topicService.updateTopic(editingRecord.maChuDe, topicData);
+          message.success('Cập nhật chủ đề thành công!');
+        } else {
+          await topicService.createTopic(topicData);
+          message.success('Thêm chủ đề mới thành công!');
+        }
+        setIsModalVisible(false);
+        fetchTopics();
+      } catch (error) {
+        message.error('Lưu thất bại: ' + (error.response?.data?.message || error.message));
+      }
     });
   };
 
-  const handleModalCancel = () => {
-    setIsModalVisible(false);
+  const handleDelete = async (id) => {
+    try {
+      await topicService.deleteTopic(id);
+      message.success('Xóa chủ đề thành công!');
+      fetchTopics();
+    } catch (error) {
+      message.error('Xóa thất bại: ' + (error.response?.data?.message || error.message));
+    }
   };
 
-  const topicData = [
-    {
-      id: 1,
-      title: 'Du Lịch & Khám Phá',
-      description: 'Từ vựng thiết yếu cho các chuyến du lịch',
-      lessons: 8,
-      words: 96,
-      imageUrl: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500&h=200&fit=crop'
-    },
-    {
-      id: 2,
-      title: 'Tiếng Anh Thương Mại',
-      description: 'Từ vựng chuyên nghiệp cho công việc',
-      lessons: 12,
-      words: 144,
-      imageUrl: 'https://images.unsplash.com/photo-1664575602276-acd073f104c1?w=500&h=200&fit=crop'
-    },
-    {
-      id: 3,
-      title: 'Ẩm Thực & Nhà Hàng',
-      description: 'Từ vựng về nhà hàng và nấu ăn',
-      lessons: 6,
-      words: 72,
-      imageUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500&h=200&fit=crop'
-    },
-    {
-      id: 4,
-      title: 'Giao Tiếp Hàng Ngày',
-      description: 'Cụm từ thông dụng cho các tình huống hàng ngày',
-      lessons: 10,
-      words: 120,
-      imageUrl: 'https://images.unsplash.com/photo-1515161318750-781d6122e367?w=500&h=200&fit=crop'
-    },
-    {
-      id: 5,
-      title: 'Công Nghệ',
-      description: 'Từ vựng liên quan đến công nghệ hiện đại',
-      lessons: 7,
-      words: 84,
-      imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&h=200&fit=crop'
-    },
-    {
-      id: 6,
-      title: 'Sức Khỏe & Thể Dục',
-      description: 'Từ vựng về sức khỏe và thể chất',
-      lessons: 5,
-      words: 60,
-      imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&h=200&fit=crop'
-    }
-  ];
+  if (loading && topics.length === 0) {
+    return <div className="admin-loading"><Spin size="large" description="Đang tải dữ liệu..." /></div>;
+  }
 
   return (
     <div className="admin-topic-tab">
       <div className="topic-header">
-        <h2 className="topic-title">Quản Lý Chủ Đề</h2>
+        <h2 className="topic-title">Quản Lý Chủ Đề ({topics.length})</h2>
         <Button type="primary" icon={<PlusOutlined />} className="add-topic-btn" onClick={showAddModal}>
           Thêm Chủ Đề
         </Button>
       </div>
 
       <Row gutter={[24, 24]}>
-        {topicData.map((topic) => (
-          <Col xs={24} md={12} key={topic.id}>
+        {topics.map((topic) => (
+          <Col xs={24} md={12} lg={8} key={topic.maChuDe}>
             <div className="topic-card">
               <div className="topic-image-wrapper">
-                <img src={topic.imageUrl} alt={topic.title} className="topic-image" />
+                <img 
+                  src={topic.anhMinhHoa || 'https://via.placeholder.com/500x200?text=No+Image'} 
+                  alt={topic.tenChuDe} 
+                  className="topic-image" 
+                />
               </div>
               
               <div className="topic-info">
-                <h3 className="topic-name">{topic.title}</h3>
-                <p className="topic-desc">{topic.description}</p>
+                <h3 className="topic-name">{topic.tenChuDe}</h3>
+                <p className="topic-desc">{topic.moTa}</p>
                 
                 <div className="topic-stats">
-                  <span>{topic.lessons} bài học</span>
-                  <span>{topic.words} từ</span>
+                  <span>{topic.soBaiHoc} bài học</span>
+                  <span>{topic.soTuVung} từ vựng</span>
                 </div>
                 
                 <div className="topic-actions">
                   <Button type="default" icon={<EditOutlined />} className="action-btn-outline" onClick={() => showEditModal(topic)}>
                     Sửa
                   </Button>
-                  <Button type="default" danger icon={<DeleteOutlined />} className="action-btn-outline">
-                    Xóa
-                  </Button>
+                  <Popconfirm
+                    title="Xóa chủ đề"
+                    description="Bạn có chắc chắn muốn xóa chủ đề này không? Các bài học liên quan sẽ bị ảnh hưởng."
+                    onConfirm={() => handleDelete(topic.maChuDe)}
+                    okText="Xóa"
+                    cancelText="Hủy"
+                    okButtonProps={{ danger: true }}
+                  >
+                    <Button type="default" danger icon={<DeleteOutlined />} className="action-btn-outline">
+                      Xóa
+                    </Button>
+                  </Popconfirm>
                 </div>
               </div>
             </div>
@@ -129,9 +141,10 @@ const AdminTopicTab = () => {
         title={editingRecord ? "Sửa Chủ Đề" : "Thêm Chủ Đề Mới"}
         open={isModalVisible}
         onOk={handleModalOk}
-        onCancel={handleModalCancel}
+        onCancel={() => setIsModalVisible(false)}
         okText="Lưu"
         cancelText="Hủy"
+        destroyOnHidden
       >
         <Form form={form} layout="vertical">
           <Form.Item name="title" label="Tên chủ đề" rules={[{ required: true, message: 'Vui lòng nhập tên chủ đề!' }]}>

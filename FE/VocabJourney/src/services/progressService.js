@@ -30,9 +30,10 @@ const progressService = {
     return response.data;
   },
 
-  saveQuizResult: async (maNguoiDung, soCauDung, tongCauHoi) => {
+  saveQuizResult: async (maNguoiDung, soCauDung, tongCauHoi, maBaiKiemTra) => {
     const response = await axiosUser.post("/TienDo/luu-ket-qua-quiz", {
       maNguoiDung,
+      maBaiKiemTra,
       soCauDung,
       tongCauHoi,
     });

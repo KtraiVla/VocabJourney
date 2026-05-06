@@ -33,9 +33,9 @@ namespace VocabJourney.Repositories
                         t.NgayCapNhatXP,
                         ISNULL((SELECT COUNT(*) + 1 FROM ThongKeNguoiDung WHERE DiemKinhNghiem > ISNULL(t.DiemKinhNghiem, 0)), (SELECT COUNT(*) + 1 FROM ThongKeNguoiDung)) AS ThuHang,
                         (SELECT COUNT(*) FROM TienDoTuVung WHERE MaNguoiDung = @MaNguoiDung AND DaHoc = 1) AS TongTuDaHoc,
-                        (SELECT COUNT(*) FROM TienDoBaiHoc WHERE MaNguoiDung = @MaNguoiDung AND TrangThai = 1) AS TongBaiHocDaXong,
-                        (SELECT ISNULL(AVG(CAST(SoCauDung AS FLOAT) / CAST(TongCauHoi AS FLOAT) * 100), 0) FROM KetQuaKiemTra WHERE MaNguoiDung = @MaNguoiDung) AS DoChinhXacTB,
-                        (SELECT COUNT(*) FROM NguoiDungHuyHieu WHERE MaNguoiDung = @MaNguoiDung) AS TongHuyHieu,
+                        (SELECT COUNT(*) FROM TienDoBaiHoc WHERE MaNguoiDung = @MaNguoiDung AND DaHoanThanh = 1) AS TongBaiHocDaXong,
+                        (SELECT ISNULL(AVG(CAST(SoCauDung AS FLOAT) / CAST(NULLIF(TongSoCau, 0) AS FLOAT) * 100), 0) FROM KetQuaKiemTra WHERE MaNguoiDung = @MaNguoiDung) AS DoChinhXacTB,
+                        (SELECT COUNT(*) FROM HuyHieuNguoiDung WHERE MaNguoiDung = @MaNguoiDung) AS TongHuyHieu,
                         (SELECT COUNT(*) FROM TienDoTuVung WHERE MaNguoiDung = @MaNguoiDung) AS TongTuDaGap,
                         (SELECT COUNT(*) FROM KetQuaKiemTra WHERE MaNguoiDung = @MaNguoiDung) AS TongQuizDaLam
                     FROM (SELECT 1 AS x) dummy
@@ -156,8 +156,14 @@ namespace VocabJourney.Repositories
                         break;
 
                     case "QUIZ": // Làm Quiz (xpGoc = câu đúng * 4 + 20 hoàn thành + 20 perfect)
-                        // Giả định xpGoc đã bao gồm (câu đúng * 4 + 20 + perfect) từ Controller
-                        xpToAdd = (int)(xpGoc * multiplier);
+                        if (soQuiz == 0) // Chỉ nhận XP cho bài Quiz đầu tiên trong ngày
+                        {
+                            xpToAdd = (int)(xpGoc * multiplier);
+                        }
+                        else
+                        {
+                            xpToAdd = 0; // Các bài Quiz sau chỉ để luyện tập, không có XP
+                        }
                         soQuiz++;
                         // Challenge: Làm 1 quiz -> +40 XP
                         if (soQuiz == 1 && (challengeStatus & 4) == 0) { bonusXP += 40; challengeStatus |= 4; }
@@ -295,14 +301,14 @@ namespace VocabJourney.Repositories
             {
                 string query = @"
                     SELECT 
-                        FORMAT(NgayHoc, 'dd/MM') AS Ngay,
+                        FORMAT(NgayOnCuoi, 'dd/MM') AS Ngay,
                         COUNT(*) AS SoTu
                     FROM TienDoTuVung
                     WHERE MaNguoiDung = @MaNguoiDung 
                       AND DaHoc = 1 
-                      AND NgayHoc >= DATEADD(day, -7, GETDATE())
-                    GROUP BY FORMAT(NgayHoc, 'dd/MM')
-                    ORDER BY MIN(NgayHoc) ASC";
+                      AND NgayOnCuoi >= DATEADD(day, -7, GETDATE())
+                    GROUP BY FORMAT(NgayOnCuoi, 'dd/MM')
+                    ORDER BY MIN(NgayOnCuoi) ASC";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -331,11 +337,11 @@ namespace VocabJourney.Repositories
                 // Lấy 5 kết quả bài kiểm tra gần nhất
                 string query = @"
                     SELECT TOP 5 
-                        FORMAT(NgayLam, 'dd/MM') AS Ngay,
-                        ROUND(CAST(SoCauDung AS FLOAT) / CAST(TongCauHoi AS FLOAT) * 100, 0) AS TiLe
+                        FORMAT(NgayLamBai, 'dd/MM') AS Ngay,
+                        ROUND(CAST(SoCauDung AS FLOAT) / CAST(NULLIF(TongSoCau, 0) AS FLOAT) * 100, 0) AS TiLe
                     FROM KetQuaKiemTra
                     WHERE MaNguoiDung = @MaNguoiDung
-                    ORDER BY NgayLam ASC";
+                    ORDER BY NgayLamBai ASC";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -367,7 +373,8 @@ namespace VocabJourney.Repositories
                         COUNT(*) AS SoTu
                     FROM TienDoTuVung t
                     JOIN TuVung v ON t.MaTuVung = v.MaTuVung
-                    JOIN ChuDe c ON v.MaChuDe = c.MaChuDe
+                    JOIN BaiHoc b ON v.MaBaiHoc = b.MaBaiHoc
+                    JOIN ChuDe c ON b.MaChuDe = c.MaChuDe
                     WHERE t.MaNguoiDung = @MaNguoiDung AND t.DaHoc = 1
                     GROUP BY c.TenChuDe";
 
@@ -400,9 +407,9 @@ namespace VocabJourney.Repositories
                     SELECT TOP 5 * FROM (
                         SELECT 
                             'VOCAB' AS Loai, 
-                            N'Đã học từ: ' + v.Tu AS NoiDung, 
-                            t.NgayCapNhat AS ThoiGian,
-                            4 AS DiemXP
+                            v.TuTiengAnh AS NoiDung, 
+                            t.NgayOnCuoi AS ThoiGian,
+                            10 AS DiemXP
                         FROM TienDoTuVung t
                         JOIN TuVung v ON t.MaTuVung = v.MaTuVung
                         WHERE t.MaNguoiDung = @MaNguoiDung AND t.DaHoc = 1
@@ -412,18 +419,18 @@ namespace VocabJourney.Repositories
                         SELECT 
                             'LESSON' AS Loai, 
                             N'Hoàn thành bài học' AS NoiDung, 
-                            NgayCapNhat AS ThoiGian,
+                            NgayHoanThanh AS ThoiGian,
                             20 AS DiemXP
                         FROM TienDoBaiHoc
-                        WHERE MaNguoiDung = @MaNguoiDung AND TrangThai = 1
-
+                        WHERE MaNguoiDung = @MaNguoiDung AND DaHoanThanh = 1
+                        
                         UNION ALL
 
                         SELECT 
                             'QUIZ' AS Loai, 
-                            N'Hoàn thành bài kiểm tra' AS NoiDung, 
-                            NgayLam AS ThoiGian,
-                            20 AS DiemXP -- Giả định trung bình hoặc lấy từ CongXP
+                            N'Làm bài kiểm tra' AS NoiDung, 
+                            NgayLamBai AS ThoiGian,
+                            50 AS DiemXP
                         FROM KetQuaKiemTra
                         WHERE MaNguoiDung = @MaNguoiDung
 
@@ -432,9 +439,9 @@ namespace VocabJourney.Repositories
                         SELECT 
                             'BADGE' AS Loai, 
                             N'Đạt huy hiệu: ' + h.TenHuyHieu AS NoiDung, 
-                            n.NgayDatDuoc AS ThoiGian,
+                            n.NgayNhan AS ThoiGian,
                             50 AS DiemXP
-                        FROM NguoiDungHuyHieu n
+                        FROM HuyHieuNguoiDung n
                         JOIN HuyHieu h ON n.MaHuyHieu = h.MaHuyHieu
                         WHERE n.MaNguoiDung = @MaNguoiDung
                     ) AS Activities

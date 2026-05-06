@@ -20,8 +20,6 @@ import AdminGamificationTab from '../components/Admin/AdminGamificationTab';
 import AdminAnalyticsTab from '../components/Admin/AdminAnalyticsTab';
 import './AdminPage.css';
 
-const { TabPane } = Tabs;
-
 const AdminPage = () => {
   const navigate = useNavigate();
 
@@ -51,6 +49,44 @@ const AdminPage = () => {
       icon: <TrophyOutlined className="admin-stat-icon" />,
       color: '#10b981' // Màu xanh lá
     }
+  ];
+
+  const tabItems = [
+    {
+      key: '1',
+      label: <span><TeamOutlined /> Người Dùng</span>,
+      children: <AdminUserTab />,
+    },
+    {
+      key: '2',
+      label: <span><BookOutlined /> Từ Vựng</span>,
+      children: <AdminVocabTab />,
+    },
+    {
+      key: '3',
+      label: <span><FileTextOutlined /> Chủ Đề</span>,
+      children: <AdminTopicTab />,
+    },
+    {
+      key: '4',
+      label: <span><ReadOutlined /> Bài Học</span>,
+      children: <AdminLessonTab />,
+    },
+    {
+      key: '5',
+      label: <span><QuestionCircleOutlined /> Bài Quiz</span>,
+      children: <AdminQuizTab />,
+    },
+    {
+      key: '6',
+      label: <span><TrophyOutlined /> Trò Chơi Hóa</span>,
+      children: <AdminGamificationTab />,
+    },
+    {
+      key: '7',
+      label: <span><BarChartOutlined /> Phân Tích</span>,
+      children: <AdminAnalyticsTab />,
+    },
   ];
 
   return (
@@ -84,7 +120,7 @@ const AdminPage = () => {
               <Card 
                 className="admin-stat-card"
                 style={{ backgroundColor: stat.color }}
-                bordered={false}
+                variant="borderless"
               >
                 <div className="admin-stat-content">
                   <div className="admin-stat-icon-wrapper">
@@ -100,60 +136,12 @@ const AdminPage = () => {
 
         {/* Phần Tabs (Chuyển đổi giữa các mục Quản lý) */}
         <div className="admin-tabs-container">
-          <Tabs defaultActiveKey="1" centered size="large">
-            
-            {/* Tab: Người Dùng */}
-            <TabPane 
-              tab={<span><TeamOutlined /> Người Dùng</span>} 
-              key="1"
-            >
-              <AdminUserTab />
-            </TabPane>
-
-            {/* Các Tab Khác (Đang để trống, có thể phát triển sau) */}
-            <TabPane 
-              tab={<span><BookOutlined /> Từ Vựng</span>} 
-              key="2"
-            >
-              <AdminVocabTab />
-            </TabPane>
-            
-            <TabPane 
-              tab={<span><FileTextOutlined /> Chủ Đề</span>} 
-              key="3"
-            >
-              <AdminTopicTab />
-            </TabPane>
-
-            <TabPane 
-              tab={<span><ReadOutlined /> Bài Học</span>} 
-              key="4"
-            >
-              <AdminLessonTab />
-            </TabPane>
-
-            <TabPane 
-              tab={<span><QuestionCircleOutlined /> Bài Quiz</span>} 
-              key="5"
-            >
-              <AdminQuizTab />
-            </TabPane>
-
-            <TabPane 
-              tab={<span><TrophyOutlined /> Trò Chơi Hóa</span>} 
-              key="6"
-            >
-              <AdminGamificationTab />
-            </TabPane>
-
-            <TabPane 
-              tab={<span><BarChartOutlined /> Phân Tích</span>} 
-              key="7"
-            >
-              <AdminAnalyticsTab />
-            </TabPane>
-
-          </Tabs>
+          <Tabs 
+            defaultActiveKey="1" 
+            centered 
+            size="large" 
+            items={tabItems}
+          />
         </div>
       </div>
     </div>

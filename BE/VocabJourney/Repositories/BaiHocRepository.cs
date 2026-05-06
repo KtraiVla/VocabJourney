@@ -81,5 +81,88 @@ namespace VocabJourney.Repositories
             }
             return danhSachBaiHoc;
         }
+        public List<object> GetAllBaiHocAdmin()
+        {
+            List<object> ds = new List<object>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = @"
+                    SELECT b.MaBaiHoc, b.TieuDe, b.MoTa, b.ThuTu, b.MaChuDe, c.TenChuDe,
+                           (SELECT COUNT(*) FROM TuVung WHERE MaBaiHoc = b.MaBaiHoc) AS SoTuVung
+                    FROM BaiHoc b
+                    JOIN ChuDe c ON b.MaChuDe = c.MaChuDe
+                    ORDER BY c.TenChuDe, b.ThuTu";
+                
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            ds.Add(new {
+                                maBaiHoc = Convert.ToInt32(reader["MaBaiHoc"]),
+                                tieuDe = reader["TieuDe"].ToString(),
+                                moTa = reader["MoTa"].ToString(),
+                                thuTu = Convert.ToInt32(reader["ThuTu"]),
+                                maChuDe = Convert.ToInt32(reader["MaChuDe"]),
+                                tenChuDe = reader["TenChuDe"].ToString(),
+                                soTuVung = Convert.ToInt32(reader["SoTuVung"])
+                            });
+                        }
+                    }
+                }
+            }
+            return ds;
+        }
+
+        public bool AddBaiHoc(BaiHoc bh)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "INSERT INTO BaiHoc (MaChuDe, TieuDe, MoTa, ThuTu) VALUES (@MaChuDe, @TieuDe, @MoTa, @ThuTu)";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaChuDe", bh.MaChuDe);
+                    cmd.Parameters.AddWithValue("@TieuDe", bh.TieuDe);
+                    cmd.Parameters.AddWithValue("@MoTa", (object)bh.MoTa ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ThuTu", bh.ThuTu);
+                    conn.Open();
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+        public bool UpdateBaiHoc(BaiHoc bh)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "UPDATE BaiHoc SET MaChuDe = @MaChuDe, TieuDe = @TieuDe, MoTa = @MoTa, ThuTu = @ThuTu WHERE MaBaiHoc = @Id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", bh.MaBaiHoc);
+                    cmd.Parameters.AddWithValue("@MaChuDe", bh.MaChuDe);
+                    cmd.Parameters.AddWithValue("@TieuDe", bh.TieuDe);
+                    cmd.Parameters.AddWithValue("@MoTa", (object)bh.MoTa ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ThuTu", bh.ThuTu);
+                    conn.Open();
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+        public bool DeleteBaiHoc(int id)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "DELETE FROM BaiHoc WHERE MaBaiHoc = @Id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    conn.Open();
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
     }
 }

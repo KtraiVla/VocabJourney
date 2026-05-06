@@ -1,28 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, CheckCircle2, XCircle } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import Navbar from "../components/common/Navbar.jsx";
 import QuizCard from "../components/Quiz/QuizCard.jsx";
 import QuizResult from "../components/Quiz/QuizResult.jsx";
 import progressService from "../services/progressService";
+import quizService from "../services/quizService";
 import "./QuizPage.css";
-
-// Dữ liệu Quiz thật (Bạn có thể lấy từ API sau này)
-const MOCK_QUIZ = [
-  { id: 1, question: '"Luggage" có nghĩa là gì?', options: ["Túi xách và vali để đi du lịch", "Một loại phương tiện", "Phòng khách sạn", "Tài liệu du lịch"], correctAnswer: 0, type: "Trắc nghiệm" },
-  { id: 2, question: '"Passport" dùng để làm gì?', options: ["Để thanh toán tiền", "Để đi lại quốc tế", "Để đặt phòng khách sạn", "Để xem bản đồ"], correctAnswer: 1, type: "Trắc nghiệm" },
-  { id: 3, question: '"Destination" nghĩa là gì?', options: ["Phương tiện di chuyển", "Điểm đến", "Khởi hành", "Vé máy bay"], correctAnswer: 1, type: "Trắc nghiệm" },
-  { id: 4, question: '"Flight" là gì?', options: ["Chuyến tàu", "Chuyến xe buýt", "Chuyến bay", "Chuyến phà"], correctAnswer: 2, type: "Trắc nghiệm" },
-  { id: 5, question: '"Departure" nghĩa là gì?', options: ["Khởi hành", "Đến nơi", "Trễ giờ", "Hủy chuyến"], correctAnswer: 0, type: "Trắc nghiệm" },
-  { id: 6, question: '"Booking" nghĩa là gì?', options: ["Đọc sách", "Đặt chỗ", "Hủy bỏ", "Thanh toán"], correctAnswer: 1, type: "Trắc nghiệm" },
-  { id: 7, question: '"Itinerary" nghĩa là gì?', options: ["Lịch trình", "Hộ chiếu", "Vé tàu", "Hành lý"], correctAnswer: 0, type: "Trắc nghiệm" },
-  { id: 8, question: '"Resort" là gì?', options: ["Sân bay", "Khu nghỉ dưỡng", "Nhà hàng", "Công viên"], correctAnswer: 1, type: "Trắc nghiệm" },
-  { id: 9, question: '"Guide" nghĩa là gì?', options: ["Khách du lịch", "Hướng dẫn viên", "Tài xế", "Phi công"], correctAnswer: 1, type: "Trắc nghiệm" },
-  { id: 10, question: '"Excursion" nghĩa là gì?', options: ["Chuyến tham quan ngắn", "Hành trình dài", "Chuyến bay", "Chuyến đi biển"], correctAnswer: 0, type: "Trắc nghiệm" },
-];
 
 export default function QuizPage() {
   const navigate = useNavigate();
+  const { lessonId } = useParams();
+  
+  const [quizList, setQuizList] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
@@ -30,9 +20,73 @@ export default function QuizPage() {
   const [isFinished, setIsFinished] = useState(false);
   const [answers, setAnswers] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [quizId, setQuizId] = useState(null);
 
-  const totalQuestions = MOCK_QUIZ.length;
-  const currentQuestion = MOCK_QUIZ[currentStep];
+  useEffect(() => {
+    const fetchQuizData = async () => {
+      try {
+        setIsLoading(true);
+        const result = await quizService.getQuizByLesson(lessonId);
+        if (result.success && result.data && result.data.danhSachCauHoi) {
+          // Chuyển đổi format từ BE sang FE
+          const formattedQuiz = result.data.danhSachCauHoi.map(q => ({
+            id: q.maCauHoi,
+            question: q.noiDung,
+            options: q.options || [],
+            correctAnswer: q.correctAnswerIndex,
+            type: "Trắc nghiệm"
+          }));
+          setQuizId(result.data.maBaiKiemTra);
+          setQuizList(formattedQuiz);
+        }
+      } catch (error) {
+        console.error("Lỗi tải quiz:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (lessonId) {
+      fetchQuizData();
+    }
+  }, [lessonId]);
+
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="quiz-page-wrapper">
+        <Navbar />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', gap: '16px' }}>
+          <Loader2 className="animate-spin" size={48} color="#6366f1" />
+          <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Đang tải câu hỏi...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!quizList || quizList.length === 0) {
+    return (
+      <div className="quiz-page-wrapper">
+        <Navbar />
+        <div style={{ textAlign: 'center', padding: '100px 20px' }}>
+          <h2 style={{ marginBottom: '20px', color: '#1e293b' }}>Bài học này hiện chưa có câu hỏi trắc nghiệm!</h2>
+          <button 
+            onClick={handleBack}
+            style={{ padding: '10px 24px', borderRadius: '8px', background: '#6366f1', color: 'white', border: 'none', cursor: 'pointer' }}
+          >
+            Quay lại
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const totalQuestions = quizList.length;
+  const currentQuestion = quizList[currentStep] || {};
 
   const handleSelectOption = (index) => {
     if (isAnswered) return;
@@ -40,7 +94,7 @@ export default function QuizPage() {
   };
 
   const handleSubmitAnswer = () => {
-    if (selectedOption === null) return;
+    if (selectedOption === null || !currentQuestion) return;
     const isCorrect = selectedOption === currentQuestion.correctAnswer;
     if (isCorrect) setScore(score + 1);
     setAnswers([...answers, { questionId: currentQuestion.id, selected: selectedOption, isCorrect }]);
@@ -53,26 +107,20 @@ export default function QuizPage() {
       setSelectedOption(null);
       setIsAnswered(false);
     } else {
-      // Khi kết thúc bài Quiz
       setIsSaving(true);
       try {
         const maNguoiDung = localStorage.getItem("maNguoiDung");
-        if (maNguoiDung) {
-          // Gọi API lưu kết quả và cộng XP theo đúng logic của bạn
-          await progressService.saveQuizResult(maNguoiDung, score, totalQuestions);
+        if (maNguoiDung && quizId) {
+          await progressService.saveQuizResult(maNguoiDung, score, totalQuestions, quizId);
         }
         setIsFinished(true);
       } catch (error) {
         console.error("Lỗi khi lưu kết quả Quiz:", error);
-        setIsFinished(true); // Vẫn hiện kết quả dù lỗi lưu
+        setIsFinished(true);
       } finally {
         setIsSaving(false);
       }
     }
-  };
-
-  const handleBack = () => {
-    navigate("/chudechitiet");
   };
 
   if (isFinished) {

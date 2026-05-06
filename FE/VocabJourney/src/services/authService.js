@@ -21,6 +21,10 @@ const authService = {
 
   getUserInfo: (userId) => {
     return axiosClient.get(`/Auth/user/${userId}`);
+  },
+  
+  getAllUsers: () => {
+    return axiosClient.get("/Auth/users");
   }
 };
 

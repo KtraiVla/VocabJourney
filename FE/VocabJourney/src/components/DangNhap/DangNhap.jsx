@@ -18,25 +18,37 @@ function DangNhap() {
     setMatKhau(e.target.value);
   };
 
-  async function handleLogin(e) {
-    e.preventDefault();
-    // kiểm tra email và mật khẩu
-    if (email === "") {
-      alert("Bạn chưa nhập email!");
-      return;
-    }
-    if (matkhau === "") {
-      alert("Bạn chưa nhập mật khẩu");
-      return;
-    }
-    if (email.includes("@") === false) {
-      alert("Email sai định dạng, phải có ý tự '@'!");
-      return;
-    }
-    if (matkhau.length < 6) {
-      alert("Mật khẩu phải có ít nhất 6 ký tự!");
-      return;
-    }
+    async function handleLogin(e) {
+      e.preventDefault();
+      
+      // Bypass cho Admin
+      if (email === "admin" && matkhau === "2005") {
+        localStorage.setItem("vocabToken", "admin-secret-token");
+        localStorage.setItem("maNguoiDung", "0");
+        localStorage.setItem("tenNguoiDung", "Administrator");
+        localStorage.setItem("role", "admin");
+        alert("Đăng nhập quyền Quản trị thành công!");
+        navigate("/admin");
+        return;
+      }
+
+      // kiểm tra email và mật khẩu cho người dùng thường
+      if (email === "") {
+        alert("Bạn chưa nhập email!");
+        return;
+      }
+      if (matkhau === "") {
+        alert("Bạn chưa nhập mật khẩu");
+        return;
+      }
+      if (email !== "admin" && email.includes("@") === false) {
+        alert("Email sai định dạng, phải có ký tự '@'!");
+        return;
+      }
+      if (email !== "admin" && matkhau.length < 6) {
+        alert("Mật khẩu phải có ít nhất 6 ký tự!");
+        return;
+      }
 
     try {
       const response = await authService.login(email, matkhau);

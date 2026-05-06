@@ -60,5 +60,26 @@ namespace VocabJourney.Controllers
                 return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
             }
         }
+        [HttpPost]
+        public IActionResult CreateTopic([FromBody] Topic topic)
+        {
+            if (_topicRepo.AddTopic(topic)) return Ok(new { success = true, message = "Thêm chủ đề thành công" });
+            return BadRequest(new { success = false, message = "Không thể thêm chủ đề" });
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateTopic(int id, [FromBody] Topic topic)
+        {
+            topic.MaChuDe = id;
+            if (_topicRepo.UpdateTopic(topic)) return Ok(new { success = true, message = "Cập nhật chủ đề thành công" });
+            return BadRequest(new { success = false, message = "Không thể cập nhật chủ đề" });
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteTopic(int id)
+        {
+            if (_topicRepo.DeleteTopic(id)) return Ok(new { success = true, message = "Xóa chủ đề thành công" });
+            return BadRequest(new { success = false, message = "Không thể xóa chủ đề" });
+        }
     }
 }

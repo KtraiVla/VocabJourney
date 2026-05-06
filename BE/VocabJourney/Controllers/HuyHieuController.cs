@@ -29,5 +29,41 @@ namespace VocabJourney.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            try { return Ok(_repo.GetAllHuyHieu()); }
+            catch (Exception ex) { return StatusCode(500, ex.Message); }
+        }
+
+        [HttpPost]
+        public IActionResult Create([FromBody] HuyHieuRequest req)
+        {
+            if (_repo.AddHuyHieu(req.TenHuyHieu, req.MoTa, req.IconName, req.DieuKien))
+                return Ok(new { success = true, message = "Thêm huy hiệu thành công" });
+            return BadRequest(new { success = false, message = "Lỗi khi thêm" });
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, [FromBody] HuyHieuRequest req)
+        {
+            if (_repo.UpdateHuyHieu(id, req.TenHuyHieu, req.MoTa, req.IconName, req.DieuKien))
+                return Ok(new { success = true, message = "Cập nhật thành công" });
+            return BadRequest(new { success = false, message = "Lỗi khi cập nhật" });
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            if (_repo.DeleteHuyHieu(id)) return Ok(new { success = true, message = "Xóa thành công" });
+            return BadRequest(new { success = false, message = "Lỗi khi xóa" });
+        }
+    }
+
+    public class HuyHieuRequest {
+        public string TenHuyHieu { get; set; }
+        public string MoTa { get; set; }
+        public string IconName { get; set; }
+        public string DieuKien { get; set; }
     }
 }

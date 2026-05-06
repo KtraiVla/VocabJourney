@@ -46,5 +46,80 @@ namespace VocabJourney.Repositories
             }
             return dsHuyHieu;
         }
+        public List<object> GetAllHuyHieu()
+        {
+            List<object> list = new List<object>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT MaHuyHieu, TenHuyHieu, MoTa, IconName, DieuKien FROM HuyHieu";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            list.Add(new {
+                                maHuyHieu = Convert.ToInt32(reader["MaHuyHieu"]),
+                                tenHuyHieu = reader["TenHuyHieu"].ToString(),
+                                moTa = reader["MoTa"].ToString(),
+                                iconName = reader["IconName"].ToString(),
+                                dieuKien = reader["DieuKien"] != DBNull.Value ? reader["DieuKien"].ToString() : ""
+                            });
+                        }
+                    }
+                }
+            }
+            return list;
+        }
+
+        public bool AddHuyHieu(string ten, string moTa, string icon, string dieuKien)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "INSERT INTO HuyHieu (TenHuyHieu, MoTa, IconName, DieuKien) VALUES (@Ten, @MoTa, @Icon, @DieuKien)";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Ten", ten);
+                    cmd.Parameters.AddWithValue("@MoTa", moTa);
+                    cmd.Parameters.AddWithValue("@Icon", icon);
+                    cmd.Parameters.AddWithValue("@DieuKien", dieuKien);
+                    conn.Open();
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+        public bool UpdateHuyHieu(int id, string ten, string moTa, string icon, string dieuKien)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "UPDATE HuyHieu SET TenHuyHieu = @Ten, MoTa = @MoTa, IconName = @Icon, DieuKien = @DieuKien WHERE MaHuyHieu = @Id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    cmd.Parameters.AddWithValue("@Ten", ten);
+                    cmd.Parameters.AddWithValue("@MoTa", moTa);
+                    cmd.Parameters.AddWithValue("@Icon", icon);
+                    cmd.Parameters.AddWithValue("@DieuKien", dieuKien);
+                    conn.Open();
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+        public bool DeleteHuyHieu(int id)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "DELETE FROM HuyHieu WHERE MaHuyHieu = @Id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    conn.Open();
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
     }
 }

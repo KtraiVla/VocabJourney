@@ -56,7 +56,7 @@ export default function QuizBanner() {
           <div 
             key={quiz.id} 
             className={`quiz-card-item ${quiz.isLocked ? 'locked' : ''} ${quiz.isCompleted ? 'completed' : ''}`}
-            onClick={() => !quiz.isLocked && navigate("/quiz")}
+            onClick={() => !quiz.isLocked && navigate(`/quiz/${quiz.lessonId}`)}
           >
             <div className="quiz-card-number">Bài {quiz.number}</div>
             <div className="quiz-card-icon">

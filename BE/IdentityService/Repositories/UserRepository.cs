@@ -96,5 +96,49 @@ namespace IdentityService.Repositories
             }
             return (null, null, DateTime.MinValue);
         }
+        public List<object> GetAllUsers()
+        {
+            var users = new List<object>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = @"
+                    SELECT 
+                        n.MaNguoiDung, 
+                        n.TenDangNhap, 
+                        n.Email, 
+                        n.VaiTro, 
+                        n.NgayTao,
+                        ISNULL(tk.CapDo, 1) AS CapDo,
+                        ISNULL(tk.DiemKinhNghiem, 0) AS DiemKinhNghiem,
+                        ISNULL(tk.TongTuDaHoc, 0) AS TongTuDaHoc,
+                        n.TrangThaiHoatDong
+                    FROM NguoiDung n
+                    LEFT JOIN ThongKeNguoiDung tk ON n.MaNguoiDung = tk.MaNguoiDung";
+                
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            users.Add(new
+                            {
+                                id = (int)reader["MaNguoiDung"],
+                                username = reader["TenDangNhap"].ToString(),
+                                email = reader["Email"].ToString(),
+                                role = reader["VaiTro"].ToString(),
+                                joinDate = Convert.ToDateTime(reader["NgayTao"]),
+                                level = Convert.ToInt32(reader["CapDo"]),
+                                xp = Convert.ToInt32(reader["DiemKinhNghiem"]),
+                                wordsLearned = Convert.ToInt32(reader["TongTuDaHoc"]),
+                                status = Convert.ToInt32(reader["TrangThaiHoatDong"]) == 1 ? "active" : "inactive"
+                            });
+                        }
+                    }
+                }
+            }
+            return users;
+        }
     }
 }
