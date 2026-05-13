@@ -314,16 +314,33 @@ namespace VocabJourney.Repositories
             List<object> dsHoatDong = new List<object>();
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
+                // Logic: 
+                // 1. Tìm ngày Thứ 2 của tuần hiện tại
+                // 2. Tạo danh sách 7 ngày trong tuần
+                // 3. JOIN với dữ liệu học tập
                 string query = @"
+                    SET DATEFIRST 1; -- Đặt Thứ 2 là ngày đầu tuần
+                    DECLARE @DauTuan DATE = DATEADD(day, 1 - DATEPART(weekday, GETDATE()), CAST(GETDATE() AS DATE));
+
+                    WITH DaysOfWeek AS (
+                        SELECT @DauTuan AS Ngay, N'Th 2' AS Thu, 1 AS OrderBy
+                        UNION ALL SELECT DATEADD(day, 1, @DauTuan), N'Th 3', 2
+                        UNION ALL SELECT DATEADD(day, 2, @DauTuan), N'Th 4', 3
+                        UNION ALL SELECT DATEADD(day, 3, @DauTuan), N'Th 5', 4
+                        UNION ALL SELECT DATEADD(day, 4, @DauTuan), N'Th 6', 5
+                        UNION ALL SELECT DATEADD(day, 5, @DauTuan), N'Th 7', 6
+                        UNION ALL SELECT DATEADD(day, 6, @DauTuan), N'CN', 7
+                    )
                     SELECT 
-                        FORMAT(NgayOnCuoi, 'dd/MM') AS Ngay,
-                        COUNT(*) AS SoTu
-                    FROM TienDoTuVung
-                    WHERE MaNguoiDung = @MaNguoiDung 
-                      AND DaHoc = 1 
-                      AND NgayOnCuoi >= DATEADD(day, -7, GETDATE())
-                    GROUP BY FORMAT(NgayOnCuoi, 'dd/MM')
-                    ORDER BY MIN(NgayOnCuoi) ASC";
+                        d.Thu,
+                        d.Ngay,
+                        COUNT(t.MaTuVung) AS SoTu
+                    FROM DaysOfWeek d
+                    LEFT JOIN TienDoTuVung t ON CAST(t.NgayOnCuoi AS DATE) = d.Ngay 
+                                            AND t.MaNguoiDung = @MaNguoiDung 
+                                            AND t.DaHoc = 1
+                    GROUP BY d.Thu, d.Ngay, d.OrderBy
+                    ORDER BY d.OrderBy ASC";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -335,7 +352,8 @@ namespace VocabJourney.Repositories
                         {
                             dsHoatDong.Add(new
                             {
-                                day = reader["Ngay"].ToString(),
+                                day = reader["Thu"].ToString(), // Trả về "Th 2", "Th 3"...
+                                date = Convert.ToDateTime(reader["Ngay"]).ToString("dd/MM"),
                                 value = Convert.ToInt32(reader["SoTu"])
                             });
                         }

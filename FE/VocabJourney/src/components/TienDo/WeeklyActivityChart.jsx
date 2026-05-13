@@ -51,7 +51,7 @@ function WeeklyActivityChart() {
 
   return (
     <div className="activity-chart-card">
-      <h3 className="activity-chart-title">Hoạt Động Học Tập 7 Ngày Qua</h3>
+      <h3 className="activity-chart-title">Hoạt Động Học Tập Hàng Tuần</h3>
       <div className="chart-container-recharts">
         {weeklyData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
@@ -91,7 +91,7 @@ function WeeklyActivityChart() {
           </ResponsiveContainer>
         ) : (
           <div className="no-data-msg" style={{ textAlign: "center", paddingTop: "50px", color: "#94a3b8" }}>
-            Chưa có hoạt động nào trong 7 ngày qua.
+            Chưa có hoạt động nào trong tuần này.
           </div>
         )}
       </div>
