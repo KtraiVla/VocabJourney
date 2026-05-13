@@ -124,40 +124,62 @@ export default function HocTuVungPage() {
     );
   }
 
-  // 3. Màn hình hoàn thành bài học
+  // 3. Màn hình hoàn thành bài học Premium
   if (isFinished) {
+    const isPerfect = score.incorrect === 0;
+    const isGood = score.correct > score.incorrect;
+
     return (
       <div className="hoc-tu-vung-page">
         <Navbar />
-        <div className="finish-container">
-          <h2>🎉 Chúc mừng! 🎉</h2>
-          <p>Bạn đã hoàn thành bài học từ vựng hôm nay.</p>
-          <div className="final-score">
-            <span>💚 {score.correct}</span> | <span>❌ {score.incorrect}</span>
+        <div className="finish-screen-premium">
+          <div className="finish-deco deco-1"></div>
+          <div className="finish-deco deco-2"></div>
+          
+          <div className="finish-card">
+            <div className="finish-icon-wrapper">
+              {isPerfect ? "🏆" : isGood ? "🌟" : "💪"}
+            </div>
+            
+            <h2 className="finish-title">
+              {isPerfect ? "Tuyệt vời!" : isGood ? "Làm tốt lắm!" : "Cố gắng lên!"}
+            </h2>
+            <p className="finish-subtitle">
+              {isPerfect 
+                ? "Bạn đã hoàn thành bài học một cách hoàn hảo!" 
+                : "Bạn đã hoàn thành bài học hôm nay. Hãy tiếp tục duy trì nhé!"}
+            </p>
+
+            <div className="finish-stats-grid">
+              <div className="stat-box correct">
+                <span className="stat-label">Đã thuộc</span>
+                <span className="stat-value">{score.correct}</span>
+              </div>
+              <div className="stat-box incorrect">
+                <span className="stat-label">Chưa thuộc</span>
+                <span className="stat-value">{score.incorrect}</span>
+              </div>
+            </div>
+
+            <div className="finish-actions">
+              <button 
+                className="btn-primary-finish"
+                onClick={handleBack}
+              >
+                Tiếp tục hành trình
+              </button>
+              <button 
+                className="btn-secondary-finish"
+                onClick={() => {
+                  setCurrentIndex(0);
+                  setScore({ correct: 0, incorrect: 0 });
+                  setIsFinished(false);
+                }}
+              >
+                Học lại bài này
+              </button>
+            </div>
           </div>
-          <button
-            className="btn-restart"
-            onClick={() => {
-              setCurrentIndex(0);
-              setScore({ correct: 0, incorrect: 0 });
-              setIsFinished(false);
-            }}
-          >
-            Học lại từ đầu
-          </button>
-          <button
-            onClick={handleBack}
-            style={{
-              marginLeft: "10px",
-              padding: "12px 24px",
-              borderRadius: "8px",
-              border: "1px solid #ddd",
-              background: "white",
-              cursor: "pointer",
-            }}
-          >
-            Quay về danh sách
-          </button>
         </div>
       </div>
     );

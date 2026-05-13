@@ -92,19 +92,62 @@ export default function OnTapPage() {
     );
   }
 
+  // 3. Màn hình hoàn thành ôn tập Premium
   if (isFinished) {
+    const isPerfect = score.incorrect === 0;
+    const isGood = score.correct > score.incorrect;
+
     return (
       <div className="hoc-tu-vung-page">
         <Navbar />
-        <div className="finish-container">
-          <h2>🎉 Hoàn thành ôn tập! 🎉</h2>
-          <p>Bạn đã ôn tập xong các từ vựng đến hạn hôm nay.</p>
-          <div className="final-score">
-            <span>💚 Thuộc: {score.correct}</span> | <span>❌ Quên: {score.incorrect}</span>
+        <div className="finish-screen-premium">
+          <div className="finish-deco deco-1"></div>
+          <div className="finish-deco deco-2"></div>
+          
+          <div className="finish-card">
+            <div className="finish-icon-wrapper">
+              {isPerfect ? "🏆" : isGood ? "🌟" : "💪"}
+            </div>
+            
+            <h2 className="finish-title">
+              {isPerfect ? "Thật ấn tượng!" : isGood ? "Rất xuất sắc!" : "Tiếp tục cố gắng!"}
+            </h2>
+            <p className="finish-subtitle">
+              {isPerfect 
+                ? "Bạn đã ôn tập xong tất cả các từ mà không sai câu nào!" 
+                : "Bạn đã hoàn thành phiên ôn tập ngày hôm nay. Trí nhớ của bạn đang tốt dần lên đấy!"}
+            </p>
+
+            <div className="finish-stats-grid">
+              <div className="stat-box correct">
+                <span className="stat-label">Đã nhớ</span>
+                <span className="stat-value">{score.correct}</span>
+              </div>
+              <div className="stat-box incorrect">
+                <span className="stat-label">Cần xem lại</span>
+                <span className="stat-value">{score.incorrect}</span>
+              </div>
+            </div>
+
+            <div className="finish-actions">
+              <button 
+                className="btn-primary-finish"
+                onClick={() => navigate("/homeuser")}
+              >
+                Quay về trang chủ
+              </button>
+              <button 
+                className="btn-secondary-finish"
+                onClick={() => {
+                  setCurrentIndex(0);
+                  setScore({ correct: 0, incorrect: 0 });
+                  setIsFinished(false);
+                }}
+              >
+                Ôn tập lại lượt này
+              </button>
+            </div>
           </div>
-          <button className="btn-restart" onClick={() => navigate("/homeuser")}>
-            Quay về trang chủ
-          </button>
         </div>
       </div>
     );
