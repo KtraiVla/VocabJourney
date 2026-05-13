@@ -13,6 +13,7 @@ import ChuDeChiTietPage from "./pages/ChuDeChiTietPage.jsx";
 import HocTuVungPage from "./pages/HocTuVungPage.jsx";
 import QuizPage from "./pages/QuizPage.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
+import OnTapPage from "./pages/OnTapPage.jsx";
 
 import "./App.css";
 
@@ -30,6 +31,7 @@ function App() {
       <Route path="/chudechitiet/:id" element={<ChuDeChiTietPage />}></Route>
       <Route path="/hoctuvung/:lessonId" element={<HocTuVungPage />}></Route>
       <Route path="/quiz/:lessonId" element={<QuizPage />}></Route>
+      <Route path="/ontap" element={<OnTapPage />}></Route>
       <Route path="/admin" element={<AdminPage />} />
     </Routes>
   );

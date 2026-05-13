@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import "./ReviewCard.css";
 import progressService from "../../services/progressService";
 
 export default function ReviewCard() {
+  const navigate = useNavigate();
   const [reviewCount, setReviewCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -45,7 +47,11 @@ export default function ReviewCard() {
         </div>
       </div>
 
-      <button className="review-action-btn">
+      <button 
+        className="review-action-btn" 
+        onClick={() => navigate("/ontap")}
+        disabled={reviewCount === 0}
+      >
         Bắt Đầu Ôn Tập <span className="rocket-emoji">🚀</span>
       </button>
 

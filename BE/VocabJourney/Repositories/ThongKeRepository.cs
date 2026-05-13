@@ -49,7 +49,7 @@ namespace VocabJourney.Repositories
                     {
                         if (reader.Read())
                         {
-                            return new ThongKeNguoiDung
+                            var thongKe = new ThongKeNguoiDung
                             {
                                 MaNguoiDung = Convert.ToInt32(reader["MaNguoiDung"]),
                                 DiemKinhNghiem = Convert.ToInt32(reader["DiemKinhNghiem"]),
@@ -70,6 +70,13 @@ namespace VocabJourney.Repositories
                                 TongTuDaGap = Convert.ToInt32(reader["TongTuDaGap"]),
                                 TongQuizDaLam = Convert.ToInt32(reader["TongQuizDaLam"])
                             };
+
+                            // Kiểm tra và reset streak nếu quá hạn
+                            if (thongKe.NgayHocCuoi.HasValue && thongKe.NgayHocCuoi.Value.Date < DateTime.Today.AddDays(-1))
+                            {
+                                thongKe.ChuoiNgayHoc = 0;
+                            }
+                            return thongKe;
                         }
                     }
                 }
@@ -84,11 +91,12 @@ namespace VocabJourney.Repositories
                 conn.Open();
 
                 // 1. Lấy thông tin hiện tại
-                string selectQuery = "SELECT DiemKinhNghiem, CapDo, ChuoiNgayHoc, XPHomNay, SoTuOnHomNay, SoTuHocHomNay, SoQuizHomNay, DailyChallengeStatus, NgayCapNhatXP FROM ThongKeNguoiDung WHERE MaNguoiDung = @MaNguoiDung";
+                string selectQuery = "SELECT DiemKinhNghiem, CapDo, ChuoiNgayHoc, NgayHocCuoi, XPHomNay, SoTuOnHomNay, SoTuHocHomNay, SoQuizHomNay, DailyChallengeStatus, NgayCapNhatXP FROM ThongKeNguoiDung WHERE MaNguoiDung = @MaNguoiDung";
                 
                 int currentXP = 0, currentLevel = 1, currentStreak = 0;
                 int xpHomNay = 0, soTuOn = 0, soTuHoc = 0, soQuiz = 0, challengeStatus = 0;
                 DateTime? lastUpdateXP = null;
+                DateTime? lastHocCuoi = null;
                 bool exists = false;
 
                 using (SqlCommand cmd = new SqlCommand(selectQuery, conn))
@@ -108,11 +116,18 @@ namespace VocabJourney.Repositories
                             soQuiz = reader["SoQuizHomNay"] != DBNull.Value ? Convert.ToInt32(reader["SoQuizHomNay"]) : 0;
                             challengeStatus = reader["DailyChallengeStatus"] != DBNull.Value ? Convert.ToInt32(reader["DailyChallengeStatus"]) : 0;
                             lastUpdateXP = reader["NgayCapNhatXP"] != DBNull.Value ? Convert.ToDateTime(reader["NgayCapNhatXP"]) : (DateTime?)null;
+                            lastHocCuoi = reader["NgayHocCuoi"] != DBNull.Value ? Convert.ToDateTime(reader["NgayHocCuoi"]) : (DateTime?)null;
                         }
                     }
                 }
 
-                // 2. Reset ngày mới
+                // 2. Kiểm tra Streak thực tế
+                if (lastHocCuoi.HasValue && lastHocCuoi.Value.Date < DateTime.Today.AddDays(-1))
+                {
+                    currentStreak = 0;
+                }
+
+                // 3. Reset ngày mới
                 if (lastUpdateXP.HasValue && lastUpdateXP.Value.Date < DateTime.Today)
                 {
                     xpHomNay = 0;

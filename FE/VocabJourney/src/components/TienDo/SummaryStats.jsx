@@ -52,7 +52,9 @@ export default function SummaryStats() {
       value: statsData?.chuoiNgayHoc || 0,
       label: "Chuỗi Ngày Học",
       icon: <Calendar />,
-      background: "linear-gradient(135deg, #f97316, #ea580c)",
+      background: statsData?.chuoiNgayHoc > 0 
+        ? "linear-gradient(135deg, #f97316, #ea580c)" 
+        : "linear-gradient(135deg, #94a3b8, #64748b)",
     },
   ];
 

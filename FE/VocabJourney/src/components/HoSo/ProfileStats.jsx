@@ -42,7 +42,7 @@ export default function ProfileStats() {
       title: "Chuỗi ngày", 
       value: userStats?.chuoiNgayHoc || 0, 
       icon: Flame, 
-      color: "#f97316" 
+      color: userStats?.chuoiNgayHoc > 0 ? "#f97316" : "#94a3b8" 
     },
     {
       id: 3,

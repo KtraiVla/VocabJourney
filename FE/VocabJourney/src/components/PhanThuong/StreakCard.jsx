@@ -29,10 +29,10 @@ export default function StreakCard() {
   if (loading) return <div className="loading-streak">...</div>;
 
   return (
-    <div className="streak-card reward-card-base">
+    <div className={`streak-card reward-card-base ${streak > 0 ? "" : "is-broken"}`}>
       <div className="streak-header">
         <div className="streak-icon-box">
-          <Flame size={32} color="white" />
+          <Flame size={32} fill={streak > 0 ? "white" : "transparent"} color={streak > 0 ? "white" : "#94a3b8"} />
         </div>
         <div className="streak-title-info">
           <span className="streak-label">Chuỗi Hiện Tại</span>

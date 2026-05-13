@@ -23,9 +23,6 @@ namespace VocabJourney.Controllers
             bool success = _repo.LuuTienDoTuVung(request.MaNguoiDung, request.MaTuVung, request.DaHoc);
             if (success)
             {
-                // Sau khi lưu tiến độ từ vựng, tự động cập nhật streak
-                var thongKeRepo = new ThongKeRepository(new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetConnectionString("DefaultConnection"));
-                thongKeRepo.CapNhatStreak(request.MaNguoiDung);
                 return Ok(new { success = true, message = "Lưu tiến độ thành công" });
             }
             return BadRequest(new { success = false, message = "Lưu tiến độ thất bại" });
@@ -68,6 +65,13 @@ namespace VocabJourney.Controllers
         {
             int count = _repo.GetSoTuCanOnTap(maNguoiDung);
             return Ok(new { success = true, count = count });
+        }
+
+        [HttpGet("danh-sach-on-tap/{maNguoiDung}")]
+        public IActionResult GetDanhSachOnTap(int maNguoiDung)
+        {
+            var data = _repo.GetDanhSachTuCanOnTap(maNguoiDung);
+            return Ok(new { success = true, data = data });
         }
     }
 

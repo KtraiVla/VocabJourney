@@ -84,8 +84,13 @@ namespace VocabJourney.Repositories
                             thongKeRepo.CongXP(maNguoiDung, actionType);
                         }
                         
-                        // Luôn cập nhật Streak khi có hoạt động tương tác từ vựng (bất kể thuộc hay chưa)
-                        thongKeRepo.CapNhatStreak(maNguoiDung);
+                        if (daHoc || oldSoLanOnDung > 0)
+                        {
+                            // Tính streak nếu:
+                            // 1. Học từ mới và đánh dấu "Đã thuộc"
+                            // 2. Hoặc đang ôn tập lại từ cũ (bất kể kết quả thuộc hay quên)
+                            thongKeRepo.CapNhatStreak(maNguoiDung);
+                        }
                     }
                     
                     return rowsAffected > 0;
@@ -122,7 +127,6 @@ namespace VocabJourney.Repositories
                     {
                         var thongKeRepo = new ThongKeRepository(_connectionString);
                         thongKeRepo.CongXP(maNguoiDung, "LESSON");
-                        thongKeRepo.CapNhatStreak(maNguoiDung);
                     }
 
                     return rowsAffected > 0;
@@ -206,14 +210,13 @@ namespace VocabJourney.Repositories
                         // Tính toán XP theo đúng bản thiết kế
                         // Mỗi câu đúng +4 XP, Hoàn thành +20 XP, Perfect +20 XP
                         int xpGoc = (soCauDung * 4) + 20;
-                        if (soCauDung == tongCauHoi && tongCauHoi >= 5) // Điều kiện Perfect (đúng 100% và bài có ít nhất 5 câu)
+                        if (soCauDung == tongCauHoi && tongCauHoi >= 15) 
                         {
                             xpGoc += 20;
                         }
 
                         var thongKeRepo = new ThongKeRepository(_connectionString);
                         thongKeRepo.CongXP(maNguoiDung, "QUIZ", xpGoc);
-                        thongKeRepo.CapNhatStreak(maNguoiDung);
                     }
 
                     return rowsAffected > 0;
@@ -236,6 +239,43 @@ namespace VocabJourney.Repositories
                     cmd.Parameters.AddWithValue("@MaNguoiDung", maNguoiDung);
                     conn.Open();
                     return (int)cmd.ExecuteScalar();
+                }
+            }
+        }
+        public List<TuVung> GetDanhSachTuCanOnTap(int maNguoiDung)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = @"
+                    SELECT v.* 
+                    FROM TienDoTuVung t
+                    JOIN TuVung v ON t.MaTuVung = v.MaTuVung
+                    WHERE t.MaNguoiDung = @MaNguoiDung 
+                    AND CAST(t.NgayOnTiepTheo AS DATE) <= CAST(GETDATE() AS DATE)
+                    ORDER BY t.NgayOnTiepTheo ASC";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaNguoiDung", maNguoiDung);
+                    conn.Open();
+                    List<TuVung> danhSach = new List<TuVung>();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            danhSach.Add(new TuVung
+                            {
+                                MaTuVung = Convert.ToInt32(reader["MaTuVung"]),
+                                TuTiengAnh = reader["TuTiengAnh"].ToString(),
+                                NghiaTiengViet = reader["NghiaTiengViet"].ToString(),
+                                PhienAm = reader["PhienAm"].ToString(),
+                                AnhMinhHoa = reader["AnhMinhHoa"] != DBNull.Value ? reader["AnhMinhHoa"].ToString() : null,
+                                DinhNghia = reader["DinhNghia"] != DBNull.Value ? reader["DinhNghia"].ToString() : null,
+                                ViDu = reader["ViDu"] != DBNull.Value ? reader["ViDu"].ToString() : null
+                            });
+                        }
+                    }
+                    return danhSach;
                 }
             }
         }

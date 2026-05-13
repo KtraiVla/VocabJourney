@@ -64,8 +64,8 @@ export default function StatsSection() {
             icon={<Flame size={28} fill="currentColor" />}
             value={userStats?.chuoiNgayHoc || 0}
             title="Chuỗi Ngày 🔥"
-            badgeText="Hãy duy trì!"
-            type="orange"
+            badgeText={userStats?.chuoiNgayHoc > 0 ? "Hãy duy trì!" : "Bắt đầu ngay!"}
+            type={userStats?.chuoiNgayHoc > 0 ? "orange" : "gray"}
           />
 
           <StatCard

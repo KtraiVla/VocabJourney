@@ -39,6 +39,11 @@ const progressService = {
     });
     return response.data;
   },
+
+  getDanhSachOnTap: async (maNguoiDung) => {
+    const response = await axiosUser.get(`/TienDo/danh-sach-on-tap/${maNguoiDung}`);
+    return response;
+  },
 };
 
 export default progressService;

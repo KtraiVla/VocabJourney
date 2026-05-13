@@ -21,6 +21,7 @@
 .stat-blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
 .stat-orange { background: linear-gradient(135deg, #fb923c, #f97316); }
 .stat-green { background: linear-gradient(135deg, #22c55e, #16a34a); }
+.stat-gray { background: linear-gradient(135deg, #94a3b8, #64748b); }
 
 .stat-card-top {
   display: flex;
