@@ -19,16 +19,24 @@ namespace VocabJourney.Repositories
             List<object> dsThuThach = new List<object>();
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                // Logic: Lấy các thử thách (HuyHieu loại 2) và tiến độ của người dùng trong ngày hôm nay
-                // Nếu chưa có dòng trong TienDoThuThachNgay cho ngày hôm nay, ta có thể tự động tạo hoặc trả về 0
+                // Logic: Lấy các thử thách (HuyHieu loại 2) và ánh xạ tiến độ từ bảng ThongKeNguoiDung
+                // Chúng ta so khớp tên thử thách để lấy đúng cột dữ liệu (SoTuHoc, SoTuOn, SoQuiz)
                 string query = @"
                     SELECT h.MaHuyHieu, h.TenHuyHieu, h.MoTa, h.MucTieu, h.PhanThuongXP,
-                           ISNULL(td.TienDoHienTai, 0) AS TienDoHienTai,
-                           ISNULL(td.DaNhanThuong, 0) AS DaNhanThuong
+                           CASE 
+                               WHEN h.TenHuyHieu LIKE N'%Học%' OR h.MoTa LIKE N'%Học%' THEN ISNULL(t.SoTuHocHomNay, 0)
+                               WHEN h.TenHuyHieu LIKE N'%Ôn%' OR h.MoTa LIKE N'%Ôn%' THEN ISNULL(t.SoTuOnHomNay, 0)
+                               WHEN h.TenHuyHieu LIKE N'%Quiz%' OR h.TenHuyHieu LIKE N'%Kiểm tra%' THEN ISNULL(t.SoQuizHomNay, 0)
+                               ELSE 0
+                           END AS TienDoHienTai,
+                           CASE 
+                               WHEN (h.TenHuyHieu LIKE N'%Học%' OR h.MoTa LIKE N'%Học%') AND (t.DailyChallengeStatus & 1) = 1 THEN 1
+                               WHEN (h.TenHuyHieu LIKE N'%Ôn%' OR h.MoTa LIKE N'%Ôn%') AND (t.DailyChallengeStatus & 2) = 2 THEN 1
+                               WHEN (h.TenHuyHieu LIKE N'%Quiz%' OR h.TenHuyHieu LIKE N'%Kiểm tra%' OR h.MoTa LIKE N'%Quiz%') AND (t.DailyChallengeStatus & 4) = 4 THEN 1
+                               ELSE 0
+                           END AS DaNhanThuong
                     FROM HuyHieu h
-                    LEFT JOIN TienDoThuThachNgay td ON h.MaHuyHieu = td.MaHuyHieu 
-                         AND td.MaNguoiDung = @MaNguoiDung 
-                         AND td.NgayGhiNhan = CAST(GETDATE() AS DATE)
+                    LEFT JOIN ThongKeNguoiDung t ON t.MaNguoiDung = @MaNguoiDung
                     WHERE h.LoaiHuyHieu = 2"; // Loại 2 là thử thách hàng ngày
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -47,7 +55,7 @@ namespace VocabJourney.Repositories
                                 Total = Convert.ToInt32(reader["MucTieu"]),
                                 Reward = Convert.ToInt32(reader["PhanThuongXP"]),
                                 Progress = Convert.ToInt32(reader["TienDoHienTai"]),
-                                IsCompleted = Convert.ToBoolean(reader["DaNhanThuong"])
+                                IsCompleted = Convert.ToInt32(reader["DaNhanThuong"]) == 1
                             });
                         }
                     }

@@ -27,10 +27,10 @@ export default function ChallengesSection() {
   return (
     <section className="challenges-section">
       <div className="challenges-header">
-        <div className="challenges-header-icon">
+        <div className="challenges-header-icon" style={{ background: 'linear-gradient(135deg, #f97316, #fb923c)' }}>
           <Target size={24} color="white" />
         </div>
-        <h3>Thử Thách Hàng Ngày</h3>
+        <h3 style={{ fontSize: '1.25rem', fontWeight: '800' }}>Thử Thách Hàng Ngày</h3>
       </div>
 
       <div className="challenges-list">

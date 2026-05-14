@@ -1,77 +1,93 @@
-.challenge-item {
-  background-color: #f8fafc;
+.reward-challenge-card {
+  background: #ffffff;
+  border: 1px solid #eef2f6;
   border-radius: 16px;
-  padding: 20px;
-  border: 1px solid #f1f5f9;
+  padding: 24px;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
 }
 
-.challenge-item-header {
-  margin-bottom: 12px;
+.reward-challenge-card:hover {
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
-.challenge-type-pills {
+.reward-challenge-badges {
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-bottom: 12px;
 }
 
-.type-pill {
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 14px;
+.type-badge {
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 0.8rem;
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 
-.xp-pill {
-  font-size: 14px;
+.type-badge.daily {
+  background-color: #e0f2fe;
+  color: #0ea5e9;
+}
+
+.type-badge.weekly {
+  background-color: #f3e8ff;
+  color: #a855f7;
+}
+
+.reward-xp-text {
+  color: #f97316;
   font-weight: 700;
-  color: #ea580c;
+  font-size: 0.85rem;
 }
 
-.challenge-title {
-  margin: 0 0 4px 0;
-  font-size: 20px;
+.reward-challenge-title {
+  font-size: 1.25rem;
   font-weight: 800;
   color: #0f172a;
+  margin: 0 0 4px 0;
 }
 
-.challenge-desc {
-  margin: 0 0 16px 0;
-  font-size: 15px;
+.reward-challenge-desc {
+  font-size: 0.95rem;
   color: #64748b;
+  margin: 0 0 20px 0;
 }
 
-.reward-challenge-progress-container {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.reward-challenge-progress-section {
+  margin-top: 16px;
 }
 
-.progress-labels {
+.progress-info-row {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.progress-label {
+  font-size: 0.85rem;
+  color: #94a3b8;
   font-weight: 500;
-  color: #64748b;
 }
 
-.progress-labels span:last-child {
-  color: #0f172a;
+.progress-value {
+  font-size: 0.9rem;
   font-weight: 800;
+  color: #0f172a;
 }
 
-.reward-challenge-progress-bar {
-  height: 8px;
-  background-color: #cbd5e1;
-  border-radius: 4px;
+.progress-track {
+  height: 12px;
+  background-color: #e2e8f0;
+  border-radius: 100px;
   overflow: hidden;
 }
 
-.reward-challenge-progress-fill {
+.progress-fill {
   height: 100%;
-  background-color: #0f172a;
-  border-radius: 4px;
+  background-color: #0f172a; /* Thanh tiến độ màu tối theo ảnh mẫu */
+  border-radius: 100px;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }

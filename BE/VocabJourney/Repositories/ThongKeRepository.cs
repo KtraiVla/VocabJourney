@@ -435,20 +435,22 @@ namespace VocabJourney.Repositories
             List<object> dsHoatDong = new List<object>();
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                // Tổng hợp 5 hoạt động gần nhất từ 3 nguồn: Từ vựng, Bài kiểm tra, Huy hiệu
+                // Tăng lên TOP 10 để không bị trôi mất các sự kiện quan trọng như hoàn thành thử thách
                 string query = @"
-                    SELECT TOP 5 * FROM (
+                    SELECT TOP 10 * FROM (
+                        -- 1. Từ vựng (Phân biệt Học mới và Ôn tập)
                         SELECT 
                             'VOCAB' AS Loai, 
-                            v.TuTiengAnh AS NoiDung, 
+                            CASE WHEN t.SoLanOn = 1 THEN N'Học từ mới: ' + v.TuTiengAnh ELSE N'Ôn tập từ: ' + v.TuTiengAnh END AS NoiDung, 
                             t.NgayOnCuoi AS ThoiGian,
-                            10 AS DiemXP
+                            CASE WHEN t.SoLanOn = 1 THEN 4 ELSE 3 END AS DiemXP
                         FROM TienDoTuVung t
                         JOIN TuVung v ON t.MaTuVung = v.MaTuVung
                         WHERE t.MaNguoiDung = @MaNguoiDung AND t.DaHoc = 1
 
                         UNION ALL
 
+                        -- 2. Bài học
                         SELECT 
                             'LESSON' AS Loai, 
                             N'Hoàn thành bài học' AS NoiDung, 
@@ -459,24 +461,58 @@ namespace VocabJourney.Repositories
                         
                         UNION ALL
 
+                        -- 3. Bài kiểm tra (Tính XP thực tế)
                         SELECT 
                             'QUIZ' AS Loai, 
-                            N'Làm bài kiểm tra' AS NoiDung, 
+                            N'Làm bài kiểm tra (' + CAST(SoCauDung AS NVARCHAR) + '/' + CAST(TongSoCau AS NVARCHAR) + ')' AS NoiDung, 
                             NgayLamBai AS ThoiGian,
-                            50 AS DiemXP
+                            (SoCauDung * 4 + 20 + (CASE WHEN SoCauDung = TongSoCau AND TongSoCau >= 15 THEN 20 ELSE 0 END)) AS DiemXP
                         FROM KetQuaKiemTra
                         WHERE MaNguoiDung = @MaNguoiDung
 
                         UNION ALL
 
+                        -- 4. Huy hiệu vĩnh viễn
                         SELECT 
                             'BADGE' AS Loai, 
                             N'Đạt huy hiệu: ' + h.TenHuyHieu AS NoiDung, 
                             n.NgayNhan AS ThoiGian,
-                            50 AS DiemXP
+                            h.PhanThuongXP AS DiemXP
                         FROM HuyHieuNguoiDung n
                         JOIN HuyHieu h ON n.MaHuyHieu = h.MaHuyHieu
                         WHERE n.MaNguoiDung = @MaNguoiDung
+
+                        UNION ALL
+
+                        -- 5. Thử thách hàng ngày (Mở rộng điều kiện LIKE để chính xác hơn)
+                        SELECT 
+                            'CHALLENGE' AS Loai, 
+                            h.TenHuyHieu AS NoiDung, 
+                            t.NgayCapNhatXP AS ThoiGian,
+                            h.PhanThuongXP AS DiemXP
+                        FROM HuyHieu h
+                        CROSS JOIN ThongKeNguoiDung t
+                        WHERE t.MaNguoiDung = @MaNguoiDung 
+                          AND h.LoaiHuyHieu = 2
+                          AND CAST(t.NgayCapNhatXP AS DATE) = CAST(GETDATE() AS DATE)
+                          AND (
+                              ((h.TenHuyHieu LIKE N'%Học%' OR h.MoTa LIKE N'%Học%') AND (t.DailyChallengeStatus & 1) = 1) OR
+                              ((h.TenHuyHieu LIKE N'%Ôn%' OR h.MoTa LIKE N'%Ôn%') AND (t.DailyChallengeStatus & 2) = 2) OR
+                              ((h.TenHuyHieu LIKE N'%Quiz%' OR h.TenHuyHieu LIKE N'%Kiểm tra%' OR h.MoTa LIKE N'%Quiz%') AND (t.DailyChallengeStatus & 4) = 4)
+                          )
+
+                        UNION ALL
+
+                        -- 6. Thưởng Combo
+                        SELECT 
+                            'CHALLENGE' AS Loai, 
+                            N'Thưởng hoàn thành tất cả thử thách' AS NoiDung, 
+                            NgayCapNhatXP AS ThoiGian,
+                            50 AS DiemXP
+                        FROM ThongKeNguoiDung
+                        WHERE MaNguoiDung = @MaNguoiDung 
+                          AND (DailyChallengeStatus & 8) = 8
+                          AND CAST(NgayCapNhatXP AS DATE) = CAST(GETDATE() AS DATE)
                     ) AS Activities
                     ORDER BY ThoiGian DESC";
 
@@ -503,3 +539,4 @@ namespace VocabJourney.Repositories
         }
     }
 }
+
