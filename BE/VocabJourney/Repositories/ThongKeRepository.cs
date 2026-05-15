@@ -153,7 +153,7 @@ namespace VocabJourney.Repositories
                         xpToAdd = 4; // Không nhân streak theo yêu cầu
                         soTuHoc++;
                         // Challenge: Học 5 từ -> +20 XP
-                        if (soTuHoc == 5 && (challengeStatus & 1) == 0) { bonusXP += 20; challengeStatus |= 1; }
+                        if (soTuHoc >= 5 && (challengeStatus & 1) == 0) { bonusXP += 20; challengeStatus |= 1; }
                         break;
  
                     case "REVIEW": // Ôn tập (+3 XP/từ)
@@ -162,7 +162,7 @@ namespace VocabJourney.Repositories
                             xpToAdd = (int)(3 * multiplier);
                             soTuOn++;
                             // Challenge: Ôn 10 từ -> +30 XP
-                            if (soTuOn == 10 && (challengeStatus & 2) == 0) { bonusXP += 30; challengeStatus |= 2; }
+                            if (soTuOn >= 10 && (challengeStatus & 2) == 0) { bonusXP += 30; challengeStatus |= 2; }
                         }
                         break;
 
@@ -173,7 +173,7 @@ namespace VocabJourney.Repositories
                     case "QUIZ": // Làm Quiz (xpGoc = câu đúng * 4 + 20 hoàn thành + 20 perfect)
                         if (soQuiz == 0) // Chỉ nhận XP cho bài Quiz đầu tiên trong ngày
                         {
-                            xpToAdd = (int)(xpGoc * multiplier);
+                            xpToAdd = xpGoc; // Không nhân streak theo yêu cầu
                         }
                         else
                         {
@@ -181,7 +181,7 @@ namespace VocabJourney.Repositories
                         }
                         soQuiz++;
                         // Challenge: Làm 1 quiz -> +40 XP
-                        if (soQuiz == 1 && (challengeStatus & 4) == 0) { bonusXP += 40; challengeStatus |= 4; }
+                        if (soQuiz >= 1 && (challengeStatus & 4) == 0) { bonusXP += 40; challengeStatus |= 4; }
                         break;
                 }
 
@@ -466,7 +466,7 @@ namespace VocabJourney.Repositories
                             'QUIZ' AS Loai, 
                             N'Làm bài kiểm tra (' + CAST(SoCauDung AS NVARCHAR) + '/' + CAST(TongSoCau AS NVARCHAR) + ')' AS NoiDung, 
                             NgayLamBai AS ThoiGian,
-                            (SoCauDung * 4 + 20 + (CASE WHEN SoCauDung = TongSoCau AND TongSoCau >= 15 THEN 20 ELSE 0 END)) AS DiemXP
+                            (SoCauDung * 4 + 20 + (CASE WHEN SoCauDung = TongSoCau AND TongSoCau >= 15 THEN 30 ELSE 0 END)) AS DiemXP
                         FROM KetQuaKiemTra
                         WHERE MaNguoiDung = @MaNguoiDung
 

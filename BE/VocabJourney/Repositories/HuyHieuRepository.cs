@@ -82,12 +82,13 @@ namespace VocabJourney.Repositories
                     }
                 }
 
-                // 2. Lấy danh sách huy hiệu và tính tiến độ
+                // 2. Lấy danh sách huy hiệu và tính tiến độ (Chỉ lấy huy hiệu vĩnh viễn LoaiHuyHieu != 2)
                 string query = @"
                     SELECT h.MaHuyHieu, h.TenHuyHieu, h.MoTa, h.IconName, h.DieuKien,
                            CAST(CASE WHEN hn.MaNguoiDung IS NOT NULL THEN 1 ELSE 0 END AS BIT) AS DaDatDuoc
                     FROM HuyHieu h
-                    LEFT JOIN HuyHieuNguoiDung hn ON h.MaHuyHieu = hn.MaHuyHieu AND hn.MaNguoiDung = @MaNguoiDung";
+                    LEFT JOIN HuyHieuNguoiDung hn ON h.MaHuyHieu = hn.MaHuyHieu AND hn.MaNguoiDung = @MaNguoiDung
+                    WHERE ISNULL(h.LoaiHuyHieu, 1) != 2";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -102,14 +103,17 @@ namespace VocabJourney.Repositories
                             int currentVal = 0;
                             int targetVal = 100; // Mặc định
 
-                            // Logic phân loại tiến độ thông minh hơn
-                            if (ten.Contains("từ vựng") || ten.Contains("ngôn ngữ") || ten.Contains("từ")) {
+                            // Logic phân loại tiến độ thông minh hơn (Kiểm tra cả tên và mô tả)
+                            string mota = reader["MoTa"].ToString().ToLower();
+                            string searchStr = ten + " " + mota;
+
+                            if (searchStr.Contains("từ vựng") || searchStr.Contains("ngôn ngữ") || searchStr.Contains("từ")) {
                                 currentVal = tongTuDaHoc;
                                 targetVal = ExtractNumber(reader["MoTa"].ToString());
-                            } else if (ten.Contains("streak") || ten.Contains("chăm chỉ") || ten.Contains("ngày")) {
+                            } else if (searchStr.Contains("streak") || searchStr.Contains("chăm chỉ") || searchStr.Contains("ngày")) {
                                 currentVal = streakHienTai;
                                 targetVal = ExtractNumber(reader["MoTa"].ToString());
-                            } else if (ten.Contains("kiểm tra") || ten.Contains("quiz") || ten.Contains("thử thách") || ten.Contains("bài")) {
+                            } else if (searchStr.Contains("kiểm tra") || searchStr.Contains("quiz") || searchStr.Contains("thử thách") || searchStr.Contains("bài")) {
                                 currentVal = tongBaiKiemTra;
                                 targetVal = ExtractNumber(reader["MoTa"].ToString());
                             }

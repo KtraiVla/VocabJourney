@@ -208,11 +208,11 @@ namespace VocabJourney.Repositories
                     if (rowsAffected > 0)
                     {
                         // Tính toán XP theo đúng bản thiết kế
-                        // Mỗi câu đúng +4 XP, Hoàn thành +20 XP, Perfect +20 XP
+                        // Mỗi câu đúng +4 XP, Hoàn thành +20 XP, Perfect +30 XP
                         int xpGoc = (soCauDung * 4) + 20;
                         if (soCauDung == tongCauHoi && tongCauHoi >= 15) 
                         {
-                            xpGoc += 20;
+                            xpGoc += 30;
                         }
 
                         var thongKeRepo = new ThongKeRepository(_connectionString);
