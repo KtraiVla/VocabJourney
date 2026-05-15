@@ -16,7 +16,7 @@ export default function TopicGird({ searchTerm = "" }) {
         const response = await topicService.getAllTopics(maNguoiDung);
         const dataFromDB = response.data;
         const colors = [
-          "blue", "yellow", "green", "purple", "pink", 
+          "blue", "yellow", "green", "purple", "pink",
           "teal", "orange", "indigo", "red", "cyan",
         ];
 
@@ -46,7 +46,7 @@ export default function TopicGird({ searchTerm = "" }) {
   }, [searchTerm]);
 
   // Lọc dữ liệu dựa trên từ khóa tìm kiếm
-  const filteredTopics = chude.filter(topic => 
+  const filteredTopics = chude.filter(topic =>
     topic.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 

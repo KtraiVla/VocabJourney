@@ -3,7 +3,7 @@ import axiosUser from "./axiosUser";
 const progressService = {
   // Lưu tiến độ khi hoàn thành 1 bài học
   saveLessonProgress: async (maNguoiDung, maBaiHoc) => {
-    const response = await axiosUser.post("/TienDo/luu-bai-hoc", {
+    const response = await axiosUser.post("/TienDo/hoan-thanh-bai-hoc", {
       maNguoiDung,
       maBaiHoc,
     });

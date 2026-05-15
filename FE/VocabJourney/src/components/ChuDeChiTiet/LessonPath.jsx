@@ -20,7 +20,8 @@ export default function LessonPath() {
           let foundCurrent = false;
           const duLieuDaBienDoi = ketQua.data.map((bh) => {
             let status = "locked";
-            if (bh.daHoanThanh) {
+            // Logic thông minh: Nếu DB báo đã xong HOẶC tiến độ từ vựng đạt 100%
+            if (bh.daHoanThanh || bh.tienDo === 100) {
               status = "completed";
             } else if (!foundCurrent) {
               status = "current";

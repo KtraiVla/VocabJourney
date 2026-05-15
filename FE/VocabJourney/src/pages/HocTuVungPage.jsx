@@ -99,7 +99,8 @@ export default function HocTuVungPage() {
       setIsFinished(true);
       try {
         if (maNguoiDung) {
-          await progressService.saveLessonProgress(maNguoiDung, lessonId);
+          // Ép kiểu sang số nguyên trước khi gửi lên Backend
+          await progressService.saveLessonProgress(parseInt(maNguoiDung), parseInt(lessonId));
         }
       } catch (error) {
         console.error("Lỗi khi lưu tiến độ bài học:", error);

@@ -29,6 +29,20 @@ namespace VocabJourney.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
+
+        [HttpGet("nguoidung/{maNguoiDung}/all")]
+        public IActionResult GetAllHuyHieuVoiTiendo(int maNguoiDung)
+        {
+            try
+            {
+                var data = _repo.GetHuyHieuVoiTiendo(maNguoiDung);
+                return Ok(new { success = true, data = data });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
         [HttpGet]
         public IActionResult GetAll()
         {

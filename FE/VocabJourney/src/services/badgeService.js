@@ -4,6 +4,9 @@ const badgeService = {
   getUserBadges: (maNguoiDung) => {
     return axiosUser.get(`/HuyHieu/nguoidung/${maNguoiDung}`);
   },
+  getAllBadgesWithStatus: (maNguoiDung) => {
+    return axiosUser.get(`/HuyHieu/nguoidung/${maNguoiDung}/all`);
+  },
   getAllBadges: () => {
     return axiosUser.get("/HuyHieu");
   },

@@ -13,15 +13,20 @@ export default function BadgeSection() {
       try {
         const maNguoiDung = localStorage.getItem("maNguoiDung");
         if (maNguoiDung) {
-          const response = await badgeService.getUserBadges(maNguoiDung);
+          // Sử dụng API lấy toàn bộ huy hiệu kèm trạng thái
+          const response = await badgeService.getAllBadgesWithStatus(maNguoiDung);
           if (response.data && response.data.success) {
             const formattedBadges = response.data.data.map(item => ({
               id: item.maHuyHieu,
               name: item.tenHuyHieu,
               description: item.moTa,
-              icon: item.iconName || "🏅", // Sử dụng IconName từ DB hoặc icon mặc định
-              unlocked: true,
-              date: null // Tạm thời để null nếu DB chưa lưu ngày đạt được
+              requirement: item.dieuKien,
+              icon: item.iconName || "🏅",
+              unlocked: item.daDatDuoc,
+              currentProgress: item.currentProgress,
+              targetProgress: item.targetProgress,
+              percentage: item.percentage,
+              date: null
             }));
             setBadges(formattedBadges);
           }
@@ -44,7 +49,9 @@ export default function BadgeSection() {
           <Award size={20} color="#f59e0b" />
           <h3>Huy Hiệu & Thành Tích</h3>
         </div>
-        <span className="badge-count">{badges.length} đã đạt</span>
+        <span className="badge-count">
+          {badges.filter(b => b.unlocked).length} đã đạt
+        </span>
       </div>
 
       <div className="badges-grid">

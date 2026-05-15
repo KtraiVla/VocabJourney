@@ -17,25 +17,7 @@ export default function ChuDeChiTietPage() {
     const fetchTopicDetail = async () => {
       try {
         setIsLoading(true);
-        // Ưu tiên dùng state truyền qua Link (nếu có) để nhanh
-        if (location.state) {
-          const state = location.state;
-          setTopicData({
-            title: state.title,
-            description: state.description,
-            image: state.image, // Thêm image
-            stats: {
-              lessons: state.lessons,
-              vocab: state.words,
-              completedRate: state.percent || 0,
-            },
-            progress: state.percent || 0,
-          });
-          setIsLoading(false);
-          return;
-        }
-
-        // Nếu không có state (do F5 trang), gọi API lấy dữ liệu thật
+        // Luôn gọi API để lấy dữ liệu mới nhất (đặc biệt là Tiến độ)
         const maNguoiDung = localStorage.getItem("maNguoiDung");
         const response = await topicService.getTopicById(id, maNguoiDung);
         const topic = response.data;
@@ -43,11 +25,11 @@ export default function ChuDeChiTietPage() {
         setTopicData({
           title: topic.tenChuDe,
           description: topic.moTa,
-          image: topic.anhMinhHoa, // Thêm image
+          image: topic.anhMinhHoa,
           stats: {
             lessons: topic.soBaiHoc,
             vocab: topic.soTuVung,
-            completedRate: topic.tienDo || 0, // Lấy tiến độ từ API
+            completedRate: topic.tienDo || 0,
           },
           progress: topic.tienDo || 0,
         });

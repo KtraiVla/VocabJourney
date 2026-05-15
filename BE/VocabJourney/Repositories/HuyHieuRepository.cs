@@ -46,6 +46,152 @@ namespace VocabJourney.Repositories
             }
             return dsHuyHieu;
         }
+
+        public List<object> GetHuyHieuVoiTiendo(int maNguoiDung)
+        {
+            List<object> dsHuyHieu = new List<object>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                // 1. Lấy các thông số thống kê của người dùng
+                int tongTuDaHoc = 0;
+                int streakHienTai = 0;
+                int tongBaiKiemTra = 0;
+
+                // Lấy tổng từ đã học
+                string sqlVocab = "SELECT COUNT(*) FROM TienDoTuVung WHERE MaNguoiDung = @MaNguoiDung AND DaHoc = 1";
+                using (SqlCommand cmd = new SqlCommand(sqlVocab, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaNguoiDung", maNguoiDung);
+                    tongTuDaHoc = (int)cmd.ExecuteScalar();
+                }
+
+                // Lấy streak và bài kiểm tra từ bảng ThongKeNguoiDung
+                string sqlStats = "SELECT TOP 1 ChuoiNgayHoc, TongQuizDaLam FROM ThongKeNguoiDung WHERE MaNguoiDung = @MaNguoiDung";
+                using (SqlCommand cmd = new SqlCommand(sqlStats, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaNguoiDung", maNguoiDung);
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            streakHienTai = reader["ChuoiNgayHoc"] != DBNull.Value ? Convert.ToInt32(reader["ChuoiNgayHoc"]) : 0;
+                            tongBaiKiemTra = reader["TongQuizDaLam"] != DBNull.Value ? Convert.ToInt32(reader["TongQuizDaLam"]) : 0;
+                        }
+                    }
+                }
+
+                // 2. Lấy danh sách huy hiệu và tính tiến độ
+                string query = @"
+                    SELECT h.MaHuyHieu, h.TenHuyHieu, h.MoTa, h.IconName, h.DieuKien,
+                           CAST(CASE WHEN hn.MaNguoiDung IS NOT NULL THEN 1 ELSE 0 END AS BIT) AS DaDatDuoc
+                    FROM HuyHieu h
+                    LEFT JOIN HuyHieuNguoiDung hn ON h.MaHuyHieu = hn.MaHuyHieu AND hn.MaNguoiDung = @MaNguoiDung";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaNguoiDung", maNguoiDung);
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int maHuyHieu = Convert.ToInt32(reader["MaHuyHieu"]);
+                            string ten = reader["TenHuyHieu"].ToString().ToLower();
+                            
+                            int currentVal = 0;
+                            int targetVal = 100; // Mặc định
+
+                            // Logic phân loại tiến độ thông minh hơn
+                            if (ten.Contains("từ vựng") || ten.Contains("ngôn ngữ") || ten.Contains("từ")) {
+                                currentVal = tongTuDaHoc;
+                                targetVal = ExtractNumber(reader["MoTa"].ToString());
+                            } else if (ten.Contains("streak") || ten.Contains("chăm chỉ") || ten.Contains("ngày")) {
+                                currentVal = streakHienTai;
+                                targetVal = ExtractNumber(reader["MoTa"].ToString());
+                            } else if (ten.Contains("kiểm tra") || ten.Contains("quiz") || ten.Contains("thử thách") || ten.Contains("bài")) {
+                                currentVal = tongBaiKiemTra;
+                                targetVal = ExtractNumber(reader["MoTa"].ToString());
+                            }
+
+                            bool daDatDuoc = Convert.ToBoolean(reader["DaDatDuoc"]);
+                            
+                            // --- LOGIC TỰ ĐỘNG ĐỒNG BỘ ---
+                            // Nếu đã đủ tiến độ nhưng chưa có trong bảng HuyHieuNguoiDung
+                            if (!daDatDuoc && currentVal >= targetVal && targetVal > 0) {
+                                AwardBadgeAutomatically(maNguoiDung, maHuyHieu);
+                                daDatDuoc = true; // Cập nhật trạng thái hiển thị ngay
+                                currentVal = targetVal; // Ép tiến độ về max
+                            }
+
+                            if (daDatDuoc) {
+                                currentVal = Math.Max(currentVal, targetVal);
+                            }
+
+                            if (targetVal <= 0) targetVal = 1;
+
+                            dsHuyHieu.Add(new
+                            {
+                                MaHuyHieu = maHuyHieu,
+                                TenHuyHieu = reader["TenHuyHieu"].ToString(),
+                                MoTa = reader["MoTa"].ToString(),
+                                IconName = reader["IconName"].ToString(),
+                                DieuKien = reader["DieuKien"] != DBNull.Value ? reader["DieuKien"].ToString() : "",
+                                DaDatDuoc = daDatDuoc,
+                                CurrentProgress = currentVal,
+                                TargetProgress = targetVal,
+                                Percentage = Math.Min(100, (int)((float)currentVal / targetVal * 100))
+                            });
+                        }
+                    }
+                }
+            }
+            return dsHuyHieu;
+        }
+
+        private void AwardBadgeAutomatically(int maNguoiDung, int maHuyHieu)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_connectionString))
+                {
+                    string query = "IF NOT EXISTS (SELECT 1 FROM HuyHieuNguoiDung WHERE MaNguoiDung = @MaNguoiDung AND MaHuyHieu = @MaHuyHieu) " +
+                                   "INSERT INTO HuyHieuNguoiDung (MaNguoiDung, MaHuyHieu, NgayDatDuoc) VALUES (@MaNguoiDung, @MaHuyHieu, GETDATE())";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@MaNguoiDung", maNguoiDung);
+                        cmd.Parameters.AddWithValue("@MaHuyHieu", maHuyHieu);
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi nếu cần, nhưng không làm gián đoạn luồng chính
+                Console.WriteLine("Lỗi tự động trao huy hiệu: " + ex.Message);
+            }
+        }
+
+        private int ExtractNumber(string text) {
+            if (string.IsNullOrEmpty(text)) return 10;
+            
+            // Loại bỏ dấu chấm/phẩy phân cách hàng nghìn trước khi trích xuất
+            string cleanText = text.Replace(".", "").Replace(",", "");
+            string resultString = "";
+            
+            foreach (char c in cleanText) {
+                if (char.IsDigit(c)) {
+                    resultString += c;
+                } else if (resultString.Length > 0) {
+                    // Nếu đã tìm thấy số và gặp ký tự khác, dừng lại (để lấy số đầu tiên tìm thấy)
+                    break;
+                }
+            }
+            
+            int result;
+            return int.TryParse(resultString, out result) ? result : 10;
+        }
         public List<object> GetAllHuyHieu()
         {
             List<object> list = new List<object>();
