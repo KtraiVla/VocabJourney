@@ -25,11 +25,11 @@ namespace VocabJourney.Repositories
                         ISNULL(t.CapDo, 1) AS CapDo,
                         ISNULL(t.ChuoiNgayHoc, 0) AS ChuoiNgayHoc,
                         t.NgayHocCuoi,
-                        t.XPHomNay,
-                        t.SoTuOnHomNay,
-                        t.SoTuHocHomNay,
-                        t.SoQuizHomNay,
-                        t.DailyChallengeStatus,
+                        ISNULL(t.XPHomNay, 0) AS XPHomNay,
+                        ISNULL(t.SoTuOnHomNay, 0) AS SoTuOnHomNay,
+                        ISNULL(t.SoTuHocHomNay, 0) AS SoTuHocHomNay,
+                        ISNULL(t.SoQuizHomNay, 0) AS SoQuizHomNay,
+                        ISNULL(t.DailyChallengeStatus, 0) AS DailyChallengeStatus,
                         t.NgayCapNhatXP,
                         ISNULL((SELECT COUNT(*) + 1 FROM ThongKeNguoiDung WHERE DiemKinhNghiem > ISNULL(t.DiemKinhNghiem, 0)), (SELECT COUNT(*) + 1 FROM ThongKeNguoiDung)) AS ThuHang,
                         (SELECT COUNT(*) FROM TienDoTuVung WHERE MaNguoiDung = @MaNguoiDung AND DaHoc = 1) AS TongTuDaHoc,
@@ -70,6 +70,16 @@ namespace VocabJourney.Repositories
                                 TongTuDaGap = Convert.ToInt32(reader["TongTuDaGap"]),
                                 TongQuizDaLam = Convert.ToInt32(reader["TongQuizDaLam"])
                             };
+
+                            // Kiểm tra và reset các chỉ số hàng ngày nếu đã sang ngày mới
+                            if (thongKe.NgayCapNhatXP.HasValue && thongKe.NgayCapNhatXP.Value.Date < DateTime.Today)
+                            {
+                                thongKe.XPHomNay = 0;
+                                thongKe.SoTuOnHomNay = 0;
+                                thongKe.SoTuHocHomNay = 0;
+                                thongKe.SoQuizHomNay = 0;
+                                thongKe.DailyChallengeStatus = 0;
+                            }
 
                             // Kiểm tra và reset streak nếu quá hạn
                             if (thongKe.NgayHocCuoi.HasValue && thongKe.NgayHocCuoi.Value.Date < DateTime.Today.AddDays(-1))
@@ -181,8 +191,8 @@ namespace VocabJourney.Repositories
                             xpToAdd = 0; // Các bài Quiz sau chỉ để luyện tập, không có XP
                         }
                         soQuiz++;
-                        // Challenge: Làm 1 quiz -> +40 XP
-                        if (soQuiz >= 1 && (challengeStatus & 4) == 0) { bonusXP += 40; challengeStatus |= 4; }
+                        // Challenge: Làm 1 quiz -> +30 XP
+                        if (soQuiz >= 1 && (challengeStatus & 4) == 0) { bonusXP += 30; challengeStatus |= 4; }
                         break;
                 }
 
@@ -193,11 +203,8 @@ namespace VocabJourney.Repositories
                     challengeStatus |= 8;
                 }
 
+                // 5. Tính tổng điểm cộng (Đã loại bỏ giới hạn 200 XP hàng ngày theo yêu cầu)
                 int totalAdd = xpToAdd + bonusXP;
-
-                // 5. Kiểm tra Hard Cap 200 XP
-                if (xpHomNay >= 200) totalAdd = 0;
-                else if (xpHomNay + totalAdd > 200) totalAdd = 200 - xpHomNay;
 
                 if (totalAdd <= 0 && xpToAdd <= 0 && bonusXP <= 0) 
                 {

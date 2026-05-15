@@ -3,11 +3,15 @@ import { Mail, Calendar, Zap, Edit2, LogOut } from "lucide-react";
 import "./ProfileHeader.css";
 import authService from "../../services/authService";
 import statsService from "../../services/statsService";
+import { X, Check } from "lucide-react";
 
 export default function ProfileHeader() {
   const [userInfo, setUserInfo] = useState(null);
   const [userStats, setUserStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editForm, setEditForm] = useState({ username: "", email: "" });
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -31,6 +35,10 @@ export default function ProfileHeader() {
 
           if (userRes && userRes.data) {
             setUserInfo(userRes.data);
+            setEditForm({ 
+              username: userRes.data.username || "", 
+              email: userRes.data.email || "" 
+            });
           }
           if (statsRes && statsRes.data) {
             setUserStats(statsRes.data);
@@ -44,6 +52,35 @@ export default function ProfileHeader() {
     };
     fetchProfileData();
   }, []);
+
+  const handleSaveProfile = async () => {
+    setIsSaving(true);
+    try {
+      const maNguoiDung = localStorage.getItem("maNguoiDung");
+      const response = await authService.updateProfile(
+        maNguoiDung, 
+        editForm.username, 
+        editForm.email,
+        editForm.hinhAnh
+      );
+      
+      if (response && response.status === 200) {
+        setUserInfo({ 
+          ...userInfo, 
+          username: editForm.username, 
+          email: editForm.email
+        });
+        localStorage.setItem("tenNguoiDung", editForm.username);
+        setIsEditModalOpen(false);
+        alert("Cập nhật hồ sơ thành công!");
+      }
+    } catch (error) {
+      console.error("Lỗi khi cập nhật hồ sơ:", error);
+      alert(error.response?.data?.message || "Cập nhật thất bại, vui lòng thử lại.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const formatDate = (dateString) => {
     if (!dateString || dateString === "0001-01-01T00:00:00") return "Đang cập nhật...";
@@ -62,7 +99,7 @@ export default function ProfileHeader() {
             alt="Avatar"
             className="profile-avatar"
           />
-          <button className="profile-avatar-edit" aria-label="Edit Avatar">
+          <button className="profile-avatar-edit" onClick={() => setIsEditModalOpen(true)}>
             <Edit2 size={14} />
           </button>
         </div>
@@ -85,7 +122,7 @@ export default function ProfileHeader() {
         </div>
       </div>
       <div className="profile-header-right">
-        <button className="profile-edit-btn">
+        <button className="profile-edit-btn" onClick={() => setIsEditModalOpen(true)}>
           <Edit2 size={16} />
           Chỉnh sửa hồ sơ
         </button>
@@ -94,6 +131,57 @@ export default function ProfileHeader() {
           Đăng xuất
         </button>
       </div>
+
+      {/* MODAL CHỈNH SỬA HỒ SƠ */}
+      {isEditModalOpen && (
+        <div className="modal-overlay">
+          <div className="edit-profile-modal">
+            <div className="modal-header">
+              <h3>Chỉnh Sửa Hồ Sơ</h3>
+              <button className="close-btn" onClick={() => setIsEditModalOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Tên hiển thị</label>
+                <input 
+                  type="text" 
+                  value={editForm.username}
+                  onChange={(e) => setEditForm({...editForm, username: e.target.value})}
+                  placeholder="Nhập tên mới..."
+                />
+              </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input 
+                  type="email" 
+                  value={editForm.email}
+                  onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                  placeholder="Nhập email mới..."
+                />
+              </div>
+              <p className="modal-note">Lưu ý: Tên hiển thị sẽ được dùng để đăng nhập.</p>
+            </div>
+
+            <div className="modal-footer">
+              <button className="cancel-btn" onClick={() => setIsEditModalOpen(false)}>Hủy</button>
+              <button 
+                className="save-btn" 
+                onClick={handleSaveProfile}
+                disabled={isSaving}
+              >
+                {isSaving ? "Đang lưu..." : (
+                  <>
+                    <Check size={18} /> Lưu thay đổi
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

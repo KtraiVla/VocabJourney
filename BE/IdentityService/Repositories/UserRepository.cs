@@ -94,7 +94,7 @@ namespace IdentityService.Repositories
                     }
                 }
             }
-            return (null, null, DateTime.MinValue);
+            return (null, null, DateTime.MinValue, null);
         }
         public List<object> GetAllUsers()
         {
@@ -193,6 +193,32 @@ namespace IdentityService.Repositories
                         transaction.Rollback();
                         return false;
                     }
+                }
+            }
+        }
+        public bool UpdateProfile(int userId, string newUsername, string newEmail)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                // Kiểm tra trùng lặp (trừ user hiện tại)
+                string checkQuery = "SELECT COUNT(1) FROM NguoiDung WHERE (TenDangNhap = @Username OR Email = @Email) AND MaNguoiDung != @UserId";
+                using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                {
+                    checkCmd.Parameters.AddWithValue("@Username", newUsername);
+                    checkCmd.Parameters.AddWithValue("@Email", newEmail);
+                    checkCmd.Parameters.AddWithValue("@UserId", userId);
+                    conn.Open();
+                    if ((int)checkCmd.ExecuteScalar() > 0) return false;
+                }
+
+                string query = "UPDATE NguoiDung SET TenDangNhap = @Username, Email = @Email WHERE MaNguoiDung = @UserId";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Username", newUsername);
+                    cmd.Parameters.AddWithValue("@Email", newEmail);
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    int result = cmd.ExecuteNonQuery();
+                    return result > 0;
                 }
             }
         }

@@ -79,5 +79,19 @@ namespace IdentityService.Controllers
 
             return NotFound(new { message = "Không tìm thấy người dùng hoặc lỗi hệ thống." });
         }
+        [HttpPut("user/{id}")]
+        public IActionResult UpdateProfile(int id, [FromBody] UpdateProfileRequest request)
+        {
+            if (_repo.UpdateProfile(id, request.Username, request.Email))
+                return Ok(new { message = "Cập nhật hồ sơ thành công!" });
+
+            return BadRequest(new { message = "Tên đăng nhập hoặc Email đã tồn tại hoặc có lỗi xảy ra." });
+        }
+    }
+
+    public class UpdateProfileRequest
+    {
+        public string Username { get; set; }
+        public string Email { get; set; }
     }
 }

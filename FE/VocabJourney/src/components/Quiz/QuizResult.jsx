@@ -2,7 +2,7 @@ import React from "react";
 import { Trophy, RotateCcw, Home, Star } from "lucide-react";
 import "./QuizResult.css";
 
-export default function QuizResult({ score, total, onRestart, onBack }) {
+export default function QuizResult({ score, total, earnedXP, onRestart, onBack }) {
   const percentage = Math.round((score / total) * 100);
   
   let message = "";
@@ -52,7 +52,7 @@ export default function QuizResult({ score, total, onRestart, onBack }) {
           </div>
           <div className="stat-divider"></div>
           <div className="stat-item">
-            <span className="stat-value">+{score * 10}</span>
+            <span className="stat-value">+{earnedXP}</span>
             <span className="stat-label">Kinh nghiệm (XP)</span>
           </div>
         </div>

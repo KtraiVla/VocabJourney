@@ -228,6 +228,7 @@ namespace VocabJourney.Repositories
                         var xpResult = thongKeRepo.CongXP(maNguoiDung, "QUIZ", xpGoc);
                         saveResult.LeveledUp = xpResult.LeveledUp;
                         saveResult.NewLevel = xpResult.NewLevel;
+                        saveResult.XPEarned = xpGoc; // Gửi số XP gốc về (Chưa tính thưởng Daily Challenge ẩn)
                     }
 
                     return saveResult;
@@ -239,6 +240,7 @@ namespace VocabJourney.Repositories
             public bool Success { get; set; }
             public bool LeveledUp { get; set; }
             public int NewLevel { get; set; }
+            public int XPEarned { get; set; }
         }
 
         public int GetSoTuCanOnTap(int maNguoiDung)

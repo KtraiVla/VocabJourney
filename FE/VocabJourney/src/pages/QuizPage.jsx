@@ -27,6 +27,7 @@ export default function QuizPage() {
   // State Level Up
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [newLevel, setNewLevel] = useState(1);
+  const [earnedXP, setEarnedXP] = useState(0);
 
   useEffect(() => {
     const fetchQuizData = async () => {
@@ -117,9 +118,12 @@ export default function QuizPage() {
         const maNguoiDung = localStorage.getItem("maNguoiDung");
         if (maNguoiDung && quizId) {
           const response = await progressService.saveQuizResult(maNguoiDung, score, totalQuestions, quizId);
-          if (response.data && response.data.leveledUp) {
-            setNewLevel(response.data.newLevel);
-            setShowLevelUp(true);
+          if (response) {
+            if (response.leveledUp) {
+              setNewLevel(response.newLevel);
+              setShowLevelUp(true);
+            }
+            setEarnedXP(response.xpEarned || 0);
           }
         }
         setIsFinished(true);
@@ -139,6 +143,7 @@ export default function QuizPage() {
         <QuizResult 
           score={score} 
           total={totalQuestions} 
+          earnedXP={earnedXP}
           onRestart={() => {
             setCurrentStep(0);
             setSelectedOption(null);

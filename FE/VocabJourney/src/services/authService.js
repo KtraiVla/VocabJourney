@@ -29,6 +29,10 @@ const authService = {
 
   deleteUser: (userId) => {
     return axiosClient.post(`/Auth/delete-user/${userId}`);
+  },
+
+  updateProfile: (userId, username, email) => {
+    return axiosClient.put(`/Auth/user/${userId}`, { username, email });
   }
 };
 

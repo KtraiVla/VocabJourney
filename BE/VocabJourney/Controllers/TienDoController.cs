@@ -54,7 +54,8 @@ namespace VocabJourney.Controllers
                 success = true, 
                 message = "Lưu kết quả Quiz thành công",
                 leveledUp = result.LeveledUp,
-                newLevel = result.NewLevel
+                newLevel = result.NewLevel,
+                xpEarned = result.XPEarned
             });
             return BadRequest(new { success = false, message = "Lưu kết quả Quiz thất bại" });
         }

@@ -67,8 +67,22 @@ namespace VocabJourney.Repositories
                     tongTuDaHoc = (int)cmd.ExecuteScalar();
                 }
 
-                // Lấy streak và bài kiểm tra từ bảng ThongKeNguoiDung
-                string sqlStats = "SELECT TOP 1 ChuoiNgayHoc, TongQuizDaLam FROM ThongKeNguoiDung WHERE MaNguoiDung = @MaNguoiDung";
+                // Lấy streak, bài kiểm tra và số chủ đề đã xong
+                int tongBaiHocDaXong = 0;
+                int tongChuDeDaXong = 0;
+                string sqlStats = @"
+                    SELECT 
+                        ISNULL((SELECT ChuoiNgayHoc FROM ThongKeNguoiDung WHERE MaNguoiDung = @MaNguoiDung), 0) as ChuoiNgayHoc,
+                        ISNULL((SELECT COUNT(*) FROM KetQuaKiemTra WHERE MaNguoiDung = @MaNguoiDung), 0) as TongQuiz,
+                        ISNULL((SELECT COUNT(*) FROM TienDoBaiHoc WHERE MaNguoiDung = @MaNguoiDung AND DaHoanThanh = 1), 0) as TongBaiHoc,
+                        ISNULL((SELECT COUNT(*) FROM (
+                            SELECT b.MaChuDe 
+                            FROM BaiHoc b
+                            JOIN TienDoBaiHoc t ON b.MaBaiHoc = t.MaBaiHoc
+                            WHERE t.MaNguoiDung = @MaNguoiDung AND t.DaHoanThanh = 1
+                            GROUP BY b.MaChuDe
+                            HAVING COUNT(*) >= (SELECT COUNT(*) FROM BaiHoc WHERE MaChuDe = b.MaChuDe)
+                        ) as DoneTopics), 0) as TongChuDe";
                 using (SqlCommand cmd = new SqlCommand(sqlStats, conn))
                 {
                     cmd.Parameters.AddWithValue("@MaNguoiDung", maNguoiDung);
@@ -77,7 +91,9 @@ namespace VocabJourney.Repositories
                         if (reader.Read())
                         {
                             streakHienTai = reader["ChuoiNgayHoc"] != DBNull.Value ? Convert.ToInt32(reader["ChuoiNgayHoc"]) : 0;
-                            tongBaiKiemTra = reader["TongQuizDaLam"] != DBNull.Value ? Convert.ToInt32(reader["TongQuizDaLam"]) : 0;
+                            tongBaiKiemTra = reader["TongQuiz"] != DBNull.Value ? Convert.ToInt32(reader["TongQuiz"]) : 0;
+                            tongBaiHocDaXong = reader["TongBaiHoc"] != DBNull.Value ? Convert.ToInt32(reader["TongBaiHoc"]) : 0;
+                            tongChuDeDaXong = reader["TongChuDe"] != DBNull.Value ? Convert.ToInt32(reader["TongChuDe"]) : 0;
                         }
                     }
                 }
@@ -107,14 +123,20 @@ namespace VocabJourney.Repositories
                             string mota = reader["MoTa"].ToString().ToLower();
                             string searchStr = ten + " " + mota;
 
-                            if (searchStr.Contains("từ vựng") || searchStr.Contains("ngôn ngữ") || searchStr.Contains("từ")) {
+                            if (searchStr.Contains("từ vựng") || searchStr.Contains("ngôn ngữ") || searchStr.Contains("từ") || searchStr.Contains("tu")) {
                                 currentVal = tongTuDaHoc;
                                 targetVal = ExtractNumber(reader["MoTa"].ToString());
-                            } else if (searchStr.Contains("streak") || searchStr.Contains("chăm chỉ") || searchStr.Contains("ngày")) {
+                            } else if (searchStr.Contains("streak") || searchStr.Contains("chăm chỉ") || searchStr.Contains("ngày") || searchStr.Contains("ngay")) {
                                 currentVal = streakHienTai;
                                 targetVal = ExtractNumber(reader["MoTa"].ToString());
-                            } else if (searchStr.Contains("kiểm tra") || searchStr.Contains("quiz") || searchStr.Contains("thử thách") || searchStr.Contains("bài")) {
+                            } else if (searchStr.Contains("kiểm tra") || searchStr.Contains("quiz") || searchStr.Contains("ktr") || searchStr.Contains("trắc nghiệm") || searchStr.Contains("trac nghiem")) {
                                 currentVal = tongBaiKiemTra;
+                                targetVal = ExtractNumber(reader["MoTa"].ToString());
+                            } else if (searchStr.Contains("chủ đề") || searchStr.Contains("chu de")) {
+                                currentVal = tongChuDeDaXong;
+                                targetVal = ExtractNumber(reader["MoTa"].ToString());
+                            } else if (searchStr.Contains("bài học") || searchStr.Contains("bài") || searchStr.Contains("khai phá") || searchStr.Contains("khám phá") || searchStr.Contains("bai") || searchStr.Contains("bách khoa") || searchStr.Contains("bach khoa")) {
+                                currentVal = tongBaiHocDaXong;
                                 targetVal = ExtractNumber(reader["MoTa"].ToString());
                             }
 
