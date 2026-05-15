@@ -11,5 +11,6 @@ namespace VocabJourney.Models
         public int DoKho { get; set; }
         public string ViDu { get; set; }
         public int MaBaiHoc { get; set; }
+        public bool DaHoc { get; set; } = false;
     }
 }

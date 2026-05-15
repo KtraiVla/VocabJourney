@@ -31,6 +31,20 @@ namespace VocabJourney.Controllers
                 return StatusCode(500, new { success = false, message = "Lỗi hệ thống: " + ex.Message });
             }
         }
+
+        [HttpGet("baihoc/{maBaiHoc}/{maNguoiDung}")]
+        public IActionResult GetByBaiHocWithProgress(int maBaiHoc, int maNguoiDung)
+        {
+            try
+            {
+                List<TuVung> danhSach = _repo.GetTuVungByBaiHocWithProgress(maBaiHoc, maNguoiDung);
+                return Ok(new { success = true, data = danhSach });
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
         [HttpGet]
         public IActionResult GetAll()
         {

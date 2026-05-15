@@ -55,6 +55,48 @@ namespace VocabJourney.Repositories
             }
             return list;
         }
+
+        public List<TuVung> GetTuVungByBaiHocWithProgress(int maBaiHoc, int maNguoiDung)
+        {
+            List<TuVung> list = new List<TuVung>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                // Join với bảng TienDoTuVung để lấy cột DaHoc cho đúng User
+                string query = @"
+                    SELECT v.MaTuVung, v.TuTiengAnh, v.NghiaTiengViet, v.PhienAm, 
+                           v.AnhMinhHoa, v.DinhNghia, v.DoKho, v.ViDu,
+                           ISNULL(t.DaHoc, 0) AS DaHoc
+                    FROM TuVung v
+                    LEFT JOIN TienDoTuVung t ON v.MaTuVung = t.MaTuVung AND t.MaNguoiDung = @MaNguoiDung
+                    WHERE v.MaBaiHoc = @MaBaiHoc";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaBaiHoc", maBaiHoc);
+                    cmd.Parameters.AddWithValue("@MaNguoiDung", maNguoiDung);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            TuVung tu = new TuVung();
+                            tu.MaTuVung = Convert.ToInt32(reader["MaTuVung"]);
+                            tu.TuTiengAnh = reader["TuTiengAnh"].ToString();
+                            tu.NghiaTiengViet = reader["NghiaTiengViet"].ToString();
+                            tu.PhienAm = reader["PhienAm"] != DBNull.Value ? reader["PhienAm"].ToString() : "";
+                            tu.AnhMinhHoa = reader["AnhMinhHoa"] != DBNull.Value ? reader["AnhMinhHoa"].ToString() : "";
+                            tu.DinhNghia = reader["DinhNghia"] != DBNull.Value ? reader["DinhNghia"].ToString() : "";
+                            tu.ViDu = reader["ViDu"] != DBNull.Value ? reader["ViDu"].ToString() : "";
+                            tu.DoKho = reader["DoKho"] != DBNull.Value ? Convert.ToInt32(reader["DoKho"]) : 1;
+                            tu.DaHoc = reader["DaHoc"] != DBNull.Value && Convert.ToBoolean(reader["DaHoc"]);
+
+                            list.Add(tu);
+                        }
+                    }
+                }
+            }
+            return list;
+        }
         public List<object> GetAllTuVungAdmin()
         {
             List<object> ds = new List<object>();

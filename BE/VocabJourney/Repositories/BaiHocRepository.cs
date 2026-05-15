@@ -179,6 +179,34 @@ namespace VocabJourney.Repositories
             }
         }
 
+        public BaiHoc GetBaiHocById(int id)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT MaBaiHoc, MaChuDe, TieuDe, MoTa, ThuTu FROM BaiHoc WHERE MaBaiHoc = @Id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new BaiHoc
+                            {
+                                MaBaiHoc = Convert.ToInt32(reader["MaBaiHoc"]),
+                                MaChuDe = Convert.ToInt32(reader["MaChuDe"]),
+                                TieuDe = reader["TieuDe"].ToString(),
+                                MoTa = reader["MoTa"] != DBNull.Value ? reader["MoTa"].ToString() : "",
+                                ThuTu = Convert.ToInt32(reader["ThuTu"])
+                            };
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
         public bool DeleteBaiHoc(int id)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))

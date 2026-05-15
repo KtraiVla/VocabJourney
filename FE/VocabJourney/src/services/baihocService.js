@@ -8,6 +8,10 @@ const baihocService = {
     const response = await axiosUser.get(url);
     return response;
   },
+  getLessonById: async (id) => {
+    const response = await axiosUser.get(`/BaiHoc/${id}`);
+    return response;
+  },
   getAllLessons: async () => {
     const response = await axiosUser.get("/BaiHoc");
     return response.data;

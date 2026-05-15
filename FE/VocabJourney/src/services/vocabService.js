@@ -5,6 +5,10 @@ const vocabService = {
     const response = await axiosUser.get(`/TuVung/baihoc/${maBaiHoc}`);
     return response;
   },
+  getTuVungByBaiHocWithProgress: async (maBaiHoc, maNguoiDung) => {
+    const response = await axiosUser.get(`/TuVung/baihoc/${maBaiHoc}/${maNguoiDung}`);
+    return response;
+  },
   getAllVocab: async () => {
     const response = await axiosUser.get("/TuVung");
     return response.data;

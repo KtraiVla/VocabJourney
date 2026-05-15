@@ -29,6 +29,21 @@ namespace VocabJourney.Controllers
             }
         }
 
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id)
+        {
+            try
+            {
+                BaiHoc bh = _repo.GetBaiHocById(id);
+                if (bh == null) return NotFound(new { success = false, message = "Không tìm thấy bài học" });
+                return Ok(new { success = true, data = bh });
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
+
         [HttpGet]
         public IActionResult GetAll()
         {
