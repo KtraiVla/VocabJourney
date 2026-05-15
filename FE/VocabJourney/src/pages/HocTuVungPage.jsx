@@ -8,6 +8,7 @@ import LearningProgress from "../components/TuVung/LearningProgress.jsx";
 import vocabService from "../services/vocabService.js";
 import progressService from "../services/progressService.js";
 import baihocService from "../services/baihocService.js";
+import LevelUpModal from "../components/common/LevelUpModal.jsx";
 import "./HocTuVungPage.css";
 
 export default function HocTuVungPage() {
@@ -25,6 +26,10 @@ export default function HocTuVungPage() {
   const [originalList, setOriginalList] = useState([]);
   const [learningList, setLearningList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // State cho Level Up
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [newLevel, setNewLevel] = useState(1);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -81,7 +86,11 @@ export default function HocTuVungPage() {
     
     try {
       if (maNguoiDung) {
-        await progressService.saveVocabProgress(maNguoiDung, currentWord.maTuVung, status === "remembered");
+        const response = await progressService.saveVocabProgress(maNguoiDung, currentWord.maTuVung, status === "remembered");
+        if (response.data && response.data.leveledUp) {
+          setNewLevel(response.data.newLevel);
+          setShowLevelUp(true);
+        }
       }
     } catch (error) {
       console.error("Lỗi khi lưu tiến độ từ vựng:", error);
@@ -100,7 +109,11 @@ export default function HocTuVungPage() {
       try {
         if (maNguoiDung) {
           // Ép kiểu sang số nguyên trước khi gửi lên Backend
-          await progressService.saveLessonProgress(parseInt(maNguoiDung), parseInt(lessonId));
+          const response = await progressService.saveLessonProgress(parseInt(maNguoiDung), parseInt(lessonId));
+          if (response.data && response.data.leveledUp) {
+            setNewLevel(response.data.newLevel);
+            setShowLevelUp(true);
+          }
         }
       } catch (error) {
         console.error("Lỗi khi lưu tiến độ bài học:", error);
@@ -338,6 +351,13 @@ export default function HocTuVungPage() {
 
         <LearningControls onNext={handleNextWord} />
       </main>
+
+      {showLevelUp && (
+        <LevelUpModal 
+          level={newLevel} 
+          onClose={() => setShowLevelUp(false)} 
+        />
+      )}
     </div>
   );
 }

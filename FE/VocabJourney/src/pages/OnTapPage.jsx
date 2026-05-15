@@ -6,6 +6,7 @@ import FlashCard from "../components/TuVung/FlashCard.jsx";
 import LearningControls from "../components/TuVung/LearningControls.jsx";
 import LearningProgress from "../components/TuVung/LearningProgress.jsx";
 import progressService from "../services/progressService.js";
+import LevelUpModal from "../components/common/LevelUpModal.jsx";
 import "./HocTuVungPage.css"; // Dùng chung style với trang học
 
 export default function OnTapPage() {
@@ -16,6 +17,10 @@ export default function OnTapPage() {
   const [score, setScore] = useState({ correct: 0, incorrect: 0 });
   const [vocabularyList, setVocabularyList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // State Level Up
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [newLevel, setNewLevel] = useState(1);
 
   useEffect(() => {
     const fetchOnTapVocab = async () => {
@@ -44,7 +49,11 @@ export default function OnTapPage() {
     try {
       if (maNguoiDung) {
         // Gọi API lưu tiến độ ôn tập (thuật toán SRS sẽ xử lý ở Backend)
-        await progressService.saveVocabProgress(maNguoiDung, currentWord.maTuVung, status === "remembered");
+        const response = await progressService.saveVocabProgress(maNguoiDung, currentWord.maTuVung, status === "remembered");
+        if (response.data && response.data.leveledUp) {
+          setNewLevel(response.data.newLevel);
+          setShowLevelUp(true);
+        }
       }
     } catch (error) {
       console.error("Lỗi khi lưu tiến độ ôn tập:", error);
@@ -198,6 +207,13 @@ export default function OnTapPage() {
 
         <LearningControls onNext={handleNextWord} />
       </main>
+
+      {showLevelUp && (
+        <LevelUpModal 
+          level={newLevel} 
+          onClose={() => setShowLevelUp(false)} 
+        />
+      )}
     </div>
   );
 }

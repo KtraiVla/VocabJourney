@@ -6,6 +6,7 @@ import QuizCard from "../components/Quiz/QuizCard.jsx";
 import QuizResult from "../components/Quiz/QuizResult.jsx";
 import progressService from "../services/progressService";
 import quizService from "../services/quizService";
+import LevelUpModal from "../components/common/LevelUpModal.jsx";
 import "./QuizPage.css";
 
 export default function QuizPage() {
@@ -22,6 +23,10 @@ export default function QuizPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [quizId, setQuizId] = useState(null);
+  
+  // State Level Up
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [newLevel, setNewLevel] = useState(1);
 
   useEffect(() => {
     const fetchQuizData = async () => {
@@ -111,7 +116,11 @@ export default function QuizPage() {
       try {
         const maNguoiDung = localStorage.getItem("maNguoiDung");
         if (maNguoiDung && quizId) {
-          await progressService.saveQuizResult(maNguoiDung, score, totalQuestions, quizId);
+          const response = await progressService.saveQuizResult(maNguoiDung, score, totalQuestions, quizId);
+          if (response.data && response.data.leveledUp) {
+            setNewLevel(response.data.newLevel);
+            setShowLevelUp(true);
+          }
         }
         setIsFinished(true);
       } catch (error) {
@@ -178,6 +187,12 @@ export default function QuizPage() {
           </div>
         </main>
       </div>
+      {showLevelUp && (
+        <LevelUpModal 
+          level={newLevel} 
+          onClose={() => setShowLevelUp(false)} 
+        />
+      )}
     </div>
   );
 }

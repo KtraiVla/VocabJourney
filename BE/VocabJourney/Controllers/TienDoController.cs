@@ -20,10 +20,15 @@ namespace VocabJourney.Controllers
         [HttpPost("luu-tu-vung")]
         public IActionResult LuuTienDoTuVung([FromBody] TienDoTuVungRequest request)
         {
-            bool success = _repo.LuuTienDoTuVung(request.MaNguoiDung, request.MaTuVung, request.DaHoc);
-            if (success)
+            var result = _repo.LuuTienDoTuVung(request.MaNguoiDung, request.MaTuVung, request.DaHoc);
+            if (result.Success)
             {
-                return Ok(new { success = true, message = "Lưu tiến độ thành công" });
+                return Ok(new { 
+                    success = true, 
+                    message = "Lưu tiến độ thành công",
+                    leveledUp = result.LeveledUp,
+                    newLevel = result.NewLevel
+                });
             }
             return BadRequest(new { success = false, message = "Lưu tiến độ thất bại" });
         }
@@ -31,16 +36,26 @@ namespace VocabJourney.Controllers
         [HttpPost("hoan-thanh-bai-hoc")]
         public IActionResult LuuTienDoBaiHoc([FromBody] TienDoBaiHocRequest request)
         {
-            bool success = _repo.LuuTienDoBaiHoc(request.MaNguoiDung, request.MaBaiHoc);
-            if (success) return Ok(new { success = true, message = "Hoàn thành bài học" });
+            var result = _repo.LuuTienDoBaiHoc(request.MaNguoiDung, request.MaBaiHoc);
+            if (result.Success) return Ok(new { 
+                success = true, 
+                message = "Hoàn thành bài học",
+                leveledUp = result.LeveledUp,
+                newLevel = result.NewLevel
+            });
             return BadRequest(new { success = false, message = "Lưu thất bại" });
         }
 
         [HttpPost("luu-ket-qua-quiz")]
         public IActionResult LuuKetQuaQuiz([FromBody] KetQuaQuizRequest request)
         {
-            bool success = _repo.LuuKetQuaKiemTra(request.MaNguoiDung, request.MaBaiKiemTra, request.SoCauDung, request.TongCauHoi);
-            if (success) return Ok(new { success = true, message = "Lưu kết quả Quiz thành công" });
+            var result = _repo.LuuKetQuaKiemTra(request.MaNguoiDung, request.MaBaiKiemTra, request.SoCauDung, request.TongCauHoi);
+            if (result.Success) return Ok(new { 
+                success = true, 
+                message = "Lưu kết quả Quiz thành công",
+                leveledUp = result.LeveledUp,
+                newLevel = result.NewLevel
+            });
             return BadRequest(new { success = false, message = "Lưu kết quả Quiz thất bại" });
         }
 

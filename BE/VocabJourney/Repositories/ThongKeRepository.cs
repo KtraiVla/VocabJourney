@@ -84,8 +84,9 @@ namespace VocabJourney.Repositories
             return null;
         }
 
-        public void CongXP(int maNguoiDung, string actionType, int xpGoc = 0)
+        public LevelUpResult CongXP(int maNguoiDung, string actionType, int xpGoc = 0)
         {
+            var result = new LevelUpResult { LeveledUp = false, NewLevel = 1 };
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
@@ -206,6 +207,7 @@ namespace VocabJourney.Repositories
                 }
 
                 int newXP = currentXP + totalAdd;
+                int startLevel = currentLevel;
                 int newLevel = currentLevel;
                 int newXPHomNay = xpHomNay + totalAdd;
 
@@ -242,7 +244,16 @@ namespace VocabJourney.Repositories
                     cmd.Parameters.AddWithValue("@MaNguoiDung", maNguoiDung);
                     cmd.ExecuteNonQuery();
                 }
+
+                result.LeveledUp = newLevel > startLevel;
+                result.NewLevel = newLevel;
             }
+            return result;
+        }
+
+        public class LevelUpResult {
+            public bool LeveledUp { get; set; }
+            public int NewLevel { get; set; }
         }
 
         private void CapNhatChiSoHienTai(int maNguoiDung, int xpHomNay, int soTuOn, int soTuHoc, int soQuiz, int status, SqlConnection conn, bool exists)

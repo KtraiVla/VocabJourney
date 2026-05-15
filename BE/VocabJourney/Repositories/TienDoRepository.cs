@@ -14,8 +14,9 @@ namespace VocabJourney.Repositories
             _connectionString = connectionString;
         }
 
-        public bool LuuTienDoTuVung(int maNguoiDung, int maTuVung, bool daHoc)
+        public SaveProgressResult LuuTienDoTuVung(int maNguoiDung, int maTuVung, bool daHoc)
         {
+            var saveResult = new SaveProgressResult { Success = false };
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 // Lấy số lần ôn đúng cũ để phân biệt là Học mới hay Ôn tập
@@ -71,7 +72,7 @@ namespace VocabJourney.Repositories
                         oldSoLanOnDung = res != null ? Convert.ToInt32(res) : 0;
                     }
 
-                    int rowsAffected = cmd.ExecuteNonQuery();
+                    saveResult.Success = rowsAffected > 0;
                     
                     if (rowsAffected > 0)
                     {
@@ -81,7 +82,9 @@ namespace VocabJourney.Repositories
                         {
                             // Phân biệt: Nếu là lần đầu tiên bấm "Đã thuộc" (old=0) thì là LEARN, ngược lại là REVIEW
                             string actionType = (oldSoLanOnDung == 0) ? "LEARN" : "REVIEW";
-                            thongKeRepo.CongXP(maNguoiDung, actionType);
+                            var xpResult = thongKeRepo.CongXP(maNguoiDung, actionType);
+                            saveResult.LeveledUp = xpResult.LeveledUp;
+                            saveResult.NewLevel = xpResult.NewLevel;
                         }
                         
                         if (daHoc || oldSoLanOnDung > 0)
@@ -93,13 +96,14 @@ namespace VocabJourney.Repositories
                         }
                     }
                     
-                    return rowsAffected > 0;
+                    return saveResult;
                 }
             }
         }
 
-        public bool LuuTienDoBaiHoc(int maNguoiDung, int maBaiHoc)
+        public SaveProgressResult LuuTienDoBaiHoc(int maNguoiDung, int maBaiHoc)
         {
+            var saveResult = new SaveProgressResult { Success = false };
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 string query = @"
@@ -122,14 +126,17 @@ namespace VocabJourney.Repositories
 
                     conn.Open();
                     int rowsAffected = cmd.ExecuteNonQuery();
+                    saveResult.Success = rowsAffected > 0;
 
                     if (rowsAffected > 0)
                     {
                         var thongKeRepo = new ThongKeRepository(_connectionString);
-                        thongKeRepo.CongXP(maNguoiDung, "LESSON");
+                        var xpResult = thongKeRepo.CongXP(maNguoiDung, "LESSON");
+                        saveResult.LeveledUp = xpResult.LeveledUp;
+                        saveResult.NewLevel = xpResult.NewLevel;
                     }
 
-                    return rowsAffected > 0;
+                    return saveResult;
                 }
             }
         }
@@ -186,8 +193,9 @@ namespace VocabJourney.Repositories
             return null;
         }
 
-        public bool LuuKetQuaKiemTra(int maNguoiDung, int maBaiKiemTra, int soCauDung, int tongCauHoi)
+        public SaveProgressResult LuuKetQuaKiemTra(int maNguoiDung, int maBaiKiemTra, int soCauDung, int tongCauHoi)
         {
+            var saveResult = new SaveProgressResult { Success = false };
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 string query = @"
@@ -204,6 +212,7 @@ namespace VocabJourney.Repositories
 
                     conn.Open();
                     int rowsAffected = cmd.ExecuteNonQuery();
+                    saveResult.Success = rowsAffected > 0;
 
                     if (rowsAffected > 0)
                     {
@@ -216,12 +225,20 @@ namespace VocabJourney.Repositories
                         }
 
                         var thongKeRepo = new ThongKeRepository(_connectionString);
-                        thongKeRepo.CongXP(maNguoiDung, "QUIZ", xpGoc);
+                        var xpResult = thongKeRepo.CongXP(maNguoiDung, "QUIZ", xpGoc);
+                        saveResult.LeveledUp = xpResult.LeveledUp;
+                        saveResult.NewLevel = xpResult.NewLevel;
                     }
 
-                    return rowsAffected > 0;
+                    return saveResult;
                 }
             }
+        }
+
+        public class SaveProgressResult {
+            public bool Success { get; set; }
+            public bool LeveledUp { get; set; }
+            public int NewLevel { get; set; }
         }
 
         public int GetSoTuCanOnTap(int maNguoiDung)
