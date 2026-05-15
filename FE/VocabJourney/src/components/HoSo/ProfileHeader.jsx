@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Mail, Calendar, Zap, Edit2, LogOut } from "lucide-react";
+import { Mail, Calendar, Zap, Edit2, LogOut, X, Check } from "lucide-react";
 import "./ProfileHeader.css";
 import authService from "../../services/authService";
 import statsService from "../../services/statsService";
-import { X, Check } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function ProfileHeader() {
   const [userInfo, setUserInfo] = useState(null);
@@ -12,10 +12,11 @@ export default function ProfileHeader() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editForm, setEditForm] = useState({ username: "", email: "" });
   const [isSaving, setIsSaving] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.clear();
-    window.location.href = "/dangnhap";
+    navigate("/dangnhap");
   };
 
   useEffect(() => {

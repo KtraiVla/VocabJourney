@@ -3,6 +3,7 @@ import "./TopicSection.css";
 import TopicCard from "./TopicCard.jsx";
 import imgDefault from "../../assets/images/dulich.jpg";
 import topicService from "../../services/topicService";
+import { Link } from "react-router-dom";
 
 export default function TopicsSection() {
   const [topics, setTopics] = useState([]);
@@ -34,9 +35,9 @@ export default function TopicsSection() {
     <section className="topics-section">
       <div className="topics-header">
         <h2>Khám Phá Chủ Đề</h2>
-        <a href="/chude" className="view-all-link">
+        <Link to="/chude" className="view-all-link">
           Xem Tất Cả →
-        </a>
+        </Link>
       </div>
 
       <div className="topics-section-grid">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./ThanhTich.css";
 import { Trophy } from "lucide-react";
 import badgeService from "../../services/badgeService";
+import { Link } from "react-router-dom";
 
 export default function ThanhTich() {
   const [badges, setBadges] = useState([]);
@@ -32,9 +33,9 @@ export default function ThanhTich() {
           </div>
           <h3>Thành Tích</h3>
         </div>
-        <a href="/phanthuong" className="db-view-all">
+        <Link to="/phanthuong" className="db-view-all">
           Xem Tất Cả
-        </a>
+        </Link>
       </div>
       
       <div className="achievements-grid">
