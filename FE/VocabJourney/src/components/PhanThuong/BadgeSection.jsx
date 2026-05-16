@@ -5,6 +5,7 @@ import "./BadgeSection.css";
 import badgeService from "../../services/badgeService";
 
 export default function BadgeSection() {
+
   const [badges, setBadges] = useState([]);
   const [loading, setLoading] = useState(true);
 

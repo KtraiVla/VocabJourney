@@ -1,8 +1,10 @@
 import "./HeroBanner.css";
 import { Zap, ArrowRight } from "lucide-react";
 import herobg from "../../assets/images/herobg.jpg";
+import { useNavigate } from "react-router-dom";
 
 export default function HeroBanner() {
+  const navigate = useNavigate();
   return (
     <div className="dashboard-hero">
       <div className="container">
@@ -26,11 +28,11 @@ export default function HeroBanner() {
             </p>
 
             <div className="db-hero-btns">
-              <button className="db-btn-primary">
+              <button className="db-btn-primary" onClick={() => navigate("/chude")}>
                 <Zap size={18} fill="currentColor" />
                 <span>Bắt Đầu Học</span>
               </button>
-              <button className="db-btn-secondary">
+              <button className="db-btn-secondary" onClick={() => navigate("/chude")}>
                 <span>Tiếp Tục Học</span>
                 <ArrowRight size={18} />
               </button>

@@ -123,7 +123,7 @@ export default function QuizPage() {
               setNewLevel(response.newLevel);
               setShowLevelUp(true);
             }
-            setEarnedXP(response.xpEarned || 0);
+            setEarnedXP(response.xpEarned || response.XPEarned || response.xPEarned || 0);
           }
         }
         setIsFinished(true);

@@ -32,10 +32,12 @@ export default function StudyDistributionCard() {
           const response = await statsService.getStudyDistribution(maNguoiDung);
           if (response && response.data && response.data.success) {
             const colors = ["#06b6d4", "#a855f7", "#22c55e", "#f97316", "#ec4899", "#3b82f6", "#ef4444"];
+
             const formattedData = response.data.data.map((item, index) => ({
               ...item,
               color: colors[index % colors.length]
             }));
+
             setDistributionData(formattedData);
           }
         }

@@ -182,14 +182,7 @@ namespace VocabJourney.Repositories
                         break;
 
                     case "QUIZ": // Làm Quiz (xpGoc = câu đúng * 4 + 20 hoàn thành + 20 perfect)
-                        if (soQuiz == 0) // Chỉ nhận XP cho bài Quiz đầu tiên trong ngày
-                        {
-                            xpToAdd = xpGoc; // Không nhân streak theo yêu cầu
-                        }
-                        else
-                        {
-                            xpToAdd = 0; // Các bài Quiz sau chỉ để luyện tập, không có XP
-                        }
+                        xpToAdd = xpGoc; // Không nhân streak theo yêu cầu
                         soQuiz++;
                         // Challenge: Làm 1 quiz -> +30 XP
                         if (soQuiz >= 1 && (challengeStatus & 4) == 0) { bonusXP += 30; challengeStatus |= 4; }
